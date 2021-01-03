@@ -618,6 +618,210 @@ istream& operator>>(istream& in, Client& c)
 
 	return in;
 }
+class Rezervare
+{
+private:
+	const int idRezervare;
+	static int nrRezervari;
+	char* dataRezervare;
+	int* nrBileteRezervate;
+	int dimensiune;
+	bool achitat;
+	//Client idClient;
+	//Bilet idBilet;
+
+public:
+	Rezervare() :idRezervare(++nrRezervari)
+	{
+		dataRezervare = nullptr;
+		nrBileteRezervate = nullptr;
+		dimensiune = 0;
+		achitat = false;
+		//idClient=0;
+		//idBilet=0;
+	}
+
+	Rezervare(char* dataRezervare, int* nrBileteRezervate, int dimensiune, bool achitat) :idRezervare(++nrRezervari)
+	{
+		if (dataRezervare != nullptr)
+		{
+			this->dataRezervare = new char[strlen(dataRezervare) + 1];
+			strcpy_s(this->dataRezervare, strlen(dataRezervare) + 1, dataRezervare);
+		}
+		else
+		{
+			this->dataRezervare = nullptr;
+		}
+
+		if (nrBileteRezervate != nullptr)
+		{
+			this->dimensiune = dimensiune;
+			this->nrBileteRezervate = new int[dimensiune];
+			for (int i = 0; i < dimensiune; i++)
+			{
+				this->nrBileteRezervate[i] = nrBileteRezervate[i];
+			}
+		}
+		else
+		{
+			this->nrBileteRezervate = nullptr;
+			this->dimensiune = 0;
+		}
+		this->achitat = achitat;
+		//this->idClient=idClient;
+		//this->idBilet=idBilet;
+	}
+
+	Rezervare(const Rezervare& r) :idRezervare(r.idRezervare)
+	{
+		if (r.dataRezervare != nullptr)
+		{
+			dataRezervare = new char[strlen(r.dataRezervare) + 1];
+			strcpy_s(dataRezervare, strlen(r.dataRezervare) + 1, r.dataRezervare);
+		}
+		else
+		{
+			dataRezervare = nullptr;
+		}
+
+		if (r.nrBileteRezervate != nullptr)
+		{
+			dimensiune = r.dimensiune;
+			nrBileteRezervate = new int[r.dimensiune];
+			for (int i = 0; i < r.dimensiune; i++)
+			{
+				nrBileteRezervate[i] = r.nrBileteRezervate[i];
+			}
+		}
+		else
+		{
+			nrBileteRezervate = nullptr;
+			dimensiune = 0;
+		}
+		achitat = r.achitat;
+		//idClient=r.idClient;
+		//idBilet=r.idBilet;
+	}
+
+	~Rezervare()
+	{
+		delete[]dataRezervare;
+		delete[]nrBileteRezervate;
+	}
+
+	Rezervare& operator=(const Rezervare& r)
+	{
+		delete[]dataRezervare;
+		delete[]nrBileteRezervate;
+		if (r.dataRezervare != nullptr)
+		{
+			dataRezervare = new char[strlen(r.dataRezervare) + 1];
+			strcpy_s(dataRezervare, strlen(r.dataRezervare) + 1, r.dataRezervare);
+		}
+		else
+		{
+			dataRezervare = nullptr;
+		}
+
+		if (r.nrBileteRezervate != nullptr)
+		{
+			dimensiune = r.dimensiune;
+			nrBileteRezervate = new int[r.dimensiune];
+			for (int i = 0; i < r.dimensiune; i++)
+			{
+				nrBileteRezervate[i] = r.nrBileteRezervate[i];
+			}
+		}
+		else
+		{
+			nrBileteRezervate = nullptr;
+			dimensiune = 0;
+		}
+		achitat = r.achitat;
+		//idClient=r.idClient;
+		//idBilet=r.idBilet;
+
+		return *this;
+	}
+
+	int& operator[](int index) throw (exception)
+	{
+		if (index >= 0 && index < dimensiune / sizeof(int) && nrBileteRezervate != nullptr)
+		{
+			return nrBileteRezervate[index];
+		}
+		else
+		{
+			throw exception("Nu exista rezervare cu numarul de bilete introdus");
+		}
+	}
+
+	explicit operator string()
+	{
+		return dataRezervare;
+	}
+
+	bool operator!()
+	{
+		return achitat != false;
+	}
+
+	friend ostream& operator<<(ostream&, Rezervare);
+	friend istream& operator>>(istream&, Rezervare&);
+};
+
+int Rezervare::nrRezervari = 0;
+
+ostream& operator<<(ostream& out, Rezervare r)
+{
+	out << "Detalii legate de rezervare: " << endl;
+	if (r.dataRezervare != nullptr)
+	{
+		out << "Data rezervarii: " << r.dataRezervare << endl;
+	}
+	out << "Numarul de bilete rezervate: " << r.dimensiune << endl;
+	if (r.nrBileteRezervate != nullptr)
+	{
+		for (int i = 0; i < r.dimensiune; i++)
+		{
+			out << "Id-ul biletului " << i << ":" << r.nrBileteRezervate[i] << endl;
+		}
+	}
+
+	if (r.achitat != 1)
+		out << "Neachitat";
+	else
+		out << "Achitat";
+	out << endl;
+
+	return out;
+}
+
+istream& operator>>(istream& in, Rezervare& r)
+{
+	delete[]r.dataRezervare;
+	string buffer;
+	cout << "Data rezervarii: ";
+	in >> ws;
+	getline(in, buffer);
+	r.dataRezervare = new char[buffer.length() + 1];
+	strcpy_s(r.dataRezervare, buffer.length() + 1, buffer.c_str());
+
+	delete[]r.nrBileteRezervate;
+	cout << "Cate bilete doriti sa rezervati?" << endl;
+	in >> r.dimensiune;
+	r.nrBileteRezervate = new int[r.dimensiune];
+	for (int i = 0; i < r.dimensiune; i++)
+	{
+		cout << "Id-ul biletului " << i << " :";
+		in >> r.nrBileteRezervate[i];
+	}
+
+	cout << "Introduceti 0 daca nu ati achitat sau 1 daca ati achitat ";
+	in >> r.achitat;
+
+	return in;
+}
 
 int main()
 {
@@ -677,4 +881,3 @@ int main()
 
 	cout << filme[2]++;*/
 }
-
