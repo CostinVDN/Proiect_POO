@@ -116,7 +116,7 @@ public:
 			{
 
 				this->nume = new char[strlen(f.nume) + 1];
-				strcpy_s(this->nume, strlen(f.nume) + 1, nume);
+				strcpy_s(this->nume, strlen(f.nume) + 1, f.nume);
 			}
 			else
 			{
@@ -151,11 +151,46 @@ public:
 
 	}
 
+	//afiseaza informatii despre un anumit film
+	void& operator[]
+	{
+
+		cout << "Test";
+
+	}
+
 	~Film()
 	{
 
 		delete[] nume;
 		delete[] frecventa;
+
+	}
+
+	void setnume(char* nume)
+	{
+
+		delete[] nume;
+		if (strlen(nume) != 0)
+		{
+
+			this->nume= new char[strlen(nume) + 1];
+			strcpy_s(this->nume, strlen(nume) + 1, nume);
+		}
+
+	}
+
+	void setfrecventa(char* frecventa)
+	{
+
+		delete[] frecventa;
+		this->frecventa = new int[7];
+
+		for(int indx=0; indx<7;indx++)
+		{
+			this->frecventa[indx] = frecventa[indx];
+			
+		}
 
 	}
 
@@ -255,8 +290,20 @@ istream& operator>> (istream& in, Film& f)
 int main()
 {
    
-	Film film_nou;
+	/*Film film_nou;
 	cin >> film_nou;
-	cout << film_nou;
+	cout << film_nou;*/
 
+	int zile[0, 1, 1, 0, 0, 1, 0];
+	Film film_nou_1("Film 1", v, "Comedie", 90);
+
+	int zile[0, 1, 0, 0, 0, 1, 1];
+	Film film_nou_2("Film 2", v, "Comedie", 85);
+
+	int zile[0, 0, 1, 0, 1, 1, 1];
+	Film film_nou_3("Film 3", v, "Actiune", 120);
+
+	Film filme{film_nou_1, film_nou_2, film_nou_3 };
+
+	cout << fime[2];
 }
