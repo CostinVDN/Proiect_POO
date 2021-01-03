@@ -9,6 +9,7 @@ Film:
 •	nrFilme: static int
 •	gen: string (actiune, comedie, drama)
 •	durata: int
+* top_20: int
 •	bilet: Bilet
 Bilet:
 •	codBilet: constant int
@@ -16,27 +17,29 @@ Bilet:
 •	codFilm: int*
 •	nrBileteEmise: static int 
 •	pret: float
-•	metodaPlata (card/numerar) – string
-•	rand: int
-•	loc: int
+•	rand: int 
+* loc: int
 Sala: 
 •	nrSala: constant int
 •	nrLocuriSala: int*
-•	nrSali: static int
+•	nrTotalSali: static int
 •	numeSala: char*
+* nrRanduri: int
+* nrLocuriPeRand: int
 •	tipSala – string (2d/3d, 4d) 
 Rezervare:
 •	idRezervare: constant
 •	nrRezervari: static int
 •	dataRezervarii: char*
-•	listaRezervari: int* (index=idClient valoare=idFilm)
+•	BileteRezervate: int* (index=idClient valoare=idFilm)
 •	achitat: bool
-•	idFilm: int 
+•	idCLient: int
+* idBilet: int
+* nrBilete: int
 Client:
 •	idClient: constant int
 •	nrClienti: static int
 •	nume: char* 
-•	nrBileteRezervate: int*(index=idClient, valoarea=nrBilete)
-•	codRezervare: int
-•	tipClient: regular/VIP
-•	abonat: bool
+* DateCard: int* (9 caractere)
+* nrCarduri:int
+* e-mail: string
