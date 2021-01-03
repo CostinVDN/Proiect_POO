@@ -13,6 +13,8 @@ private:
 	static int nrFilme;
 	string gen;
 	int durata;
+	int pozitie_top;
+
 	//Bilet Bilete;
 
 public:
@@ -20,15 +22,13 @@ public:
 	{
 
 		nume = nullptr;
-
 		frecventa = nullptr;
-
 		gen = "";
-
 		durata = 0;
+		pozitie_top = 0;
 	}
-	
-	Film(char* nume, int* frecventa, string gen, int durata):idFilm(++nrFilme)
+
+	Film(char* nume, int* frecventa, string gen, int durata, int pozitie_top=20) :idFilm(++nrFilme)
 	{
 		if (strlen(nume) != 0)
 		{
@@ -41,13 +41,13 @@ public:
 
 			this->nume = nullptr;
 		}
-		
+
 		if (frecventa != nullptr)
 		{
 
 			this->frecventa = new int[7];
 
-			for (int indx{ 0 }; indx <7; indx++)
+			for (int indx{ 0 }; indx < 7; indx++)
 			{
 
 				this->frecventa[indx] = frecventa[indx];
@@ -62,10 +62,15 @@ public:
 
 		this->gen = gen;
 		this->durata = durata;
-	
+		if (pozitie_top > 0)
+		{
+
+			this->pozitie_top = pozitie_top;
+		}
+
 	}
 
-	Film(const Film& f):idFilm(f.idFilm)
+	Film(const Film& f) :idFilm(f.idFilm)
 	{
 
 		if (strlen(f.nume) != 0)
@@ -100,6 +105,7 @@ public:
 
 		this->gen = f.gen;
 		this->durata = f.durata;
+		this->pozitie_top = f.pozitie_top;
 
 	}
 
@@ -129,7 +135,7 @@ public:
 
 				this->frecventa = new int[7];
 
-				for (int indx =0 ; indx < 7; indx++)
+				for (int indx = 0; indx < 7; indx++)
 				{
 
 					this->frecventa[indx] = f.frecventa[indx];
@@ -144,6 +150,7 @@ public:
 
 			this->gen = f.gen;
 			this->durata = f.durata;
+			this->pozitie_top = f.pozitie_top;
 
 		}
 
@@ -151,13 +158,22 @@ public:
 
 	}
 
-	//afiseaza informatii despre un anumit film
-	void& operator[]
+	//Verifica daca un film ruleaza intr-o anumita  zi
+	bool operator[](int zi)
 	{
+		bool ruleaza = false;
 
-		cout << "Test";
+		for (int indx = 0; indx < 7; indx++)
+		{
+
+			if (this->frecventa[zi] == 1)
+				ruleaza = true;
+		}
+
+		return ruleaza;
 
 	}
+
 
 	~Film()
 	{
@@ -174,9 +190,16 @@ public:
 		if (strlen(nume) != 0)
 		{
 
-			this->nume= new char[strlen(nume) + 1];
+			this->nume = new char[strlen(nume) + 1];
 			strcpy_s(this->nume, strlen(nume) + 1, nume);
 		}
+
+	}
+
+	char* getnume()
+	{
+
+		return this->nume;
 
 	}
 
@@ -186,11 +209,135 @@ public:
 		delete[] frecventa;
 		this->frecventa = new int[7];
 
-		for(int indx=0; indx<7;indx++)
+		for (int indx = 0; indx < 7; indx++)
 		{
 			this->frecventa[indx] = frecventa[indx];
-			
+
 		}
+
+	}
+
+	//operatorul ++ creste frecventa rularii filmului cu 1 zi
+	Film operator++()
+	{
+
+		bool alocare_zi = false;
+		int indx = 6;
+
+		do
+		{
+
+			if (this->frecventa[indx] == 0)
+			{
+
+				this->frecventa[indx] = 1;
+				alocare_zi = true;
+			}
+
+			indx--;
+
+		} while ((indx < 0) || (!alocare_zi));
+
+
+		return *this;
+	}
+
+	Film operator++(int i)
+	{
+		Film copie = *this;
+		bool alocare_zi = false;
+		int indx = 6;
+
+		do
+		{
+
+			if (copie.frecventa[indx] == 0)
+			{
+
+				copie.frecventa[indx] = 1;
+				alocare_zi = true;
+			}
+
+			indx--;
+
+		} while ((indx < 0) || (!alocare_zi));
+
+		return copie;
+	}
+
+	Film operator+(int poz)
+	{
+
+		this->pozitie_top -= poz;
+
+		return *this;
+
+	}
+
+	//Returneaza Numele filmului
+	explicit operator string()
+	{
+
+		return this->nume;
+
+	}
+
+	//Returneaza durata filmului 
+	operator int()
+	{
+
+		return durata;
+
+	}
+
+	//Returneaza daca filmul este in top 10
+	bool operator!()
+	{
+
+		if (this->pozitie_top > 10)
+			return true;
+		else
+			return false;
+
+	}
+
+	//Care din filmele comparate ruleaza mai multe zile intr-o saptamana
+	Film operator>=(const Film& f)
+	{
+
+		int nr_zile_film1=0, nr_zile_film2=0;
+
+		for (int indx = 0; indx < 7; indx++)
+		{
+
+			if (this->frecventa[indx] == 1)
+				nr_zile_film1++;
+
+			if (f.frecventa[indx] == 1)
+				nr_zile_film2++;
+
+		}
+
+		if (nr_zile_film1 >= nr_zile_film2)
+			return *this;
+
+		if (nr_zile_film1 < nr_zile_film2)
+			return f;
+		
+	}
+
+	//Verifica daca doua filme ruleaza in aceleasi zile
+	bool operator==(Film &f)
+	{
+
+		for (int indx = 0; indx < 7; indx++)
+		{
+
+			if (this->frecventa[indx] != f.frecventa[indx])
+				return false;
+		}
+
+		return true;
 
 	}
 
@@ -203,11 +350,11 @@ int Film::nrFilme = 0;
 ostream& operator<< (ostream& out, Film f)
 {
 
-	string zile_sapt[] = {"Luni", "Marti", "Miercuri", "Joi", "Vineri", "Sambata", "Duminica" };
+	string zile_sapt[] = { "Luni", "Marti", "Miercuri", "Joi", "Vineri", "Sambata", "Duminica" };
 
 	out << "Detalii Film :" << endl;
-	out << "============================="<< endl;
-	
+	out << "=============================" << endl;
+
 	if (f.nume != nullptr)
 	{
 		out << "Nume: " << f.nume << endl;
@@ -232,6 +379,7 @@ ostream& operator<< (ostream& out, Film f)
 
 	out << "Genul: " << f.gen << endl;
 	out << "Durata: " << f.durata << " min. " << endl;
+	out << "Pozitie top 10: " << f.pozitie_top << endl;
 
 	return out;
 }
@@ -270,7 +418,7 @@ istream& operator>> (istream& in, Film& f)
 	{
 		cout << "Ziua " << indx << ": ";
 		in >> zi_rulare;
-		f.frecventa[zi_rulare -1 ] = 1;
+		f.frecventa[zi_rulare - 1] = 1;
 
 	}
 
@@ -289,21 +437,59 @@ istream& operator>> (istream& in, Film& f)
 
 int main()
 {
-   
+
+	string zile_sapt[] = { "Luni", "Marti", "Miercuri", "Joi", "Vineri", "Sambata", "Duminica" };
+
 	/*Film film_nou;
 	cin >> film_nou;
 	cout << film_nou;*/
 
-	int zile[0, 1, 1, 0, 0, 1, 0];
-	Film film_nou_1("Film 1", v, "Comedie", 90);
+	int zile[] = {0, 1, 1, 0, 0, 1, 0 };
+	Film film_nou_1((char*) "Film 1", zile, "Comedie", 90,15);
 
-	int zile[0, 1, 0, 0, 0, 1, 1];
-	Film film_nou_2("Film 2", v, "Comedie", 85);
+	int zile1[] = {1, 1, 1, 0, 0, 1, 1 };
+	Film film_nou_2((char*)"Film 2", zile1, "Comedie", 85,11);
 
-	int zile[0, 0, 1, 0, 1, 1, 1];
-	Film film_nou_3("Film 3", v, "Actiune", 120);
+	int zile2[] = {1, 0, 1, 0, 0, 1, 1 };
+	Film film_nou_3((char*) "Film 3", zile2, "Actiune", 120,12);
 
-	Film filme{film_nou_1, film_nou_2, film_nou_3 };
+	Film filme[] = { film_nou_1, film_nou_2, film_nou_3 };
 
-	cout << fime[2];
+	cout << filme[1] << endl;
+	cout << filme[2] << endl <<endl;
+
+	if (filme[1] == filme[2])
+	{
+
+		cout << "Filmele ruleaza concomitent!";
+	}
+	else
+	{
+
+		cout << "Filmele nu ruleaza in aceleasi zile";
+
+	}
+
+	//cout << filme[2] + 1 << endl;
+	//cout << filme[2] + 3 << endl;
+	//cout << string(filme[2]) <<endl;
+	//cout << int(filme[2]) << endl;
+
+	//cout << "Filmul care ruleaza de mai multe ori  este: " << string(filme[2] >= filme[1]) << endl;
+
+	//if (!filme[2])
+	//{
+
+	//	cout << "Filmul nu este in top 10 !";
+
+	//}
+	//else
+	//{
+
+	//	cout << "Filmul este in top 10!";
+	//}
+
+	/*cout << ++filme[2];
+
+	cout << filme[2]++;*/
 }
