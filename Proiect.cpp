@@ -654,7 +654,7 @@ private:
 	static int nrRezervari;
 	char* dataRezervare;
 	int* nrBileteRezervate;
-	int dimensiune;
+	int nrBilete;
 	bool achitat;
 	//Client idClient;
 	//Bilet idBilet;
@@ -664,13 +664,13 @@ public:
 	{
 		dataRezervare = nullptr;
 		nrBileteRezervate = nullptr;
-		dimensiune = 0;
+		nrBilete = 0;
 		achitat = false;
 		//idClient=0;
 		//idBilet=0;
 	}
 
-	Rezervare(char* dataRezervare, int* nrBileteRezervate, int dimensiune, bool achitat) :idRezervare(++nrRezervari)
+	Rezervare(char* dataRezervare, int* nrBileteRezervate, int nrBilete, bool achitat) :idRezervare(++nrRezervari)
 	{
 		if (dataRezervare != nullptr)
 		{
@@ -684,9 +684,9 @@ public:
 
 		if (nrBileteRezervate != nullptr)
 		{
-			this->dimensiune = dimensiune;
-			this->nrBileteRezervate = new int[dimensiune];
-			for (int i = 0; i < dimensiune; i++)
+			this->nrBilete = nrBilete;
+			this->nrBileteRezervate = new int[nrBilete];
+			for (int i = 0; i < nrBilete; i++)
 			{
 				this->nrBileteRezervate[i] = nrBileteRezervate[i];
 			}
@@ -694,7 +694,7 @@ public:
 		else
 		{
 			this->nrBileteRezervate = nullptr;
-			this->dimensiune = 0;
+			this->nrBilete = 0;
 		}
 		this->achitat = achitat;
 		//this->idClient=idClient;
@@ -715,9 +715,9 @@ public:
 
 		if (r.nrBileteRezervate != nullptr)
 		{
-			dimensiune = r.dimensiune;
-			nrBileteRezervate = new int[r.dimensiune];
-			for (int i = 0; i < r.dimensiune; i++)
+			nrBilete = r.nrBilete;
+			nrBileteRezervate = new int[r.nrBilete];
+			for (int i = 0; i < r.nrBilete; i++)
 			{
 				nrBileteRezervate[i] = r.nrBileteRezervate[i];
 			}
@@ -725,7 +725,7 @@ public:
 		else
 		{
 			nrBileteRezervate = nullptr;
-			dimensiune = 0;
+			nrBilete = 0;
 		}
 		achitat = r.achitat;
 		//idClient=r.idClient;
@@ -754,9 +754,9 @@ public:
 
 		if (r.nrBileteRezervate != nullptr)
 		{
-			dimensiune = r.dimensiune;
-			nrBileteRezervate = new int[r.dimensiune];
-			for (int i = 0; i < r.dimensiune; i++)
+			nrBilete = r.nrBilete;
+			nrBileteRezervate = new int[r.nrBilete];
+			for (int i = 0; i < r.nrBilete; i++)
 			{
 				nrBileteRezervate[i] = r.nrBileteRezervate[i];
 			}
@@ -764,7 +764,7 @@ public:
 		else
 		{
 			nrBileteRezervate = nullptr;
-			dimensiune = 0;
+			nrBilete = 0;
 		}
 		achitat = r.achitat;
 		//idClient=r.idClient;
@@ -775,7 +775,7 @@ public:
 
 	int& operator[](int index) throw (exception)
 	{
-		if (index >= 0 && index < dimensiune / sizeof(int) && nrBileteRezervate != nullptr)
+		if (index >= 0 && index < nrBilete / sizeof(int) && nrBileteRezervate != nullptr)
 		{
 			return nrBileteRezervate[index];
 		}
@@ -784,6 +784,20 @@ public:
 			throw exception("Nu exista rezervare cu numarul de bilete introdus");
 		}
 	}
+
+	friend Rezervare operator+(int, Rezervare);
+
+	//Modifica rezervarea prin anularea unor bilete 
+	//forma 1: functie metoda
+	Rezervare operator--(int i)
+	{
+		Rezervare copie = *this;
+		nrBilete--;
+		return  copie;
+	}
+
+	//forma 2: functie globala
+	friend Rezervare operator--(Rezervare, int);
 
 	explicit operator string()
 	{
@@ -795,6 +809,21 @@ public:
 		return achitat != false;
 	}
 
+	//Verifica care dintre cele doua rezervari are mai multe bilete
+	Rezervare operator > (Rezervare& r)
+	{
+		if (nrBilete > r.nrBilete)
+			return *this;
+		return r;
+	}
+
+	//Verifica daca cele doua rezervari comparate au acelasi numar de bilete
+	bool operator == (Rezervare& r)
+	{
+		if (nrBilete == r.nrBilete)
+			return true;
+		return false;
+	}
 	friend ostream& operator<<(ostream&, Rezervare);
 	friend istream& operator>>(istream&, Rezervare&);
 };
@@ -808,10 +837,10 @@ ostream& operator<<(ostream& out, Rezervare r)
 	{
 		out << "Data rezervarii: " << r.dataRezervare << endl;
 	}
-	out << "Numarul de bilete rezervate: " << r.dimensiune << endl;
+	out << "Numarul de bilete rezervate: " << r.nrBilete << endl;
 	if (r.nrBileteRezervate != nullptr)
 	{
-		for (int i = 0; i < r.dimensiune; i++)
+		for (int i = 0; i < r.nrBilete; i++)
 		{
 			out << "Id-ul biletului " << i << ":" << r.nrBileteRezervate[i] << endl;
 		}
@@ -838,9 +867,9 @@ istream& operator>>(istream& in, Rezervare& r)
 
 	delete[]r.nrBileteRezervate;
 	cout << "Cate bilete doriti sa rezervati?" << endl;
-	in >> r.dimensiune;
-	r.nrBileteRezervate = new int[r.dimensiune];
-	for (int i = 0; i < r.dimensiune; i++)
+	in >> r.nrBilete;
+	r.nrBileteRezervate = new int[r.nrBilete];
+	for (int i = 0; i < r.nrBilete; i++)
 	{
 		cout << "Id-ul biletului " << i << " :";
 		in >> r.nrBileteRezervate[i];
@@ -850,6 +879,29 @@ istream& operator>>(istream& in, Rezervare& r)
 	in >> r.achitat;
 
 	return in;
+}
+
+//Modifica ziua rezervarii. Rezervarea se va putea modifica doar daca a fost facuta in prima parte a lunii (pana in ziua 15 a lunii).
+//Rezervarea poate fi modificata doar cu 7 zile mai tarziu, nu mai mult
+Rezervare operator+(int x, Rezervare rez)
+{
+	int zi = atoi(rez.dataRezervare);
+	if (zi <= 15 && x <= 7)
+	{
+		zi += x;
+		string zi_noua = zi_noua + to_string(zi);
+		r.dataRezervare[0] = zi_noua[0];
+		r.dataRezervare[1] = zi_noua[1];
+	}
+
+	return rez;
+}
+
+Rezervare operator--(Rezervare r, int i)
+{
+	Rezervare copie = r;
+	r.nrBilete--;
+	return copie;
 }
 
 int main()
