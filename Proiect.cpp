@@ -904,6 +904,350 @@ Rezervare operator--(Rezervare r, int i)
 	return copie;
 }
 
+
+
+class Sala
+{
+private:
+	const int nrSala;
+	char* numeSala;
+	int** locuriSala;
+	static int nrTotalSali;
+	string tipSala;
+	int nrLocuriPeRand;
+	int nrRanduri;
+
+public:
+	Sala() : nrSala(++nrTotalSali)
+	{
+		numeSala = nullptr;
+		locuriSala = nullptr;
+		nrTotalSali = 0;
+		tipSala = "";
+		nrLocuriPeRand = 0;
+		nrRanduri = 0;
+	}
+
+	Sala(char* numeSala, int** locuriSala, int nrRanduri, int nrLocuriPeRand, string tipSala) :nrSala(++nrTotalSali)
+	{
+		if (strlen(numeSala) != 0)
+		{
+			this->numeSala = new char[strlen(numeSala) + 1];
+			strcpy_s(this->numeSala, strlen(numeSala) + 1, numeSala);
+		}
+		else
+		{
+			this->numeSala = nullptr;
+		}
+
+		if (nrRanduri > 0 && nrLocuriPeRand > 0)
+		{
+			this->locuriSala = new int* [nrRanduri];
+			for (int i = 0; i < nrRanduri; i++)
+			{
+				this->locuriSala[i] = new int[nrLocuriPeRand];
+			}
+			for (int i = 0; i < nrRanduri; i++)
+			{
+				for (int j = 0; j < nrLocuriPeRand; j++)
+				{
+					this->locuriSala[i][j] = locuriSala[i][j];
+				}
+			}
+
+		}
+		else
+		{
+			this->locuriSala = nullptr;
+		}
+		this->nrRanduri = nrRanduri;
+		this->nrLocuriPeRand = nrLocuriPeRand;
+		this->tipSala = tipSala;
+	}
+
+	Sala(const Sala& s) :nrSala(s.nrSala)
+	{
+		if (strlen(s.numeSala) != 0)
+		{
+			this->numeSala = new char[strlen(s.numeSala) + 1];
+			strcpy_s(this->numeSala, strlen(s.numeSala) + 1, s.numeSala);
+		}
+		else
+		{
+			this->numeSala = nullptr;
+		}
+
+		if (s.nrRanduri > 0 && s.nrLocuriPeRand > 0)
+		{
+			this->locuriSala = new int* [s.nrRanduri];
+			for (int i = 0; i < s.nrRanduri; i++)
+			{
+				this->locuriSala[i] = new int[s.nrLocuriPeRand];
+			}
+			for (int i = 0; i < s.nrRanduri; i++)
+			{
+				for (int j = 0; j < s.nrLocuriPeRand; j++)
+				{
+					this->locuriSala[i][j] = s.locuriSala[i][j];
+				}
+			}
+
+		}
+		else
+		{
+			this->locuriSala = nullptr;
+		}
+		this->nrRanduri = s.nrRanduri;
+		this->nrLocuriPeRand = s.nrLocuriPeRand;
+		this->tipSala = s.tipSala;
+	}
+
+
+	Sala& operator=(const Sala& s)
+	{
+		delete[] numeSala;
+		delete[] locuriSala;
+
+		if (this != &s)
+		{
+			if (strlen(s.numeSala) != 0)
+			{
+				this->numeSala = new char[strlen(s.numeSala) + 1];
+				strcpy_s(this->numeSala, strlen(s.numeSala) + 1, numeSala);
+			}
+			else
+			{
+				this->numeSala = nullptr;
+			}
+
+			if (s.nrRanduri > 0 && s.nrLocuriPeRand > 0)
+			{
+				this->locuriSala = new int* [s.nrRanduri];
+				for (int i = 0; i < s.nrRanduri; i++)
+				{
+					this->locuriSala[i] = new int[s.nrLocuriPeRand];
+				}
+				for (int i = 0; i < s.nrRanduri; i++)
+				{
+					for (int j = 0; j < s.nrLocuriPeRand; j++)
+					{
+						this->locuriSala[i][j] = s.locuriSala[i][j];
+					}
+				}
+
+			}
+			else
+			{
+				this->locuriSala = nullptr;
+			}
+			this->nrRanduri = s.nrRanduri;
+			this->nrLocuriPeRand = s.nrLocuriPeRand;
+			this->tipSala = s.tipSala;
+		}
+		return *this;
+	}
+
+	~Sala()
+	{
+		delete[] numeSala;
+		delete[] locuriSala;
+	}
+
+	void setLocuriSala(int** locuriNoiSala)
+
+	{
+		for (int i = 0; i < nrRanduri; i++)
+		{
+			for (int j = 0; j < nrLocuriPeRand; j++)
+			{
+				this->locuriSala[i][j] = locuriNoiSala[i][j];
+			}
+		}
+	}
+
+	void setnrRanduri(int nr)
+	{
+		this->nrRanduri = this->nrRanduri + nr;
+	}
+
+	//Operator indexare [] - Verifica cate locurile disponibile sunt pe un anumit rand
+	int operator[](int indexRand)
+	{ 
+		int locuriDisponibile = 0;
+		for (int index = 0; index < this->nrLocuriPeRand; index++)
+		{
+			if (this->locuriSala[indexRand][index] == 0)
+				locuriDisponibile++;
+		}
+		return locuriDisponibile;
+	}
+
+	//operator +  adaugare locuri pe un rand
+	Sala operator+(int nrLocuriNoi)
+	{
+		this->nrLocuriPeRand += nrLocuriNoi;
+		return *this;
+	}
+
+	//operatorul ++ adauga un rand intr-o sala
+	Sala operator++(int i)
+	{
+		Sala copie = *this;
+		nrRanduri++;
+		return copie;
+	}
+
+	//operatorul cast (catre orice tip) explicit --cout string Sala 5
+	//Returneaza tipul salii
+	explicit operator string()
+	{
+		return this->tipSala;
+	}
+
+	//operatorul cast implicit 
+	operator char*()
+	{
+		return numeSala;
+	}
+	
+	//operatorul ! pentru negatie => Returneaza daca sala are mai mult de 5 randuri
+	bool operator!()
+	{
+		if (this-> nrRanduri > 5)
+
+			return true;
+		else
+			return false;
+	}
+	//Operator conditional (<,>,=<,>=)  -- comparare nrLocuri intre 2 sali
+	bool operator>=(Sala& s)
+	{
+		int locuriSala1 = s.nrRanduri * s.nrLocuriPeRand;
+		int locuriSala2 = this->nrRanduri * this->nrLocuriPeRand;
+
+		if (locuriSala1 >= locuriSala2)
+			return true;
+		else 
+			return false;
+	}
+
+	//operatorul pentru testarea egalitatii dintre 2 obiecte ==  verificare nrLocuri ocupate  intre 2 sali
+	bool operator == (Sala& s)
+	{
+		int locuriOcupateSala1 = 0;
+		int locuriOcupateSala2 = 0;
+
+		for (int i = 0; i < this->nrRanduri; i++)
+		{
+			for (int j = 0; j < this->nrLocuriPeRand; j++)
+			{
+				if (this->locuriSala[i][j] == 1)
+					locuriOcupateSala1++;
+			}
+		}
+
+		for (int i = 0; i < s.nrRanduri; i++)
+		{
+			for (int j = 0; j < s.nrLocuriPeRand; j++)
+			{
+				if (s.locuriSala[i][j] == 1)
+					locuriOcupateSala2++;
+			}
+		}
+
+		if (locuriOcupateSala1 == locuriOcupateSala2)
+			return true;
+		else
+			return false;
+	}
+
+	friend ostream& operator<< (ostream&, Sala);
+	friend istream& operator>> (istream&, Sala&);
+};
+
+int Sala::nrTotalSali = 0;
+
+/*Sala &operator++ (Sala s)
+{
+	s.nrRanduri ++;
+	return s;
+}*/
+
+ostream& operator<< (ostream& out, Sala s)
+{
+	out << "Detalii Sala:" << endl;
+	out << "=========================" << endl;
+	out << "Nr Sala: " << s.nrSala << endl;
+	if (s.numeSala != nullptr)
+	{
+		out << "Nume sala: " << s.numeSala << endl;
+	}
+	out << "Tip sala: " << s.tipSala << endl;
+	out << "Nr locuri in sala: " << s.nrRanduri * s.nrLocuriPeRand << endl << endl;
+	out << "Locuri disponibile: " << endl;
+	out << "-------------------------" << endl;
+	for (int i = 0; i < s.nrRanduri; i++)
+	{
+		out << "Rand " << i+1 << ": ";
+		for (int j = 0; j < s.nrLocuriPeRand; j++)
+		{
+			out << " " << s.locuriSala[i][j];
+		}
+		out << endl;
+	}
+	//out << "Au fost adaugate " << adaugareLocuripeRand << "locuri pe randul:" << rand <<endl;
+	return out;
+}
+
+istream& operator>> (istream& in, Sala& s)
+{
+	string buffer;
+
+	delete[] s.numeSala;
+	cout << "Nume sala: ";
+	in >> ws;
+
+	getline(in, buffer);
+	s.numeSala = new char[buffer.length() + 1];
+	strcpy_s(s.numeSala, buffer.length() + 1, buffer.c_str());
+
+	cout << endl;
+
+	delete[] s.locuriSala;
+	cout << "Cate randuri sunt in sala? ";
+	in >> s.nrRanduri;
+	cout << endl;
+
+	cout << "Cate locuri sunt pe fiecare rand? ";
+	in >> s.nrLocuriPeRand;
+	cout << endl;
+
+	if (s.nrRanduri > 0 && s.nrLocuriPeRand > 0)
+	{
+		s.locuriSala = new int* [s.nrRanduri];
+		for (int i = 0; i < s.nrRanduri; i++)
+		{
+			s.locuriSala[i] = new int[s.nrLocuriPeRand];
+		}
+		for (int i = 0; i < s.nrRanduri; i++)
+		{
+			for (int j = 0; j < s.nrLocuriPeRand; j++)
+			{
+				s.locuriSala[i][j] = 0;
+			}
+		}
+
+	}
+
+	cout << "Tip sala: ";
+	in >> s.tipSala;
+	cout << endl;
+
+	return in;
+}
+
+
+
 int main()
 {
 
@@ -961,4 +1305,51 @@ int main()
 	/*cout << ++filme[2];
 
 	cout << filme[2]++;*/
+	
+	Sala sala_noua;
+	cin >> sala_noua;
+	cout << sala_noua;
+
+	/*int** matrice1 = new int* [2];
+	for (int i = 0; i < 2; i++)
+	{
+		matrice1[i] = new int[2];
+	}
+
+	int** matrice2 = new int* [2];
+	for (int i = 0; i < 2; i++)
+	{
+		matrice2[i] = new int[4];
+	}
+
+	matrice1[0][0] = 1;
+	matrice1[0][1] = 0;
+	matrice1[1][0] = 0;
+	matrice1[1][1] = 1;
+
+	//Sala sala_1((char*)"Venus", matrice1, 2, 2, "3D");
+	//cout << "Nr de locuri libere in sala:";
+	//cin >> sala_1;
+	cout << sala_1 << endl;
+
+
+	matrice2[0][0] = 1;
+	matrice2[0][1] = 0;
+	matrice2[0][2] = 0;
+	matrice2[0][3] = 0;
+	matrice2[1][0] = 1;
+	matrice2[1][1] = 0;
+	matrice2[1][2] = 1;
+	matrice2[1][3] = 0;
+
+	Sala sala_2((char*)"Terra", matrice2, 2, 4, "2D");
+	cout << "Nr de locuri libere in sala:";
+	//cin >> sala_2;
+	cout << sala_2[1] << endl;
+
+	if (sala_1 == sala_2)
+		cout << "Salile au acelasi numar de locuri ocupate.";
+	else
+		cout << "Salile NU au acelasi numar de locuri ocupate.";
+		*/
 }
