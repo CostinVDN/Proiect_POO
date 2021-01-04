@@ -3,6 +3,34 @@
 #include <fstream>
 using namespace std;
 
+class Bilete
+{
+
+private:
+	const int codBilet;
+	char* dataBilet;
+	int* codFilm;
+	static int nrBileteEmise;
+	float pret;
+	int rand;
+	int loc;
+
+public:
+
+	Bilete()
+		: codBilet{ ++nrBileteEmise }
+	{
+
+		dataBilet = nullptr;
+		codFilm = nullptr;
+		pret = 0.0;
+		rand = 0;
+		loc = 0;
+
+	}
+
+};
+
 class Film
 {
 
@@ -343,34 +371,6 @@ public:
 
 	friend ostream& operator<< (ostream&, Film);
 	friend istream& operator>> (istream&, Film&);
-};
-
-class Bilete
-{
-
-private:
-	const int codBilet;
-	char* dataBilet;
-	int* codFilm;
-	static int nrBileteEmise;
-	float pret;
-	int rand;
-	int loc;
-
-public:
-
-	Bilete()
-		: codBilet{ ++nrBileteEmise }
-	{
-
-		dataBilet = nullptr;
-		codFilm = nullptr;
-		pret = 0.0;
-		rand = 0;
-		loc = 0;
-
-	}
-
 };
 
 int Film::nrFilme = 0;
