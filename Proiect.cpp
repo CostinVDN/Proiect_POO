@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <iomanip>
 #include <fstream>
 using namespace std;
 
@@ -9,26 +10,453 @@ class Bilete
 private:
 	const int codBilet;
 	char* dataBilet;
-	int* codFilm;
+	string DataFilm; //Data cand uleaza fimul
+	int* OreRulare; // La ce ore ruleaza un film intr-o zi
+	int nrSpectacole;
 	static int nrBileteEmise;
 	float pret;
+	int idFilm;
 	int rand;
 	int loc;
 
 public:
 
-	Bilete()
-		: codBilet{ ++nrBileteEmise }
+	Bilete(): codBilet{ ++nrBileteEmise }
 	{
 
 		dataBilet = nullptr;
-		codFilm = nullptr;
+		OreRulare = nullptr;
+		idFilm = 0;
 		pret = 0.0;
 		rand = 0;
 		loc = 0;
+		nrSpectacole = 0;
 
 	}
 
+	Bilete(char* dataBilet, string DataFilm, int* OreRulare, int nrSpectacole, int idFilm, float pret, int rand, int loc)
+		: codBilet{ ++nrBileteEmise }
+	{
+
+		if (dataBilet != nullptr)
+		{
+
+			this->dataBilet = new char[strlen(dataBilet) + 1];
+			strcpy_s(this->dataBilet, strlen(dataBilet) + 1, dataBilet);
+
+		}
+		else
+		{
+
+			dataBilet = nullptr;
+
+		}
+
+		if (OreRulare != nullptr)
+		{
+
+			this->OreRulare = new int[nrSpectacole];
+			for (int indx = 0; indx < nrSpectacole; indx++)
+			{
+
+				this->OreRulare[indx] = OreRulare[indx];
+
+			}
+
+		}
+		else
+		{
+
+			this->OreRulare = nullptr;
+
+		}
+
+		this->nrSpectacole = nrSpectacole;
+		this->DataFilm = DataFilm;
+		this->pret = pret;
+		this->rand = rand;
+		this->loc = loc;
+		this->idFilm = idFilm;
+
+	}
+
+	Bilete(const Bilete& b) : codBilet{b.codBilet}
+	{
+
+		if (b.dataBilet != nullptr)
+		{
+
+			this->dataBilet = new char[strlen(b.dataBilet) + 1];
+			strcpy_s(this->dataBilet, strlen(b.dataBilet) + 1, b.dataBilet);
+
+		}
+		else
+		{
+
+			this->dataBilet = nullptr;
+
+		}
+
+		if (b.OreRulare != nullptr)
+		{
+
+			this->OreRulare = new int[b.nrSpectacole];
+			for (int indx = 0; indx < b.nrSpectacole; indx++)
+			{
+
+				this->OreRulare[indx] = b.OreRulare[indx];
+
+			}
+
+		}
+		else
+		{
+
+			this->OreRulare = nullptr;
+
+		}
+
+		this->nrSpectacole = b.nrSpectacole;
+		this->DataFilm = b.DataFilm;
+		this->pret = b.pret;
+		this->rand = b.rand;
+		this->loc = b.loc;
+		this->idFilm = b.idFilm;
+
+	}
+
+	Bilete& operator=(const Bilete &b)
+	{
+
+		delete[] dataBilet;
+		delete[] OreRulare;
+
+		if (this != &b)
+		{
+
+			if (b.dataBilet != nullptr)
+			{
+
+				this->dataBilet = new char[strlen(b.dataBilet) + 1];
+				strcpy_s(this->dataBilet, strlen(b.dataBilet) + 1, b.dataBilet);
+
+			}
+			else
+			{
+
+				this->dataBilet = nullptr;
+
+			}
+
+			if (b.OreRulare != nullptr)
+			{
+
+				this->OreRulare = new int[b.nrSpectacole];
+				for (int indx = 0; indx < b.nrSpectacole; indx++)
+				{
+
+					this->OreRulare[indx] = b.OreRulare[indx];
+
+				}
+
+			}
+			else
+			{
+
+				this->OreRulare = nullptr;
+
+			}
+
+			this->nrSpectacole = b.nrSpectacole;
+			this->DataFilm = b.DataFilm;
+			this->pret = b.pret;
+			this->rand = b.rand;
+			this->loc = b.loc;
+			this->idFilm = b.idFilm;
+		}
+
+		return* this;
+
+	}
+
+	~Bilete()
+	{
+
+		delete[] dataBilet;
+		delete[] OreRulare;
+
+	}
+
+	void setDataFilm(int zi, int luna, int an)
+	{
+
+		this->DataFilm = to_string(zi) + "." + to_string(luna) + "." + to_string(an);
+
+	}
+
+	//Se afiseaza detalii biletelor emise pentru un anumit film dupa IDfilm
+	bool operator[](int indx)
+	{
+	
+		if (this->idFilm == indx)
+			return true;
+		else
+		{
+
+			return false;
+		}
+	
+	}
+
+	//Se acorda o reducere clientilor fideli de 10%,20%
+	Bilete operator-(float reducere)
+	{
+		
+		this->pret = this->pret * (1-reducere/ 100);
+
+		return *this;
+	}
+
+	//Se schimba data filmului cu 1 zi dupa
+	Bilete operator++()
+	{
+
+		int zi, luna, an;
+		int pozitie_s = 0, pozitie_f = 0;
+
+		Bilete copie_bilet = *this;
+
+		pozitie_s = 0;
+		pozitie_f = DataFilm.find(".");
+		zi = stoi(copie_bilet.DataFilm.substr(pozitie_s, pozitie_f));
+
+		pozitie_s = pozitie_f + 1;
+		pozitie_f = DataFilm.find(".", pozitie_s);
+		luna = stoi(copie_bilet.DataFilm.substr(pozitie_s, pozitie_f - pozitie_s));
+
+		pozitie_s = pozitie_f + 1;
+
+		an = stoi(copie_bilet.DataFilm.substr(pozitie_s, 4));
+
+		zi++;
+
+		switch (luna)
+		{
+
+		case 1:
+		case 3:
+		case 5:
+		case 7:
+		case 8:
+		case 9:
+		case 11:
+		case 12:
+
+			if (zi > 31)
+			{
+				zi = 1;
+				++luna;
+			}
+
+			if (luna > 12)
+			{
+				luna = 1;
+				++an;
+			}
+			break;
+
+		case 2:
+			if (zi > 28)
+			{
+				zi = 1;
+				++luna;
+			}
+			break;
+
+		case 4:
+		case 6:
+		case 10:
+
+			if (zi > 30)
+			{
+				zi = 1;
+				++luna;
+			}
+
+		}
+
+		this->DataFilm = ((zi >= 10) ? to_string(zi) : "0" + to_string(zi)) + "." + ((luna >= 10) ? to_string(luna) : "0" + to_string(luna)) + "." + to_string(an);
+
+
+		return *this;
+
+	}
+
+	Bilete operator++(int x)
+	{
+
+		int zi, luna, an;
+		int pozitie_s = 0, pozitie_f=0;
+
+		Bilete copie_bilet = *this;
+		
+		pozitie_s = 0;
+		pozitie_f = DataFilm.find(".");
+		zi = stoi(copie_bilet.DataFilm.substr(pozitie_s, pozitie_f));
+
+		pozitie_s = pozitie_f + 1;
+		pozitie_f=DataFilm.find(".",pozitie_s);
+		luna = stoi(copie_bilet.DataFilm.substr(pozitie_s, pozitie_f-pozitie_s));
+
+		pozitie_s = pozitie_f + 1;
+
+		an = stoi(copie_bilet.DataFilm.substr(pozitie_s, 4));
+
+		zi++;
+
+		switch (luna)
+		{
+
+			case 1:
+			case 3:
+			case 5:
+			case 7:
+			case 8:
+			case 9:
+			case 11:
+			case 12:
+
+				if (zi > 31)
+				{
+					zi = 1;
+					++luna;
+				}
+
+				if (luna > 12)
+				{
+					luna = 1;
+					++an;
+				}
+				break;
+
+			case 2:
+				if (zi > 28)
+				{
+					zi = 1;
+					++luna;
+				}
+				break;
+
+			case 4:
+			case 6:
+			case 10:
+
+				if (zi > 30)
+				{
+					zi = 1;
+					++luna;
+				}
+
+		}
+		
+		copie_bilet.DataFilm = ((zi >= 10)?to_string(zi):"0"+ to_string(zi)) + "." + ((luna >= 10)?to_string(luna):"0" + to_string(luna)) + "." + to_string(an);
+		
+		return copie_bilet;
+
+	}
+
+	//Returneaza data Biletului
+	explicit operator string()
+	{
+
+
+		return dataBilet;
+
+	}
+
+	//Returneaza true/false daca biletul s-a emis in aceeasi zi cu ziua  in care ruleaza filmul
+	bool operator!()
+	{
+
+
+		if (DataFilm == dataBilet)
+			return false;
+		else
+			return true;
+
+	}
+
+	//Verifica daca biletele s-au emis pentru filme din aceeasi zi
+	string operator==(Bilete &b)
+	{
+
+		//Se verifica ca biletele sa nu fie emis pentru acleasi film
+		if (this->DataFilm == b.DataFilm)
+		{
+
+			return "Biletele sunt emise pentru filme ce ruleaza in aceeasi zi";
+		}
+		else
+		{
+
+			return "Biletele sunt emise pentru filme ce NU ruleaza in aceeasi zi";
+
+		}
+
+	}
+
+	//Verifica care din filme are mai multe proiectii dupa ora 17
+	int operator>=(Bilete& b)
+	{
+
+		int proiectii_film1 = 0;
+		int proiectii_film2 = 0;
+
+		for (int indx = 0; indx < this->nrSpectacole; indx++)
+		{
+
+			if (this->OreRulare[indx] > 17)
+				++proiectii_film1;
+
+		}
+
+		for (int indx = 0; indx < b.nrSpectacole; indx++)
+		{
+
+			if (b.OreRulare[indx] > 17)
+				++proiectii_film2;
+
+		}
+
+		if ((proiectii_film1 == 0) && (proiectii_film2 == 0))
+			return 0;
+		
+		if (proiectii_film1 > proiectii_film2)
+			return 1;
+
+		if (proiectii_film1 < proiectii_film2)
+			return 2;
+
+		if (proiectii_film1 == proiectii_film2)
+			return 3;
+
+	}
+
+	int getnrBilete()
+	{
+
+		return Bilete::nrBileteEmise;
+		
+	}
+
+	int getIDFilm()
+	{
+
+		return this->idFilm;
+	}
+
+	friend istream& operator>> (istream&, Bilete&);
+	friend ostream& operator<< (ostream&, Bilete);
 };
 
 class Film
@@ -1442,5 +1870,82 @@ int main()
 	Rezervare r2((char*)"02/02/2020", nrBileteRezervate2, 5, true);
 	r1.operator--();
 	cout << r1.getNrBilete();*/
+
+	int ore1[] = {10,12,14};
+	Bilete Bilet1((char*)"04.01.2021", "15.01.2021", ore1, 3, 1, 25.75, 1, 4);
+
+	int ore2[] = {16, 18, 20, 22};
+	Bilete Bilet2((char*)"07.01.2021", "12.01.2021", ore2, 4, 2, 50.15, 3, 10);
+
+	int ore3[] = {16,18, 20, 22};
+	Bilete Bilet3((char*)"09.01.2021", "15.01.2021", ore3, 4, 3, 42.25, 5, 7);
+	
+	int ore4[] = {8,12,16,20};
+	Bilete Bilet4((char*)"05.01.2021", "09.01.2021", ore4, 4, 1, 52.75, 2, 8);
+	
+	int ore5[] = {16,18};
+	Bilete Bilet5((char*)"15.01.2021", "25.01.2021", ore5, 2, 2, 25, 2, 7);
+
+	Bilete lista_bilete[] = { Bilet1, Bilet2, Bilet3, Bilet4, Bilet5};
+
+	int ID_film;
+	Bilete bilet_test;
+	cout << "Introduceti idfilm pentru care doriti afisarea biletelor emise: ";
+	cin >> ID_film;
+
+
+	for (int indx = 0; indx < bilet_test.getnrBilete()-1; indx++)
+	{
+
+		if (lista_bilete[indx][ID_film])
+		{
+
+			cout << lista_bilete[indx] << endl;
+
+		}
+
+	}
+
+	cout << fixed;
+	cout << setprecision(2);
+	cout << (lista_bilete[0] - 10) << endl;
+
+	cout << ++lista_bilete[1]++;
+
+	cout << "Data emitere bilet: " << string(lista_bilete[1]) << endl;
+
+	if (!lista_bilete[1])
+	{
+
+		cout << "Biletul NU este emis in aceeazi zi cu filmul";
+	}
+	else
+	{
+
+		cout << "Biletul este emis in aceeazi zi cu filmul";
+
+	}
+
+
+	cout << endl << (lista_bilete[0] == lista_bilete[1]) << endl;
+
+	switch (lista_bilete[1] >= lista_bilete[2])
+	{
+		case 0:
+			cout<< "Nici unul din filme nu ruleaza dupa ora 17!" << endl;
+			break;
+
+		case 1:
+			cout << "Filmul cu ID " << lista_bilete[1].getIDFilm() << " ruleaza de mai multe ori dupa ora 17" << endl;
+			cout << lista_bilete[1];
+			break;
+
+		case 2:
+			cout << "Filmul cu ID " << lista_bilete[2].getIDFilm() << " ruleaza de mai multe ori dupa ora 17" << endl;
+			cout << lista_bilete[2];
+			break;
+	default:
+		cout << "Ambele filme ruleaza de acelasi numar de ori dupa ora 17 " << endl;
+	}
 
 }
