@@ -464,27 +464,26 @@ istream& operator>> (istream& in, Film& f)
 	return in;
 }
 
-
 class Client
 {
 private:
 	const int idClient;
 	static int nrClienti;
 	char* nume;
-	int nrCarduri;
-	int* dateCard;
+	int nrZile;
+	int* filtareRezultate;
 	string email;
 
 public:
 	Client() : idClient(++nrClienti)
 	{
 		nume = nullptr;
-		nrCarduri = 0;
-		dateCard = nullptr;
+		nrZile = 0;
+		filtareRezultate = nullptr;
 		email = "";
 	}
 
-	Client(char* nume, int* dateCard, int nrCarduri, string tipClient, bool abonat) : idClient(++nrClienti)
+	Client(char* nume, int* filtareRezultate, int nrZile, string tipClient, bool abonat) : idClient(++nrClienti)
 	{
 		if (nume != nullptr)
 		{
@@ -496,19 +495,19 @@ public:
 			this->nume = nullptr;
 		}
 
-		if (dateCard != nullptr && nrCarduri > 0)
+		if (filtareRezultate != nullptr && nrZile > 0)
 		{
-			this->dateCard = new int[nrCarduri];
-			for (int i = 0; i < nrCarduri; i++)
+			this->filtareRezultate = new int[nrZile];
+			for (int i = 0; i < nrZile; i++)
 			{
-				this->dateCard[i] = dateCard[i];
+				this->filtareRezultate[i] = filtareRezultate[i];
 			}
-			this->nrCarduri = nrCarduri;
+			this->nrZile = nrZile;
 		}
 		else
 		{
-			this->dateCard = nullptr;
-			this->nrCarduri = 0;
+			this->filtareRezultate = nullptr;
+			this->nrZile = 0;
 		}
 
 		this->email = email;
@@ -526,19 +525,19 @@ public:
 			nume = nullptr;
 		}
 
-		if (c.dateCard != nullptr && c.nrCarduri > 0)
+		if (c.filtareRezultate != nullptr && c.nrZile > 0)
 		{
-			dateCard = new int[c.nrCarduri];
-			for (int i = 0; i < c.nrCarduri; i++)
+			filtareRezultate = new int[c.nrZile];
+			for (int i = 0; i < c.nrZile; i++)
 			{
-				dateCard[i] = c.dateCard[i];
+				filtareRezultate[i] = c.filtareRezultate[i];
 			}
-			nrCarduri = c.nrCarduri;
+			nrZile = c.nrZile;
 		}
 		else
 		{
-			dateCard = nullptr;
-			nrCarduri = 0;
+			filtareRezultate = nullptr;
+			nrZile = 0;
 		}
 
 		email = c.email;
@@ -547,14 +546,14 @@ public:
 	~Client()
 	{
 		delete[] nume;
-		delete[] dateCard;
+		delete[] filtareRezultate;
 
 	}
 
 	Client& operator=(Client& c)
 	{
 		delete[] nume;
-		delete[] dateCard;
+		delete[] filtareRezultate;
 
 		if (c.nume != nullptr)
 		{
@@ -566,19 +565,19 @@ public:
 			nume = nullptr;
 		}
 
-		if (c.dateCard != nullptr && c.nrCarduri > 0)
+		if (c.filtareRezultate != nullptr && c.nrZile > 0)
 		{
-			dateCard = new int[c.nrCarduri];
-			for (int i = 0; i < c.nrCarduri; i++)
+			filtareRezultate = new int[c.nrZile];
+			for (int i = 0; i < c.nrZile; i++)
 			{
-				dateCard[i] = c.dateCard[i];
+				filtareRezultate[i] = c.filtareRezultate[i];
 			}
-			nrCarduri = c.nrCarduri;
+			nrZile = c.nrZile;
 		}
 		else
 		{
-			dateCard = nullptr;
-			nrCarduri = 0;
+			filtareRezultate = nullptr;
+			nrZile = 0;
 		}
 
 		email = c.email;
@@ -596,17 +595,27 @@ ostream& operator<<(ostream& out, Client c)
 {
 	if (c.nume != nullptr)
 	{
-		out << "Nume: " << c.nume << endl;
-	}
-	out << "Numar carduri inregistrate: " << c.nrCarduri << endl;
-	if (c.dateCard != nullptr)
-	{
-		for (int i = 0; i < c.nrCarduri; i++)
-		{
-			out << "Numar card " << i + 1 << ": " << c.dateCard[i] << endl;
-		}
+		out << endl << "Nume: " << c.nume << endl;
 	}
 	out << "Email: " << c.email << endl;
+	/*out << "Filtrare rezultate:" << endl;
+	if (c.nrZile == 1)
+	{
+		out << "Numar zile: " << c.nrZile << endl;
+	}
+	else if (c.nrZile == 0)
+	{
+		cout << "Fara filtare rezultate" << endl;
+	}
+
+	if (c.filtareRezultate != nullptr)
+	{
+		for (int i = 0; i < c.nrZile; i++)
+		{
+			out << "Zi " << i + 1 << ": " << c.filtareRezultate[i] << endl;
+		}
+	}*/
+	cout << endl;
 	return out;
 }
 
@@ -620,33 +629,45 @@ istream& operator>>(istream& in, Client& c)
 	c.nume = new char[strlen(buffer) + 1];
 	strcpy_s(c.nume, strlen(buffer) + 1, buffer);
 
-	if (c.dateCard != nullptr)
-	{
-		delete[] c.dateCard;
-	}
-	cout << endl << "Numar carduri: ";
-	in >> c.nrCarduri;
-	if (c.nrCarduri > 0)
-	{
-		c.dateCard = new int[c.nrCarduri];
-		for (int i = 0; i < c.nrCarduri; i++)
-		{
-			cout << endl << "Numar card " << i + 1 << ": ";
-			in >> c.dateCard[i];
-		}
-	}
-	else
-	{
-		c.nrCarduri = 0;
-		c.dateCard = nullptr;
-	}
 	cout << endl << "Email: ";
-	in >> ws;
+	//in >> ws;
 	getline(in, c.email);
 	cout << endl;
 
+	if (c.filtareRezultate != nullptr)
+	{
+		delete[] c.filtareRezultate;
+	}
+	cout << "Selecteaza filmul:" << endl;
+	cout << "Doresti sa filtrezi afisarea filemlor care ruleaza in aceasta saptamana? [apasa 1 pentru da, 0 pentru nu] ";
+	int optiune = 0;
+	in >> optiune;
+	if (optiune == 1)
+	{
+		cout << endl << "Selecteaza numarul zilelor si zilele din saptamana [1 = luni] ";
+		cout << endl << "Numar zile: ";
+		in >> c.nrZile;
+		if (c.nrZile > 0)
+		{
+			c.filtareRezultate = new int[c.nrZile];
+			for (int i = 0; i < c.nrZile; i++)
+			{
+				cout << "Zi " << i + 1 << ": ";
+				in >> c.filtareRezultate[i];
+			}
+		}
+		else
+		{
+			c.nrZile = 0;
+			c.filtareRezultate = nullptr;
+		}
+		cout << endl;
+	}
+
+
 	return in;
 }
+
 class Rezervare
 {
 private:
