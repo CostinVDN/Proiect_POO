@@ -584,6 +584,57 @@ public:
 
 		return *this;
 	}
+	
+	int operator[](int index)
+	{
+		if (index >= 0 && index > nrZile)
+		{
+			return filtareRezultate[index];
+		}
+		return -1;
+	}
+
+	friend Client operator+(int, Client);
+
+	//Creste numarul de zile selectate
+	//forma 1: functie metoda
+	Client operator++()
+	{
+		nrZile++;
+		return *this;
+	}
+
+	//forma 2:functie globala
+	friend Client operator++(Client);
+
+	explicit operator string()
+	{
+		return this->nume;
+	}
+
+	//Verifica daca clientul a selectat un numar de zile
+	bool operator!()
+	{
+		if (nrZile == 0)
+			return true;
+		return false;
+	}
+
+	//Compara numarul de zile selectate de doi clienti
+	Client operator>=(const Client& c)
+	{
+		if (nrZile >= c.nrZile)
+			return *this;
+		return c;
+	}
+
+	//Verifica daca doi clienti au selectat acelasi numar de zile
+	bool operator==(Client& c)
+	{
+		if (nrZile == c.nrClienti)
+			return true;
+		return false;
+	}
 
 	friend ostream& operator<<(ostream&, Client);
 	friend istream& operator>>(istream&, Client&);
@@ -666,6 +717,19 @@ istream& operator>>(istream& in, Client& c)
 
 
 	return in;
+}
+
+//Creste numarul de zile selectate
+Client operator+(int x, Client c)
+{
+	c.nrClienti += x;
+	return c;
+}
+
+Client operator++(Client c)
+{
+	c.nrZile++;
+	return c;
 }
 
 class Rezervare
@@ -810,15 +874,14 @@ public:
 
 	//Modifica rezervarea prin anularea unor bilete 
 	//forma 1: functie metoda
-	Rezervare operator--(int i)
+	Rezervare operator--()
 	{
-		Rezervare copie = *this;
 		nrBilete--;
-		return  copie;
+		return *this;
 	}
 
 	//forma 2: functie globala
-	friend Rezervare operator--(Rezervare, int);
+	friend Rezervare operator--(Rezervare);
 
 	explicit operator string()
 	{
@@ -911,18 +974,17 @@ Rezervare operator+(int x, Rezervare rez)
 	{
 		zi += x;
 		string zi_noua = zi_noua + to_string(zi);
-		r.dataRezervare[0] = zi_noua[0];
-		r.dataRezervare[1] = zi_noua[1];
+		rez.dataRezervare[0] = zi_noua[0];
+		rez.dataRezervare[1] = zi_noua[1];
 	}
 
 	return rez;
 }
 
-Rezervare operator--(Rezervare r, int i)
+Rezervare operator--(Rezervare r)
 {
-	Rezervare copie = r;
 	r.nrBilete--;
-	return copie;
+	return r;
 }
 
 
@@ -1373,4 +1435,12 @@ int main()
 	else
 		cout << "Salile NU au acelasi numar de locuri ocupate.";
 		*/
+
+		/*int nrBileteRezervate1[] = { 1,2,3,4,5 };
+	int nrBileteRezervate2[] = { 6,7,8,9,10 };
+	Rezervare r1((char*)"12/02/2020", nrBileteRezervate1, 5, true);
+	Rezervare r2((char*)"02/02/2020", nrBileteRezervate2, 5, true);
+	r1.operator--();
+	cout << r1.getNrBilete();*/
+
 }
