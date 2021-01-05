@@ -465,7 +465,7 @@ class Film
 private:
 	const int idFilm;
 	char* nume;
-	int* frecventa;
+	int* program;
 	static int nrFilme;
 	string gen;
 	int durata;
@@ -478,13 +478,13 @@ public:
 	{
 
 		nume = nullptr;
-		frecventa = nullptr;
+		program = nullptr;
 		gen = "";
 		durata = 0;
 		pozitie_top = 0;
 	}
 
-	Film(char* nume, int* frecventa, string gen, int durata, int pozitie_top = 20) :idFilm(++nrFilme)
+	Film(char* nume, int* program, string gen, int durata, int pozitie_top = 20) :idFilm(++nrFilme)
 	{
 		if (strlen(nume) != 0)
 		{
@@ -498,21 +498,21 @@ public:
 			this->nume = nullptr;
 		}
 
-		if (frecventa != nullptr)
+		if (program != nullptr)
 		{
 
-			this->frecventa = new int[7];
+			this->program = new int[7];
 
 			for (int indx{ 0 }; indx < 7; indx++)
 			{
 
-				this->frecventa[indx] = frecventa[indx];
+				this->program[indx] = program[indx];
 			}
 		}
 		else
 		{
 
-			this->frecventa = nullptr;
+			this->program = nullptr;
 		}
 
 
@@ -541,21 +541,21 @@ public:
 			this->nume = nullptr;
 		}
 
-		if (f.frecventa != nullptr)
+		if (f.program != nullptr)
 		{
 
-			this->frecventa = new int[7];
+			this->program = new int[7];
 
 			for (int indx = 0; indx < 7; indx++)
 			{
 
-				this->frecventa[indx] = f.frecventa[indx];
+				this->program[indx] = f.program[indx];
 			}
 		}
 		else
 		{
 
-			this->frecventa = nullptr;
+			this->program = nullptr;
 		}
 
 
@@ -570,7 +570,7 @@ public:
 	{
 
 		delete[] nume;
-		delete[] frecventa;
+		delete[] program;
 
 		if (this != &f)
 		{
@@ -586,21 +586,21 @@ public:
 				this->nume = nullptr;
 			}
 
-			if (f.frecventa != nullptr)
+			if (f.program != nullptr)
 			{
 
-				this->frecventa = new int[7];
+				this->program = new int[7];
 
 				for (int indx = 0; indx < 7; indx++)
 				{
 
-					this->frecventa[indx] = f.frecventa[indx];
+					this->program[indx] = f.program[indx];
 				}
 			}
 			else
 			{
 
-				this->frecventa = nullptr;
+				this->program = nullptr;
 			}
 
 
@@ -622,7 +622,7 @@ public:
 		for (int indx = 0; indx < 7; indx++)
 		{
 
-			if (this->frecventa[zi] == 1)
+			if (this->program[zi] == 1)
 				ruleaza = true;
 		}
 
@@ -635,7 +635,7 @@ public:
 	{
 
 		delete[] nume;
-		delete[] frecventa;
+		delete[] program;
 
 	}
 
@@ -659,15 +659,15 @@ public:
 
 	}
 
-	void setfrecventa(char* frecventa)
+	void setprogram(char* program)
 	{
 
-		delete[] frecventa;
-		this->frecventa = new int[7];
+		delete[] program;
+		this->program = new int[7];
 
 		for (int indx = 0; indx < 7; indx++)
 		{
-			this->frecventa[indx] = frecventa[indx];
+			this->program[indx] = program[indx];
 
 		}
 
@@ -683,10 +683,10 @@ public:
 		do
 		{
 
-			if (this->frecventa[indx] == 0)
+			if (this->program[indx] == 0)
 			{
 
-				this->frecventa[indx] = 1;
+				this->program[indx] = 1;
 				alocare_zi = true;
 			}
 
@@ -707,10 +707,10 @@ public:
 		do
 		{
 
-			if (copie.frecventa[indx] == 0)
+			if (copie.program[indx] == 0)
 			{
 
-				copie.frecventa[indx] = 1;
+				copie.program[indx] = 1;
 				alocare_zi = true;
 			}
 
@@ -766,10 +766,10 @@ public:
 		for (int indx = 0; indx < 7; indx++)
 		{
 
-			if (this->frecventa[indx] == 1)
+			if (this->program[indx] == 1)
 				nr_zile_film1++;
 
-			if (f.frecventa[indx] == 1)
+			if (f.program[indx] == 1)
 				nr_zile_film2++;
 
 		}
@@ -789,7 +789,7 @@ public:
 		for (int indx = 0; indx < 7; indx++)
 		{
 
-			if (this->frecventa[indx] != f.frecventa[indx])
+			if (this->program[indx] != f.program[indx])
 				return false;
 		}
 
@@ -817,13 +817,13 @@ ostream& operator<< (ostream& out, Film f)
 		out << "Nume: " << f.nume << endl;
 	}
 
-	if (f.frecventa != nullptr)
+	if (f.program != nullptr)
 	{
-		out << "Frecventa: ";
+		out << "program: ";
 		for (int indx = 0; indx < 7; indx++)
 		{
 
-			if (f.frecventa[indx] == 1)
+			if (f.program[indx] == 1)
 			{
 
 				out << zile_sapt[indx] << " ";
@@ -856,26 +856,26 @@ istream& operator>> (istream& in, Film& f)
 
 	cout << endl;
 
-	delete[] f.frecventa;
-	f.frecventa = new int[7];
+	delete[] f.program;
+	f.program = new int[7];
 	for (int indx = 0; indx < 7; indx++)
 	{
 
-		f.frecventa[indx] = 0;
+		f.program[indx] = 0;
 	}
 
-	int nr_frecventa;
+	int nr_program;
 	int zi_rulare;
 
 	cout << "De cate ori va rula filmul intr-o sapatamana : ";
-	in >> nr_frecventa;
+	in >> nr_program;
 
 	cout << "In ce zile va rula filmul [Se va introduce numarul zilei saptamanii (ex: 3 pt Miercur)]: " << endl;
-	for (int indx = 1; indx <= nr_frecventa; indx++)
+	for (int indx = 1; indx <= nr_program; indx++)
 	{
 		cout << "Ziua " << indx << ": ";
 		in >> zi_rulare;
-		f.frecventa[zi_rulare - 1] = 1;
+		f.program[zi_rulare - 1] = 1;
 
 	}
 
