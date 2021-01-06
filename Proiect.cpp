@@ -898,20 +898,20 @@ private:
 	const int idClient;
 	static int nrClienti;
 	char* nume;
-	int nrZile;
-	int* filtareRezultate;
+	int nrCarduri;
+	int* nrAsociatCard;
 	string email;
 
 public:
 	Client() : idClient(++nrClienti)
 	{
 		nume = nullptr;
-		nrZile = 0;
-		filtareRezultate = nullptr;
+		nrCarduri = 0;
+		nrAsociatCard = nullptr;
 		email = "";
 	}
 
-	Client(char* nume, int* filtareRezultate, int nrZile, string tipClient, bool abonat) : idClient(++nrClienti)
+	Client(char* nume, int* nrAsociatCard, int nrCarduri, string tipClient, bool abonat) : idClient(++nrClienti)
 	{
 		if (nume != nullptr)
 		{
@@ -923,19 +923,19 @@ public:
 			this->nume = nullptr;
 		}
 
-		if (filtareRezultate != nullptr && nrZile > 0)
+		if (nrAsociatCard != nullptr && nrCarduri > 0)
 		{
-			this->filtareRezultate = new int[nrZile];
-			for (int i = 0; i < nrZile; i++)
+			this->nrAsociatCard = new int[nrCarduri];
+			for (int i = 0; i < nrCarduri; i++)
 			{
-				this->filtareRezultate[i] = filtareRezultate[i];
+				this->nrAsociatCard[i] = nrAsociatCard[i];
 			}
-			this->nrZile = nrZile;
+			this->nrCarduri = nrCarduri;
 		}
 		else
 		{
-			this->filtareRezultate = nullptr;
-			this->nrZile = 0;
+			this->nrAsociatCard = nullptr;
+			this->nrCarduri = 0;
 		}
 
 		this->email = email;
@@ -953,19 +953,19 @@ public:
 			nume = nullptr;
 		}
 
-		if (c.filtareRezultate != nullptr && c.nrZile > 0)
+		if (c.nrAsociatCard != nullptr && c.nrCarduri > 0)
 		{
-			filtareRezultate = new int[c.nrZile];
-			for (int i = 0; i < c.nrZile; i++)
+			nrAsociatCard = new int[c.nrCarduri];
+			for (int i = 0; i < c.nrCarduri; i++)
 			{
-				filtareRezultate[i] = c.filtareRezultate[i];
+				nrAsociatCard[i] = c.nrAsociatCard[i];
 			}
-			nrZile = c.nrZile;
+			nrCarduri = c.nrCarduri;
 		}
 		else
 		{
-			filtareRezultate = nullptr;
-			nrZile = 0;
+			nrAsociatCard = nullptr;
+			nrCarduri = 0;
 		}
 
 		email = c.email;
@@ -974,14 +974,14 @@ public:
 	~Client()
 	{
 		delete[] nume;
-		delete[] filtareRezultate;
+		delete[] nrAsociatCard;
 
 	}
 
 	Client& operator=(Client& c)
 	{
 		delete[] nume;
-		delete[] filtareRezultate;
+		delete[] nrAsociatCard;
 
 		if (c.nume != nullptr)
 		{
@@ -993,19 +993,19 @@ public:
 			nume = nullptr;
 		}
 
-		if (c.filtareRezultate != nullptr && c.nrZile > 0)
+		if (c.nrAsociatCard != nullptr && c.nrCarduri > 0)
 		{
-			filtareRezultate = new int[c.nrZile];
-			for (int i = 0; i < c.nrZile; i++)
+			nrAsociatCard = new int[c.nrCarduri];
+			for (int i = 0; i < c.nrCarduri; i++)
 			{
-				filtareRezultate[i] = c.filtareRezultate[i];
+				nrAsociatCard[i] = c.nrAsociatCard[i];
 			}
-			nrZile = c.nrZile;
+			nrCarduri = c.nrCarduri;
 		}
 		else
 		{
-			filtareRezultate = nullptr;
-			nrZile = 0;
+			nrAsociatCard = nullptr;
+			nrCarduri = 0;
 		}
 
 		email = c.email;
@@ -1015,9 +1015,9 @@ public:
 
 	int operator[](int index)
 	{
-		if (index >= 0 && index > nrZile)
+		if (index >= 0 && index > nrCarduri)
 		{
-			return filtareRezultate[index];
+			return nrAsociatCard[index];
 		}
 		return -1;
 	}
@@ -1028,7 +1028,7 @@ public:
 	//forma 1: functie metoda
 	Client operator++()
 	{
-		nrZile++;
+		nrCarduri++;
 		return *this;
 	}
 
@@ -1043,7 +1043,7 @@ public:
 	//Verifica daca clientul a selectat un numar de zile
 	bool operator!()
 	{
-		if (nrZile == 0)
+		if (nrCarduri == 0)
 			return true;
 		return false;
 	}
@@ -1051,7 +1051,7 @@ public:
 	//Compara numarul de zile selectate de doi clienti
 	Client operator>=(const Client& c)
 	{
-		if (nrZile >= c.nrZile)
+		if (nrCarduri >= c.nrCarduri)
 			return *this;
 		return c;
 	}
@@ -1059,7 +1059,7 @@ public:
 	//Verifica daca doi clienti au selectat acelasi numar de zile
 	bool operator==(Client& c)
 	{
-		if (nrZile == c.nrClienti)
+		if (nrCarduri == c.nrClienti)
 			return true;
 		return false;
 	}
@@ -1077,23 +1077,23 @@ ostream& operator<<(ostream& out, Client c)
 		out << endl << "Nume: " << c.nume << endl;
 	}
 	out << "Email: " << c.email << endl;
-	/*out << "Filtrare rezultate:" << endl;
-	if (c.nrZile == 1)
+
+	if (c.nrCarduri > 0)
 	{
-		out << "Numar zile: " << c.nrZile << endl;
+		out << "Numar carduri " << c.nrCarduri << endl;
 	}
-	else if (c.nrZile == 0)
+	else if (c.nrCarduri == 0)
 	{
-		cout << "Fara filtare rezultate" << endl;
+		cout << "Nu sunt carduri inregistrate" << endl;
 	}
 
-	if (c.filtareRezultate != nullptr)
+	if (c.nrAsociatCard != nullptr)
 	{
-		for (int i = 0; i < c.nrZile; i++)
+		for (int i = 0; i < c.nrCarduri; i++)
 		{
-			out << "Zi " << i + 1 << ": " << c.filtareRezultate[i] << endl;
+			out << "Card " << i + 1 << ": " << c.nrAsociatCard[i] << endl;
 		}
-	}*/
+	}
 	cout << endl;
 	return out;
 }
@@ -1113,32 +1113,33 @@ istream& operator>>(istream& in, Client& c)
 	getline(in, c.email);
 	cout << endl;
 
-	if (c.filtareRezultate != nullptr)
+	if (c.nrAsociatCard != nullptr)
 	{
-		delete[] c.filtareRezultate;
+		delete[] c.nrAsociatCard;
 	}
-	cout << "Selecteaza filmul:" << endl;
-	cout << "Doresti sa filtrezi afisarea filemlor care ruleaza in aceasta saptamana? [apasa 1 pentru da, 0 pentru nu] ";
+
+	cout << "Doresti sa salvezi datele cardurilor pentru plati ulterioare? [apasa 1 pentru da, 0 pentru nu] ";
 	int optiune = 0;
 	in >> optiune;
 	if (optiune == 1)
 	{
-		cout << endl << "Selecteaza numarul zilelor si zilele din saptamana [1 = luni] ";
-		cout << endl << "Numar zile: ";
-		in >> c.nrZile;
-		if (c.nrZile > 0)
+		cout << endl << "Introdu numarul de carduri pe care doresti sa le salvezi: ";
+		in >> c.nrCarduri;
+		if (c.nrCarduri > 0)
 		{
-			c.filtareRezultate = new int[c.nrZile];
-			for (int i = 0; i < c.nrZile; i++)
+			
+			c.nrAsociatCard = new int[c.nrCarduri];
+			for (int i = 0; i < c.nrCarduri; i++)
 			{
-				cout << "Zi " << i + 1 << ": ";
-				in >> c.filtareRezultate[i];
+				cout << "Intordu numarul asociat pentru ";
+				cout << "Cardul " << i + 1 << ": ";
+				in >> c.nrAsociatCard[i];
 			}
 		}
 		else
 		{
-			c.nrZile = 0;
-			c.filtareRezultate = nullptr;
+			c.nrCarduri = 0;
+			c.nrAsociatCard = nullptr;
 		}
 		cout << endl;
 	}
@@ -1147,7 +1148,7 @@ istream& operator>>(istream& in, Client& c)
 	return in;
 }
 
-//Creste numarul de zile selectate
+//Creste numarul de carduri selectate
 Client operator+(int x, Client c)
 {
 	c.nrClienti += x;
@@ -1156,7 +1157,7 @@ Client operator+(int x, Client c)
 
 Client operator++(Client c)
 {
-	c.nrZile++;
+	c.nrCarduri++;
 	return c;
 }
 
@@ -1761,6 +1762,9 @@ istream& operator>> (istream& in, Sala& s)
 
 int main()
 {
+	Client c;
+	cin >> c;
+	cout << c;
 	int** matrice2 = new int* [2];
 	for (int i = 0; i < 2; i++)
 	{
