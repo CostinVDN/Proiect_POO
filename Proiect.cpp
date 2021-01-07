@@ -10,10 +10,13 @@ class Bilete
 private:
 	const int codBilet;
 	char* dataBilet;
-	string DataFilm; //Data cand uleaza fimul
-	int* OreRulare; // La ce ore ruleaza un film intr-o zi
-	int nrSpectacole;
+	string DataFilm; //Data cand ruleaza fimul
+	int* filme; // Se poate achitiona un bilet pentru mai multe filme are ruleaza la ac ora
+	int nrFilme;
 	static int nrBileteEmise;
+	string sala;
+	string Film;
+	int Ora;
 	float pret;
 	int idFilm;
 	int rand;
@@ -21,23 +24,22 @@ private:
 
 public:
 
-	Bilete() : codBilet{ ++nrBileteEmise }
+	Bilete(): codBilet{ ++nrBileteEmise }
 	{
 
 		dataBilet = nullptr;
-		OreRulare = nullptr;
+		filme = nullptr;
 		idFilm = 0;
 		pret = 0.0;
-		rand = 0;
+		rand=0;
 		loc = 0;
-		nrSpectacole = 0;
-
+		
 	}
 
-	Bilete(char* dataBilet, string DataFilm, int* OreRulare, int nrSpectacole, int idFilm, float pret, int rand, int loc)
-		: codBilet{ ++nrBileteEmise }
+	Bilete(char* dataBilet, string DataFilm, int* filme, int nrFilme, int idFilm, string sala, int Ora, string Film, float pret, int rand, int loc): codBilet{ ++nrBileteEmise }
 	{
 
+		// Data se aloca automat
 		if (dataBilet != nullptr)
 		{
 
@@ -52,14 +54,14 @@ public:
 
 		}
 
-		if (OreRulare != nullptr)
+		if (filme != nullptr)
 		{
 
-			this->OreRulare = new int[nrSpectacole];
-			for (int indx = 0; indx < nrSpectacole; indx++)
+			this->filme = new int[nrFilme];
+			for (int indx = 0; indx < nrFilme; indx++)
 			{
 
-				this->OreRulare[indx] = OreRulare[indx];
+				this->filme[indx] = filme[indx];
 
 			}
 
@@ -67,11 +69,14 @@ public:
 		else
 		{
 
-			this->OreRulare = nullptr;
+			this->filme = nullptr;
 
 		}
 
-		this->nrSpectacole = nrSpectacole;
+		this->sala = sala;
+		this->Film = Film;
+		this->Ora = Ora;
+		this->nrFilme = nrFilme;
 		this->DataFilm = DataFilm;
 		this->pret = pret;
 		this->rand = rand;
@@ -80,7 +85,7 @@ public:
 
 	}
 
-	Bilete(const Bilete& b) : codBilet{ b.codBilet }
+	Bilete(const Bilete& b) : codBilet{b.codBilet}
 	{
 
 		if (b.dataBilet != nullptr)
@@ -97,14 +102,14 @@ public:
 
 		}
 
-		if (b.OreRulare != nullptr)
+		if (b.filme != nullptr)
 		{
 
-			this->OreRulare = new int[b.nrSpectacole];
-			for (int indx = 0; indx < b.nrSpectacole; indx++)
+			this->filme = new int[b.nrFilme];
+			for (int indx = 0; indx < b.nrFilme; indx++)
 			{
 
-				this->OreRulare[indx] = b.OreRulare[indx];
+				this->filme[indx] = b.filme[indx];
 
 			}
 
@@ -112,11 +117,14 @@ public:
 		else
 		{
 
-			this->OreRulare = nullptr;
+			this->filme = nullptr;
 
 		}
 
-		this->nrSpectacole = b.nrSpectacole;
+
+		this->sala = b.sala;
+		this->Film = b.Film;
+		this->Ora = b.Ora;
 		this->DataFilm = b.DataFilm;
 		this->pret = b.pret;
 		this->rand = b.rand;
@@ -125,11 +133,11 @@ public:
 
 	}
 
-	Bilete& operator=(const Bilete& b)
+	Bilete& operator=(const Bilete &b)
 	{
 
 		delete[] dataBilet;
-		delete[] OreRulare;
+		delete[] filme;
 
 		if (this != &b)
 		{
@@ -148,14 +156,14 @@ public:
 
 			}
 
-			if (b.OreRulare != nullptr)
+			if (b.filme != nullptr)
 			{
 
-				this->OreRulare = new int[b.nrSpectacole];
-				for (int indx = 0; indx < b.nrSpectacole; indx++)
+				this->filme = new int[b.nrFilme];
+				for (int indx = 0; indx < b.nrFilme; indx++)
 				{
 
-					this->OreRulare[indx] = b.OreRulare[indx];
+					this->filme[indx] = b.filme[indx];
 
 				}
 
@@ -163,11 +171,14 @@ public:
 			else
 			{
 
-				this->OreRulare = nullptr;
+				this->filme = nullptr;
 
 			}
 
-			this->nrSpectacole = b.nrSpectacole;
+			this->sala = b.sala;
+			this->Film = b.Film;
+			this->Ora = b.Ora;
+			this->nrFilme= b.nrFilme;
 			this->DataFilm = b.DataFilm;
 			this->pret = b.pret;
 			this->rand = b.rand;
@@ -175,7 +186,7 @@ public:
 			this->idFilm = b.idFilm;
 		}
 
-		return*this;
+		return* this;
 
 	}
 
@@ -183,7 +194,7 @@ public:
 	{
 
 		delete[] dataBilet;
-		delete[] OreRulare;
+		delete[] filme;
 
 	}
 
@@ -194,10 +205,10 @@ public:
 
 	}
 
-	//Se afiseaza detalii biletelor emise pentru un anumit film dupa IDfilm
+	//Se afiseaza daca biletul s-a emis pentru un anumit film
 	bool operator[](int indx)
 	{
-
+	
 		if (this->idFilm == indx)
 			return true;
 		else
@@ -205,88 +216,27 @@ public:
 
 			return false;
 		}
-
+	
 	}
 
 	//Se acorda o reducere clientilor fideli de 10%,20%
 	Bilete operator-(float reducere)
 	{
-
-		this->pret = this->pret * (1 - reducere / 100);
+		
+		this->pret = this->pret * (1-reducere/ 100);
 
 		return *this;
 	}
 
-	//Se schimba data filmului cu 1 zi dupa
+	//Se schimba ora cu urmatoarea proiecte peste 2 ore (ex.de la ora 10 la ora 12)
+	//Daca ora > 20 se trece la ora 10
 	Bilete operator++()
 	{
 
-		int zi, luna, an;
-		int pozitie_s = 0, pozitie_f = 0;
+		this->Ora += 2;
 
-		Bilete copie_bilet = *this;
-
-		pozitie_s = 0;
-		pozitie_f = DataFilm.find(".");
-		zi = stoi(copie_bilet.DataFilm.substr(pozitie_s, pozitie_f));
-
-		pozitie_s = pozitie_f + 1;
-		pozitie_f = DataFilm.find(".", pozitie_s);
-		luna = stoi(copie_bilet.DataFilm.substr(pozitie_s, pozitie_f - pozitie_s));
-
-		pozitie_s = pozitie_f + 1;
-
-		an = stoi(copie_bilet.DataFilm.substr(pozitie_s, 4));
-
-		zi++;
-
-		switch (luna)
-		{
-
-		case 1:
-		case 3:
-		case 5:
-		case 7:
-		case 8:
-		case 9:
-		case 11:
-		case 12:
-
-			if (zi > 31)
-			{
-				zi = 1;
-				++luna;
-			}
-
-			if (luna > 12)
-			{
-				luna = 1;
-				++an;
-			}
-			break;
-
-		case 2:
-			if (zi > 28)
-			{
-				zi = 1;
-				++luna;
-			}
-			break;
-
-		case 4:
-		case 6:
-		case 10:
-
-			if (zi > 30)
-			{
-				zi = 1;
-				++luna;
-			}
-
-		}
-
-		this->DataFilm = ((zi >= 10) ? to_string(zi) : "0" + to_string(zi)) + "." + ((luna >= 10) ? to_string(luna) : "0" + to_string(luna)) + "." + to_string(an);
-
+		if (this->Ora > 20)
+			this->Ora = 10;
 
 		return *this;
 
@@ -295,71 +245,11 @@ public:
 	Bilete operator++(int x)
 	{
 
-		int zi, luna, an;
-		int pozitie_s = 0, pozitie_f = 0;
-
 		Bilete copie_bilet = *this;
-
-		pozitie_s = 0;
-		pozitie_f = DataFilm.find(".");
-		zi = stoi(copie_bilet.DataFilm.substr(pozitie_s, pozitie_f));
-
-		pozitie_s = pozitie_f + 1;
-		pozitie_f = DataFilm.find(".", pozitie_s);
-		luna = stoi(copie_bilet.DataFilm.substr(pozitie_s, pozitie_f - pozitie_s));
-
-		pozitie_s = pozitie_f + 1;
-
-		an = stoi(copie_bilet.DataFilm.substr(pozitie_s, 4));
-
-		zi++;
-
-		switch (luna)
-		{
-
-		case 1:
-		case 3:
-		case 5:
-		case 7:
-		case 8:
-		case 9:
-		case 11:
-		case 12:
-
-			if (zi > 31)
-			{
-				zi = 1;
-				++luna;
-			}
-
-			if (luna > 12)
-			{
-				luna = 1;
-				++an;
-			}
-			break;
-
-		case 2:
-			if (zi > 28)
-			{
-				zi = 1;
-				++luna;
-			}
-			break;
-
-		case 4:
-		case 6:
-		case 10:
-
-			if (zi > 30)
-			{
-				zi = 1;
-				++luna;
-			}
-
-		}
-
-		copie_bilet.DataFilm = ((zi >= 10) ? to_string(zi) : "0" + to_string(zi)) + "." + ((luna >= 10) ? to_string(luna) : "0" + to_string(luna)) + "." + to_string(an);
+		
+		copie_bilet.Ora += 2;
+		if (copie_bilet.Ora > 20)
+			copie_bilet.Ora = 10;
 
 		return copie_bilet;
 
@@ -387,7 +277,7 @@ public:
 	}
 
 	//Verifica daca biletele s-au emis pentru filme din aceeasi zi
-	string operator==(Bilete& b)
+	string operator==(Bilete &b)
 	{
 
 		//Se verifica ca biletele sa nu fie emis pentru acleasi film
@@ -405,40 +295,14 @@ public:
 
 	}
 
-	//Verifica care din filme are mai multe proiectii dupa ora 17
-	int operator>=(Bilete& b)
+	//Verifica care din bilete s-a emis pentru mai multe filme
+	bool operator>=(Bilete& b)
 	{
 
-		int proiectii_film1 = 0;
-		int proiectii_film2 = 0;
-
-		for (int indx = 0; indx < this->nrSpectacole; indx++)
-		{
-
-			if (this->OreRulare[indx] > 17)
-				++proiectii_film1;
-
-		}
-
-		for (int indx = 0; indx < b.nrSpectacole; indx++)
-		{
-
-			if (b.OreRulare[indx] > 17)
-				++proiectii_film2;
-
-		}
-
-		if ((proiectii_film1 == 0) && (proiectii_film2 == 0))
-			return 0;
-
-		if (proiectii_film1 > proiectii_film2)
-			return 1;
-
-		if (proiectii_film1 < proiectii_film2)
-			return 2;
-
-		if (proiectii_film1 == proiectii_film2)
-			return 3;
+		if (this->nrFilme >= b.nrFilme)
+			return true;
+		else
+			return false;
 
 	}
 
@@ -446,7 +310,7 @@ public:
 	{
 
 		return Bilete::nrBileteEmise;
-
+		
 	}
 
 	int getIDFilm()
@@ -457,6 +321,7 @@ public:
 
 	friend istream& operator>> (istream&, Bilete&);
 	friend ostream& operator<< (ostream&, Bilete);
+	friend ofstream& operator<<(ofstream&, Bilete);
 };
 
 class Film
@@ -468,10 +333,11 @@ private:
 	int* program;
 	static int nrFilme;
 	string gen;
+	string sala;
+	int nr_proiectii;
+	int* ora_film;
 	int durata;
 	int pozitie_top;
-
-	//Bilet Bilete;
 
 public:
 	Film() : idFilm(++nrFilme)
@@ -479,12 +345,13 @@ public:
 
 		nume = nullptr;
 		program = nullptr;
+		ora_film = nullptr;
 		gen = "";
 		durata = 0;
-		pozitie_top = 0;
+		pozitie_top = 20;
 	}
 
-	Film(char* nume, int* program, string gen, int durata, int pozitie_top = 20) :idFilm(++nrFilme)
+	Film(char* nume, int* program, string gen, int durata, string sala, int nr_proiectii, int* ora_film, int pozitie_top = 20) :idFilm(++nrFilme)
 	{
 		if (strlen(nume) != 0)
 		{
@@ -515,9 +382,29 @@ public:
 			this->program = nullptr;
 		}
 
+		if (ora_film != nullptr)
+		{
 
+			this->ora_film = new int[nr_proiectii]
+				;
+			for (int indx = 0; indx < nr_proiectii; indx++)
+			{
+
+				this->ora_film[indx] = ora_film[indx];
+
+			}
+		}
+		else
+		{
+
+			ora_film = nullptr;
+		}
+
+		this->nr_proiectii = nr_proiectii;
 		this->gen = gen;
 		this->durata = durata;
+		this->sala = sala;
+
 		if (pozitie_top > 0)
 		{
 
@@ -559,6 +446,25 @@ public:
 		}
 
 
+		if (f.ora_film != nullptr)
+		{
+
+			this->ora_film = new int[f.nr_proiectii];
+			for (int indx = 0; indx < f.nr_proiectii; indx++)
+			{
+
+				this->ora_film[indx] = f.ora_film[indx];
+
+			}
+		}
+		else
+		{
+
+			this->ora_film = nullptr;
+		}
+
+		this->sala = f.sala;
+		this->nr_proiectii = f.nr_proiectii;
 		this->gen = f.gen;
 		this->durata = f.durata;
 		this->pozitie_top = f.pozitie_top;
@@ -571,6 +477,7 @@ public:
 
 		delete[] nume;
 		delete[] program;
+		delete[] ora_film;
 
 		if (this != &f)
 		{
@@ -603,7 +510,26 @@ public:
 				this->program = nullptr;
 			}
 
+			if (f.ora_film != nullptr)
+			{
 
+				this->ora_film = new int[f.nr_proiectii]
+					;
+				for (int indx = 0; indx < f.nr_proiectii; indx++)
+				{
+
+					this->ora_film[indx] = f.ora_film[indx];
+
+				}
+			}
+			else
+			{
+
+				this->ora_film = nullptr;
+			}
+
+			this->sala = f.sala;
+			this->nr_proiectii = f.nr_proiectii;
 			this->gen = f.gen;
 			this->durata = f.durata;
 			this->pozitie_top = f.pozitie_top;
@@ -652,6 +578,13 @@ public:
 
 	}
 
+	int getidFilm()
+	{
+
+		return this->idFilm;
+
+	}
+
 	char* getnume()
 	{
 
@@ -659,21 +592,46 @@ public:
 
 	}
 
-	void setprogram(char* program)
+	string getgen()
 	{
 
-		delete[] program;
-		this->program = new int[7];
-
-		for (int indx = 0; indx < 7; indx++)
-		{
-			this->program[indx] = program[indx];
-
-		}
+		return this->gen;
 
 	}
 
-	//operatorul ++ creste program rularii filmului cu 1 zi
+	int* getprogram()
+	{
+
+		return this->program;
+	}
+
+	int getnrproiectii()
+	{
+
+		return this->nr_proiectii;
+	}
+
+	int* getora_film()
+	{
+
+		return this->ora_film;
+
+	}
+
+	int getdurata()
+	{
+
+		return this -> durata;
+	}
+
+	string getsala()
+	{
+
+		return this->sala;
+
+	}
+
+	//operatorul ++ creste frecventa rularii filmului cu 1 zi
 	Film operator++()
 	{
 
@@ -761,7 +719,7 @@ public:
 	Film operator>=(const Film& f)
 	{
 
-		int nr_zile_film1 = 0, nr_zile_film2 = 0;
+		int nr_zile_film1=0, nr_zile_film2=0;
 
 		for (int indx = 0; indx < 7; indx++)
 		{
@@ -779,11 +737,11 @@ public:
 
 		if (nr_zile_film1 < nr_zile_film2)
 			return f;
-
+		
 	}
 
 	//Verifica daca doua filme ruleaza in aceleasi zile
-	bool operator==(Film& f)
+	bool operator==(Film &f)
 	{
 
 		for (int indx = 0; indx < 7; indx++)
@@ -804,43 +762,40 @@ public:
 int Film::nrFilme = 0;
 int Bilete::nrBileteEmise = 0;
 
+//Operator afisare info Filme
 ostream& operator<< (ostream& out, Film f)
 {
 
-	string zile_sapt[] = { "Luni", "Marti", "Miercuri", "Joi", "Vineri", "Sambata", "Duminica" };
+	string zile_sapt[] = { "L", "M", "M", "J", "V", "S", "D" };
 
-	//out << "Detalii Film :" << endl;
-	out << "=============================" << endl;
+	out << setw(7) << left << f.getidFilm() << setw(15) << left << f.getnume() << setw(10) << left << f.gen;
 
-	if (f.nume != nullptr)
+	string program;
+	for (int indx = 0; indx < 7.; indx++)
 	{
-		out << "Nume: " << f.nume << endl;
+		if (f.program[indx] != 0)
+			program = program + zile_sapt[indx] + " ";
+
 	}
 
-	if (f.program != nullptr)
+	out << setw(20) << left << program;
+
+	string ore;
+	for (int indx = 0; indx < f.nr_proiectii; indx++)
 	{
-		out << "Frecventa: ";
-		for (int indx = 0; indx < 7; indx++)
-		{
 
-			if (f.program[indx] == 1)
-			{
+		ore = ore + to_string(f.ora_film[indx]) + " ";
 
-				out << zile_sapt[indx] << " ";
-
-			}
-		}
-
-		out << endl;
 	}
 
-	out << "Genul: " << f.gen << endl;
-	out << "Durata: " << f.durata << " min. " << endl;
-	out << "Pozitie top 10: " << f.pozitie_top << endl;
+	out << setw(15) << left << ore << setw(15) << left << to_string(f.durata) + " min." 
+		<< setw(15) << left << f.sala << endl;
 
 	return out;
 }
 
+
+//Operator citire info Filme
 istream& operator>> (istream& in, Film& f)
 {
 
@@ -854,24 +809,22 @@ istream& operator>> (istream& in, Film& f)
 	f.nume = new char[buffer.length() + 1];
 	strcpy_s(f.nume, buffer.length() + 1, buffer.c_str());
 
-	cout << endl;
-
 	delete[] f.program;
 	f.program = new int[7];
 	for (int indx = 0; indx < 7; indx++)
-	{
+{
 
 		f.program[indx] = 0;
 	}
 
-	int nr_frecventa;
+	int nr_proiectii,nr_ore;
 	int zi_rulare;
 
-	cout << "De cate ori va rula filmul intr-o sapatamana : ";
-	in >> nr_frecventa;
+	cout << "De cate ori va rula filmul intr-o saptamana : ";
+	in >> nr_proiectii;
 
 	cout << "In ce zile va rula filmul [Se va introduce numarul zilei saptamanii (ex: 3 pt Miercur)]: " << endl;
-	for (int indx = 1; indx <= nr_frecventa; indx++)
+	for (int indx = 1; indx <= nr_proiectii; indx++)
 	{
 		cout << "Ziua " << indx << ": ";
 		in >> zi_rulare;
@@ -879,18 +832,153 @@ istream& operator>> (istream& in, Film& f)
 
 	}
 
-	cout << endl;
+	delete[] f.ora_film;
+	cout << "Cate proiectii va avea filmul in fiecare zi : ";
+	in >> f.nr_proiectii;
+
+	cout << "La ce ore va rula filmul in fiecare zi: " << endl;
+	f.ora_film = new int[f.nr_proiectii];
+	for (int indx = 0; indx < f.nr_proiectii; indx++)
+	{
+		cout << "Proiecta " << indx + 1 << ": ";
+		in >> f.ora_film[indx];
+
+	}
 
 	cout << "Genul filmului: ";
 	in >> f.gen;
-	cout << endl;
 
 	cout << "Durata filmului: ";
 	in >> f.durata;
-	cout << endl;
+
+	cout << "Sala in care ruleaza : ";
+	in >> f.sala;
 
 	return in;
 }
+
+
+//Operator afisare info Bilete
+ostream& operator<< (ostream& out, Bilete b)
+{
+
+
+	out << "Detalii Bilet :" << endl;
+	out << "=============================" << endl;
+
+	out << "Cod Bilet : " << b.codBilet << endl;
+
+	out << "ID Film: " << b.idFilm << endl;
+
+	if (b.dataBilet != nullptr)
+	{
+		out << "Data emitere: " << b.dataBilet<< endl;
+	}
+
+	out << "Data spectacol: " << b. DataFilm << endl;
+
+	out << "Numar spectacole: " << b.nrFilme<< endl;
+
+	out << "Pretul: " << b.pret<< endl;
+	out << "Rand: " << b.rand<< endl;
+	out << "Loc: " << b.loc<< endl;
+
+	return out;
+}
+
+//Operator citire info Bilete
+istream& operator>> (istream& in, Bilete& b)
+{
+
+	string buffer;
+
+	cout <<"NUmele filmului pt care generati biletul: ";
+	in >> ws;
+	getline(in, b.Film);
+
+	delete[] b.dataBilet;
+	cout << "Data emiterii (ZZ.LL.AAAA): ";
+	getline(in, buffer);
+	b.dataBilet = new char[buffer.length() + 1];
+	strcpy_s(b.dataBilet, buffer.length() + 1, buffer.c_str());
+
+	cout << "Data spectacol (ZZ.LL.AAAA): ";
+	in >> ws;
+	getline(in, b.DataFilm);
+
+	cout << "Numar filme pentru care este emis biletul: ";
+	in >> b.nrFilme;
+
+	delete[] b.filme;
+	b.filme = new int[b.nrFilme];
+	for (int indx = 0; indx < b.nrFilme; indx++)
+	{
+
+		cout << "IDFilm " << indx + 1 << ": ";
+		in >> b.filme[indx];
+
+	}
+
+	cout << "Ora: ";
+	in >> b.Ora;
+
+	cout << "Sala: ";
+	in >> ws;
+	getline(in, b.sala);
+
+	cout << "Rand: ";
+	in >> b.rand;
+
+	cout << "Loc: ";
+	in >> b.loc;
+
+	cout << "Pret bilet: ";
+	in >> b.pret;
+	
+	
+	return in;
+}
+
+//Operator info Bilete salvare in fisier 
+ofstream& operator<<(ofstream& file_out, Bilete b)
+{
+
+	string buffer;
+
+	if (file_out.is_open())
+	{
+
+		file_out << b.Film <<endl;
+		file_out << b.DataFilm << endl;
+		file_out << b.Ora << endl;
+		file_out << b.sala << endl;
+		file_out << b.rand << endl;
+		file_out << b.loc << endl;
+
+		return file_out;
+
+	}
+}
+
+void Afisare_lista_filme(Film* lista_filme, int nr_filme)
+{
+
+	cout << "Detalii filme ce ruleaza in saptamana curenta " << endl;
+	cout << "======================================================================================" << endl;
+	cout << setw(7) << left << "ID" << setw(15) << left << "Titlu" << setw(10) << left << "Genul" 
+		<< setw(20) << left << "Program" << setw(15) << left << "Ore"
+		<< setw(15) << left << "Durata" << setw(15) << left << "Sala" << endl;
+	cout << "======================================================================================" << endl << endl;
+
+	for (int indx = 0; indx < nr_filme; indx++)
+	{
+
+		cout << &lista_filme[indx];
+	}
+
+
+}
+
 
 class Client
 {
