@@ -1012,6 +1012,72 @@ public:
 
 		return *this;
 	}
+	char* getNume()
+	{
+		if (nume == nullptr)
+			return nullptr;
+		char* copie = new char[strlen(nume) + 1];
+		strcpy_s(copie, strlen(nume) + 1, nume);
+		return copie;
+	}
+
+	void setNume(char* nume)
+	{
+		if (nume != nullptr)
+		{
+			if (this->nume != nullptr)
+				delete[]this->nume;
+			this->nume = new char[strlen(nume) + 1];
+			strcpy_s(this->nume, strlen(nume) + 1, nume);
+		}
+	}
+
+
+	int* getNrAsociatCard()
+	{
+		if (nrAsociatCard != nullptr)
+		{
+			int* copie = new int[nrCarduri];
+			for (int i = 0; i < nrCarduri; i++)
+			{
+				copie[i] = nrAsociatCard[i];
+			}
+			return copie;
+		}
+		else
+		{
+			return nullptr;
+		}
+	}
+
+	int getNrCarduri()
+	{
+		return nrCarduri;
+	}
+
+	void setNrAsociatCard(int* nrAsociatCard, int nrCarduri)
+	{
+		if (nrAsociatCard != nullptr && nrCarduri > 0)
+		{
+			if (this->nrAsociatCard != nullptr)
+				delete[]this->nrAsociatCard;
+			this->nrAsociatCard = new int[nrCarduri];
+			for (int i = 0; i < nrCarduri; i++)
+			{
+				this->nrAsociatCard[i] = nrAsociatCard[i];
+			}
+		}
+	}
+
+	string getEmail()
+	{
+		return email;
+	}
+
+	void setEmail(string email)
+	{
+		this->email = email;
+	}
 
 	int operator[](int index)
 	{
@@ -1062,6 +1128,49 @@ public:
 		if (nrCarduri == c.nrClienti)
 			return true;
 		return false;
+	}
+
+
+	void serializeClient()
+	{
+		ofstream f("Client.bin", ios::binary);
+		f.write(nume, (long long)strlen(nume) + 1);
+		f.write((char*)&nrCarduri, sizeof(nrCarduri));
+		for (int i = 0; i < nrCarduri; i++)
+		{
+			f.write((char*)&nrAsociatCard[i], sizeof(nrAsociatCard[i]));
+		}
+		f.write(email.c_str(), email.length());
+		f.close();
+	}
+
+	void deserializeClient()
+	{
+		ifstream f("Cliebt.bin", ios::binary);
+		string buffer = "";
+		char c = 0;
+		while ((c = f.get()) != 0)
+		{
+			buffer += c;
+		}
+		delete[] nume;
+		nume = new char[buffer.length() + 1];
+		strcpy_s(nume, buffer.length() + 1, buffer.c_str());
+
+		f.read((char*)&nrCarduri, sizeof(nrCarduri));
+		delete[] nrAsociatCard;
+		nrAsociatCard = new int[nrCarduri];
+		for (int i = 0; i < nrCarduri; i++)
+		{
+			f.read((char*)&nrAsociatCard[i], sizeof(nrAsociatCard[i]));
+		}
+
+		int length = 0;
+		f.read((char*)&length, sizeof(length));
+		char* aux = new char[length];
+		f.read(aux, length);
+		email = aux;
+		f.close();
 	}
 
 	friend ostream& operator<<(ostream&, Client);
@@ -1287,6 +1396,60 @@ public:
 		return *this;
 	}
 
+	char* getDataRezervare()
+	{
+		if (dataRezervare == nullptr)
+			return nullptr;
+		char* copie = new char[strlen(dataRezervare) + 1];
+		strcpy_s(copie, strlen(dataRezervare) + 1, dataRezervare);
+		return copie;
+	}
+
+	void setDataRezervare(char* dataRezervare)
+	{
+		if (dataRezervare != nullptr)
+		{
+			if (this->dataRezervare != nullptr)
+				delete[]this->dataRezervare;
+			this->dataRezervare = new char[strlen(dataRezervare) + 1];
+			strcpy_s(this->dataRezervare, strlen(dataRezervare) + 1, dataRezervare);
+
+		}
+	}
+
+	int* getNrBileteRezervate()
+	{
+		if (nrBileteRezervate != nullptr)
+		{
+			int* copie = new int[nrBilete];
+			for (int i = 0; i < nrBilete; i++)
+			{
+				copie[i] = nrBileteRezervate[i];
+			}
+			return copie;
+		}
+		return nullptr;
+	}
+
+	int getNrBilete()
+	{
+		return nrBilete;
+	}
+
+	void setNrBileteRezervate(int* nrBileteRezervate, int nrBilete)
+	{
+		if (nrBileteRezervate != nullptr && nrBilete > 0)
+		{
+			if (this->nrBileteRezervate != nullptr)
+				delete[]this->nrBileteRezervate;
+			this->nrBileteRezervate = new int[nrBilete];
+			for (int i = 0; i < nrBilete; i++)
+			{
+				this->nrBileteRezervate[i] = nrBileteRezervate[i];
+			}
+		}
+	}
+
 	int& operator[](int index) throw (exception)
 	{
 		if (index >= 0 && index < nrBilete / sizeof(int) && nrBileteRezervate != nullptr)
@@ -1337,6 +1500,43 @@ public:
 			return true;
 		return false;
 	}
+
+	void serializeRezervare()
+	{
+		ofstream f("Rezervare.bin", ios::binary);
+		f.write(dataRezervare, (long long)strlen(dataRezervare) + 1);
+		f.write((char*)&nrBilete, sizeof(nrBilete));
+		for (int i = 0; i < nrBilete; i++)
+		{
+			f.write((char*)&nrBileteRezervate[i], sizeof(nrBileteRezervate[i]));
+		}
+		f.close();
+	}
+
+	void deserializeRezervare()
+	{
+		ifstream f("Rezervare.bin", ios::binary);
+		string buffer = "";
+		char c = 0;
+		while ((c = f.get()) != 0)
+		{
+			buffer += c;
+		}
+		delete[] dataRezervare;
+		dataRezervare = new char[buffer.length() + 1];
+		strcpy_s(dataRezervare, buffer.length() + 1, buffer.c_str());
+
+		f.read((char*)&nrBilete, sizeof(nrBilete));
+		delete[] nrBileteRezervate;
+		nrBileteRezervate = new int[nrBilete];
+		for (int i = 0; i < nrBilete; i++)
+		{
+			f.read((char*)&nrBileteRezervate[i], sizeof(nrBileteRezervate[i]));
+		}
+
+		f.close();
+	}
+
 	friend ostream& operator<<(ostream&, Rezervare);
 	friend istream& operator>>(istream&, Rezervare&);
 };
@@ -1970,4 +2170,19 @@ int main()
 		r1.operator--();
 		cout << r1.getNrBilete();*/
 
+		/*int asociatCard[] = { 1,2,3,4,5,6,7 };
+	string email = "vasile.ion@yahoo.com";
+	Client c((char*)"Vasile Ion", asociatCard, 7, email);
+	cout << c.getNume() << endl;
+	cout << c.getNrCarduri() << endl;
+	cout << c.getNrAsociatCard() << endl;
+	cout << c.getEmail() << endl;
+	string email1 = "vasile@yahoo.com";
+	c.setEmail(email1);
+	cout << c.getEmail();
+		*/
+
+	//int nrBilete[] = { 1,2,3,4,5,6,7,8 };
+	//Rezervare r((char*)"12/10/2020", nrBilete, 8, true);
+	//cout << r.getNrBileteRezervate();
 }
