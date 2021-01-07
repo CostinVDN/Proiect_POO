@@ -1762,9 +1762,9 @@ istream& operator>> (istream& in, Sala& s)
 
 int main()
 {
-	Client c;
-	cin >> c;
-	cout << c;
+	//Client c;
+	//cin >> c;
+	//cout << c;
 	int** matrice2 = new int* [2];
 	for (int i = 0; i < 2; i++)
 	{
@@ -1793,37 +1793,43 @@ int main()
 
 	vector<Film> vectorFilm;
 
-		vectorFilm.push_back(f1);
-		vectorFilm.push_back(f2);
-		vectorFilm.push_back(f3);
+	vectorFilm.push_back(f1);
+	vectorFilm.push_back(f2);
+	vectorFilm.push_back(f3);
 
 
 	int optiune = 0;
 	int optiuneFilm = 0;
 	int rand = 0;
 	int loc = 0;
-	do
+
+
+	while (true)
 	{
-		cout << " Meniu:" << endl;
+		cout << endl << "==== Meniu: ====" << endl << endl;
 		cout << "1. Filme" << endl;
 		cout << "2. Rezervare bilet" << endl;
+		cout << "0. Exit" << endl;
 		cout << endl << "Selecteaza optiunea: ";
+
 		cin >> optiune;
 		cout << endl;
 
 		switch (optiune)
 		{
+		case 0:
+			break;
 		case 1:
 
 			for (int i = 0; i < 3; i++)
 			{
 				cout << vectorFilm[i];
 			}
-			break;
+			continue;
 		case 2:
 
 			cin >> r;
-			
+
 			for (int i = 0; i < 3; i++)
 			{
 				cout << endl << "Apasa " << i + 1 << " pentru filmul: " << endl;
@@ -1836,7 +1842,7 @@ int main()
 			cout << endl << "Selecteaza randul si locul: " << endl;
 			cout << s1 << endl;
 
-			
+
 			cout << "Rand: ";
 			cin >> rand;
 			cout << "Loc: ";
@@ -1850,117 +1856,118 @@ int main()
 		default:
 			cout << "Optiunea este invalida, incerca din nou!" << endl << endl;
 		}
+		break;
 
-	} while (optiune == 0);
+	}
 
 
 	//string zile_sapt[] = { "Luni", "Marti", "Miercuri", "Joi", "Vineri", "Sambata", "Duminica" };
 
-	///*Film film_nou;
-	//cin >> film_nou;
-	//cout << film_nou;*/
+		///*Film film_nou;
+		//cin >> film_nou;
+		//cout << film_nou;*/
 
-	//int zile[] = { 0, 1, 1, 0, 0, 1, 0 };
-	//Film film_nou_1((char*)"Film 1", zile, "Comedie", 90, 15);
+		//int zile[] = { 0, 1, 1, 0, 0, 1, 0 };
+		//Film film_nou_1((char*)"Film 1", zile, "Comedie", 90, 15);
 
-	//int zile1[] = { 1, 1, 1, 0, 0, 1, 1 };
-	//Film film_nou_2((char*)"Film 2", zile1, "Comedie", 85, 11);
+		//int zile1[] = { 1, 1, 1, 0, 0, 1, 1 };
+		//Film film_nou_2((char*)"Film 2", zile1, "Comedie", 85, 11);
 
-	//int zile2[] = { 1, 0, 1, 0, 0, 1, 1 };
-	//Film film_nou_3((char*)"Film 3", zile2, "Actiune", 120, 12);
+		//int zile2[] = { 1, 0, 1, 0, 0, 1, 1 };
+		//Film film_nou_3((char*)"Film 3", zile2, "Actiune", 120, 12);
 
-	//Film filme[] = { film_nou_1, film_nou_2, film_nou_3 };
+		//Film filme[] = { film_nou_1, film_nou_2, film_nou_3 };
 
-	//cout << filme[1] << endl;
-	//cout << filme[2] << endl << endl;
+		//cout << filme[1] << endl;
+		//cout << filme[2] << endl << endl;
 
-	//if (filme[1] == filme[2])
-	//{
+		//if (filme[1] == filme[2])
+		//{
 
-	//	cout << "Filmele ruleaza concomitent!";
-	//}
-	//else
-	//{
+		//	cout << "Filmele ruleaza concomitent!";
+		//}
+		//else
+		//{
 
-	//	cout << "Filmele nu ruleaza in aceleasi zile";
+		//	cout << "Filmele nu ruleaza in aceleasi zile";
 
-	//}
+		//}
 
-	//cout << filme[2] + 1 << endl;
-	//cout << filme[2] + 3 << endl;
-	//cout << string(filme[2]) <<endl;
-	//cout << int(filme[2]) << endl;
+		//cout << filme[2] + 1 << endl;
+		//cout << filme[2] + 3 << endl;
+		//cout << string(filme[2]) <<endl;
+		//cout << int(filme[2]) << endl;
 
-	//cout << "Filmul care ruleaza de mai multe ori  este: " << string(filme[2] >= filme[1]) << endl;
+		//cout << "Filmul care ruleaza de mai multe ori  este: " << string(filme[2] >= filme[1]) << endl;
 
-	//if (!filme[2])
-	//{
+		//if (!filme[2])
+		//{
 
-	//	cout << "Filmul nu este in top 10 !";
+		//	cout << "Filmul nu este in top 10 !";
 
-	//}
-	//else
-	//{
+		//}
+		//else
+		//{
 
-	//	cout << "Filmul este in top 10!";
-	//}
+		//	cout << "Filmul este in top 10!";
+		//}
 
-	/*cout << ++filme[2];
+		/*cout << ++filme[2];
 
-	cout << filme[2]++;*/
+		cout << filme[2]++;*/
 
-	//Sala sala_noua;
-	//cin >> sala_noua;
-	//cout << sala_noua;
+		//Sala sala_noua;
+		//cin >> sala_noua;
+		//cout << sala_noua;
 
-	/*int** matrice1 = new int* [2];
-	for (int i = 0; i < 2; i++)
-	{
-		matrice1[i] = new int[2];
-	}
+		/*int** matrice1 = new int* [2];
+		for (int i = 0; i < 2; i++)
+		{
+			matrice1[i] = new int[2];
+		}
 
-	int** matrice2 = new int* [2];
-	for (int i = 0; i < 2; i++)
-	{
-		matrice2[i] = new int[4];
-	}
+		int** matrice2 = new int* [2];
+		for (int i = 0; i < 2; i++)
+		{
+			matrice2[i] = new int[4];
+		}
 
-	matrice1[0][0] = 1;
-	matrice1[0][1] = 0;
-	matrice1[1][0] = 0;
-	matrice1[1][1] = 1;
+		matrice1[0][0] = 1;
+		matrice1[0][1] = 0;
+		matrice1[1][0] = 0;
+		matrice1[1][1] = 1;
 
-	//Sala sala_1((char*)"Venus", matrice1, 2, 2, "3D");
-	//cout << "Nr de locuri libere in sala:";
-	//cin >> sala_1;
-	cout << sala_1 << endl;
+		//Sala sala_1((char*)"Venus", matrice1, 2, 2, "3D");
+		//cout << "Nr de locuri libere in sala:";
+		//cin >> sala_1;
+		cout << sala_1 << endl;
 
 
-	matrice2[0][0] = 1;
-	matrice2[0][1] = 0;
-	matrice2[0][2] = 0;
-	matrice2[0][3] = 0;
-	matrice2[1][0] = 1;
-	matrice2[1][1] = 0;
-	matrice2[1][2] = 1;
-	matrice2[1][3] = 0;
+		matrice2[0][0] = 1;
+		matrice2[0][1] = 0;
+		matrice2[0][2] = 0;
+		matrice2[0][3] = 0;
+		matrice2[1][0] = 1;
+		matrice2[1][1] = 0;
+		matrice2[1][2] = 1;
+		matrice2[1][3] = 0;
 
-	Sala sala_2((char*)"Terra", matrice2, 2, 4, "2D");
-	cout << "Nr de locuri libere in sala:";
-	//cin >> sala_2;
-	cout << sala_2[1] << endl;
+		Sala sala_2((char*)"Terra", matrice2, 2, 4, "2D");
+		cout << "Nr de locuri libere in sala:";
+		//cin >> sala_2;
+		cout << sala_2[1] << endl;
 
-	if (sala_1 == sala_2)
-		cout << "Salile au acelasi numar de locuri ocupate.";
-	else
-		cout << "Salile NU au acelasi numar de locuri ocupate.";
-		*/
+		if (sala_1 == sala_2)
+			cout << "Salile au acelasi numar de locuri ocupate.";
+		else
+			cout << "Salile NU au acelasi numar de locuri ocupate.";
+			*/
 
-		/*int nrBileteRezervate1[] = { 1,2,3,4,5 };
-	int nrBileteRezervate2[] = { 6,7,8,9,10 };
-	Rezervare r1((char*)"12/02/2020", nrBileteRezervate1, 5, true);
-	Rezervare r2((char*)"02/02/2020", nrBileteRezervate2, 5, true);
-	r1.operator--();
-	cout << r1.getNrBilete();*/
+			/*int nrBileteRezervate1[] = { 1,2,3,4,5 };
+		int nrBileteRezervate2[] = { 6,7,8,9,10 };
+		Rezervare r1((char*)"12/02/2020", nrBileteRezervate1, 5, true);
+		Rezervare r2((char*)"02/02/2020", nrBileteRezervate2, 5, true);
+		r1.operator--();
+		cout << r1.getNrBilete();*/
 
 }
