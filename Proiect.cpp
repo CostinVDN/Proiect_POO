@@ -320,6 +320,28 @@ public:
 		return this->idFilm;
 	}
 
+	void serializare_bilet(ofstream& f, Bilete bilete)
+	{
+		int lungime_sir = 0;
+
+		lungime_sir = Film.length() + 1;
+		f.write((char*)&lungime_sir, sizeof(lungime_sir));
+		f.write(Film.c_str(), lungime_sir);
+
+		f.write(dataBilet, (long long)strlen(dataBilet) + 1);
+
+		f.write((char*)&Ora, sizeof(Ora));
+		f.write((char*)&rand, sizeof(rand));
+		f.write((char*)&loc, sizeof(loc));
+
+		lungime_sir = sala.length() + 1;
+		f.write((char*)&lungime_sir, sizeof(lungime_sir));
+		f.write(sala.c_str(), lungime_sir);
+		f.write((char*)&pret, sizeof(pret));
+
+		f.write("\n\r", sizeof("\n\r"));
+	}
+
 	friend istream& operator>> (istream&, Bilete&);
 	friend ostream& operator<< (ostream&, Bilete);
 	friend ofstream& operator<<(ofstream&, Bilete);
@@ -754,6 +776,35 @@ public:
 
 		return true;
 
+	}
+
+	void serializare_film(ofstream &f, Film film)
+	{
+		int lungime_sir = 0;
+
+		f.write(nume, (long long)strlen(nume)+1);
+		
+		lungime_sir = gen.length() + 1;
+		f.write((char*)&lungime_sir, sizeof(lungime_sir));
+		f.write(gen.c_str(), lungime_sir);
+
+		for (int i = 0; i < 7; i++)
+		{
+			f.write((char*)&program[i], sizeof(program[i]));
+		}
+
+		for (int i = 0; i < nr_proiectii; i++)
+		{
+			f.write((char*)&ora_film[i], sizeof(ora_film[i]));
+		}
+
+		f.write((char*)&durata, sizeof(durata));
+
+		lungime_sir = sala.length() + 1;
+		f.write((char*)&lungime_sir, sizeof(lungime_sir));
+		f.write(sala.c_str(), lungime_sir);
+
+		f.write("\n\r", sizeof("\n\r"));
 	}
 
 	friend ostream& operator<< (ostream&, Film);
@@ -2047,10 +2098,251 @@ istream& operator>> (istream& in, Sala& s)
 	return in;
 }
 
+void Afisare_lista_filme(Film** lista_filme, int nr_filme)
+{
+
+
+	cout << "Detalii filme ce ruleaza in saptamana curenta " << endl;
+	cout << "======================================================================================" << endl;
+	cout << setw(7) << left << "ID" << setw(15) << left << "Titlu" << setw(10) << left << "Genul" 
+		<< setw(20) << left << "Program" << setw(15) << left << "Ore"
+		<< setw(15) << left << "Durata" << setw(15) << left << "Sala" << endl;
+	cout << "======================================================================================" << endl << endl;
+
+	for (int indx = 0; indx < nr_filme; indx++)
+	{
+
+		if (lista_filme[indx] != nullptr)
+			cout << (*lista_filme[indx]);
+
+	}
+
+}
+
+void Afisare_lista_bilete(Bilete** lista_bilete, int nr_bilete)
+{
+
+
+	cout << "Detalii bilete emise " << endl;
+	cout << "======================================================================================" << endl;
+	cout << setw(7) << left << "ID" << setw(15) << left << "Film" << setw(15) << left << "Data bilet"
+		<< setw(7) << left << "Ora" << setw(7) << left << "Rand" << setw(7) << left << "Loc" 
+		<< setw(15) << left << "Sala " << setw(15) << left << "Pret" << endl;
+	cout << "======================================================================================" << endl << endl;
+
+	for (int indx = 0; indx < nr_bilete; indx++)
+	{
+
+		if (lista_bilete[indx] != nullptr)
+			cout << (*lista_bilete[indx]);
+
+	}
+
+}
+
+void Modificare_info_filme(Film** lista_filme, int nr_filme)
+{
+
+	//2. Modificare film si afisare nuoa lista filme
+	int idfilm = 1;
+	
+	cout << "Introduceti ID FIlm pe care doriti sa-l modificati ";
+	do
+	{
+
+		cin >> idfilm;
+
+	} while ((idfilm < 1) || (idfilm > nr_filme));
+
+	cin >> (*lista_filme[idfilm - 1]);
+
+	Afisare_lista_filme(lista_filme, nr_filme);
+
+}
+
+void Modificare_info_bilete(Bilete** lista_bilete, int nr_bilete)
+{
+
+	//2. Modificare film si afisare nuoa lista filme
+	int idbilet = 1;
+
+	cout << "Introduceti ID Bilet pe care doriti sa-l modificati ";
+	do
+	{
+
+		cin >> idbilet;
+
+	} while ((idbilet< 1) || (idbilet> nr_bilete));
+
+	cin >> (*lista_bilete[idbilet- 1]);
+
+	Afisare_lista_bilete(lista_bilete, nr_bilete);
+
+}
+
+void Stergere_info_film(Film** lista_filme, int nr_filme)
+{
+
+	int idfilm = 1;
+
+	cout << "Introduceti ID FIlm pe care doriti sa-l stergeti: ";
+
+	do
+	{
+
+		cin >> idfilm;
+
+	} while ((idfilm < 1) || (idfilm > nr_filme));
+
+	lista_filme[idfilm - 1] = nullptr;
+
+	Afisare_lista_filme(lista_filme, nr_filme);
+
+}
+
+
+void Stergere_info_bilet(Bilete** lista_bilete, int nr_bilete)
+{
+
+	int idbilet = 1;
+
+	Afisare_lista_bilete(lista_bilete, nr_bilete);
+	cout << endl;
+
+	cout << "Introduceti ID Bilet pe care doriti sa-l stergeti: ";
+
+	do
+	{
+
+		cin >> idbilet;
+
+	} while ((idbilet< 1) || (idbilet> nr_bilete));
+
+	lista_bilete[idbilet- 1] = nullptr;
+
+	Afisare_lista_bilete(lista_bilete, nr_bilete);
+
+}
 
 
 int main()
 {
+
+	//OPERATII FILME
+
+	//1. Adaugare filme si afisare lista filme inregistrate
+	int nr_filme = 0, opt;
+	Film** lista_filme = nullptr;
+
+	cout << "Introduceti nr de filme ce urmeaza a fi inregistrate: ";
+	do
+	{
+
+		cin >> nr_filme;
+
+	} while (nr_filme < 0);
+
+	lista_filme = new Film * [nr_filme];
+	for (int indx = 0; indx < nr_filme; indx++)
+	{
+
+		lista_filme[indx] = new Film();
+		cin >> (*lista_filme[indx]);
+
+		cout << endl;
+	}
+
+	Afisare_lista_filme(lista_filme, nr_filme);
+
+
+	//2. Modificare film
+	Modificare_info_filme(lista_filme, nr_filme);
+	
+
+	//3. Stergere film
+	Stergere_info_film(lista_filme, nr_filme);
+
+
+	//4. Serializare filme
+	ofstream f("film.bin", ios::binary);
+	for (int indx = 0; indx < nr_filme; indx++)
+	{
+
+		if (lista_filme[indx] != nullptr)
+			lista_filme[indx]->serializare_film(f, (*lista_filme[indx]));
+
+	}
+
+	f.close();
+
+	
+	//OPERATIUNI BILETE
+
+	//1. Adaugare Bilete si afisare lisa bilete emise
+	int nr_bilete = 0;
+	Bilete** lista_bilete = nullptr;
+
+	//system("cls");
+	cout << "Introduceti nr de Bilete: ";
+	do
+	{
+
+		cin >> nr_bilete;
+
+	} while (nr_bilete < 0);
+
+	lista_bilete= new Bilete* [nr_bilete];
+
+	for (int indx = 0; indx < nr_bilete; indx++)
+	{
+
+		lista_bilete[indx] = new Bilete();
+		cin >> (*lista_bilete[indx]);
+
+		cout << endl;
+	}
+
+	Afisare_lista_bilete(lista_bilete, nr_bilete);
+
+
+	//2. Modificare bilet
+	Modificare_info_bilete(lista_bilete, nr_bilete);
+
+
+	//3. Stergere bilet
+	Stergere_info_bilet(lista_bilete, nr_bilete);
+
+	//4. Salvare bilete in fisier
+	 f.open("Info_bilete.txt");
+
+	for (int indx = 0; indx < nr_bilete; indx++)
+	{
+
+		if (lista_bilete[indx] != nullptr)
+			f << (*lista_bilete[indx]);
+
+	}
+	
+	f.close()*/
+
+	//5. Serializare filme
+	f.open("bilet.bin", ios::binary);
+	for (int indx = 0; indx < nr_bilete; indx++)
+	{
+
+		if (lista_bilete[indx] != nullptr)
+			lista_bilete[indx]->serializare_bilet(f, (*lista_bilete[indx]));
+
+	}
+
+	f.close();
+
+	delete[] lista_filme;
+	delete[] lista_bilete;
+
+
+
+
 	//Client c;
 	//cin >> c;
 	//cout << c;
