@@ -1938,9 +1938,9 @@ public:
 	}
 
 
-	void setLocuriSala(int nrRanduri, int nrLocuriPeRand)
+	void setLocuriSala(int rand, int loc)
 	{
-		locuriSala[nrRanduri][nrLocuriPeRand] = 1;
+		locuriSala[rand - 1][loc - 1] = 1;
 	}
 
 	//getter nume sala
@@ -1966,8 +1966,11 @@ public:
 				for (int j = 0; j < nrLocuriPeRand; j++)
 				{
 					cout << " " << locuriSala[i][j];
-					if (locuriSala[i][j] == 0);
-					locuriLibere++;
+					if (locuriSala[i][j] == 0)
+					{
+						locuriLibere++;
+					}
+					
 				}
 				cout << endl;
 			}
@@ -2398,114 +2401,114 @@ int main()
 	//OPERATII FILME
 
 	//1. Adaugare filme si afisare lista filme inregistrate
-	int nr_filme = 0, opt;
-	Film** lista_filme = nullptr;
+	//int nr_filme = 0, opt;
+	//Film** lista_filme = nullptr;
 
-	cout << "Introduceti nr de filme ce urmeaza a fi inregistrate: ";
-	do
-	{
+	//cout << "Introduceti nr de filme ce urmeaza a fi inregistrate: ";
+	//do
+	//{
 
-		cin >> nr_filme;
+	//	cin >> nr_filme;
 
-	} while (nr_filme < 0);
+	//} while (nr_filme < 0);
 
-	lista_filme = new Film * [nr_filme];
-	for (int indx = 0; indx < nr_filme; indx++)
-	{
+	//lista_filme = new Film * [nr_filme];
+	//for (int indx = 0; indx < nr_filme; indx++)
+	//{
 
-		lista_filme[indx] = new Film();
-		cin >> (*lista_filme[indx]);
+	//	lista_filme[indx] = new Film();
+	//	cin >> (*lista_filme[indx]);
 
-		cout << endl;
-	}
+	//	cout << endl;
+	//}
 
-	Afisare_lista_filme(lista_filme, nr_filme);
-
-
-	//2. Modificare film
-	Modificare_info_filme(lista_filme, nr_filme);
+	//Afisare_lista_filme(lista_filme, nr_filme);
 
 
-	//3. Stergere film
-	Stergere_info_film(lista_filme, nr_filme);
+	////2. Modificare film
+	//Modificare_info_filme(lista_filme, nr_filme);
 
 
-	//4. Serializare filme
-	ofstream f("film.bin", ios::binary);
-	for (int indx = 0; indx < nr_filme; indx++)
-	{
-
-		if (lista_filme[indx] != nullptr)
-			lista_filme[indx]->serializare_film(f, (*lista_filme[indx]));
-
-	}
-
-	f.close();
+	////3. Stergere film
+	//Stergere_info_film(lista_filme, nr_filme);
 
 
-	//OPERATIUNI BILETE
+	////4. Serializare filme
+	//ofstream f("film.bin", ios::binary);
+	//for (int indx = 0; indx < nr_filme; indx++)
+	//{
 
-	//1. Adaugare Bilete si afisare lisa bilete emise
-	int nr_bilete = 0;
-	Bilete** lista_bilete = nullptr;
+	//	if (lista_filme[indx] != nullptr)
+	//		lista_filme[indx]->serializare_film(f, (*lista_filme[indx]));
 
-	//system("cls");
-	cout << "Introduceti nr de Bilete: ";
-	do
-	{
+	//}
 
-		cin >> nr_bilete;
-
-	} while (nr_bilete < 0);
-
-	lista_bilete = new Bilete * [nr_bilete];
-
-	for (int indx = 0; indx < nr_bilete; indx++)
-	{
-
-		lista_bilete[indx] = new Bilete();
-		cin >> (*lista_bilete[indx]);
-
-		cout << endl;
-	}
-
-	Afisare_lista_bilete(lista_bilete, nr_bilete);
+	//f.close();
 
 
-	//2. Modificare bilet
-	Modificare_info_bilete(lista_bilete, nr_bilete);
+	////OPERATIUNI BILETE
+
+	////1. Adaugare Bilete si afisare lisa bilete emise
+	//int nr_bilete = 0;
+	//Bilete** lista_bilete = nullptr;
+
+	////system("cls");
+	//cout << "Introduceti nr de Bilete: ";
+	//do
+	//{
+
+	//	cin >> nr_bilete;
+
+	//} while (nr_bilete < 0);
+
+	//lista_bilete = new Bilete * [nr_bilete];
+
+	//for (int indx = 0; indx < nr_bilete; indx++)
+	//{
+
+	//	lista_bilete[indx] = new Bilete();
+	//	cin >> (*lista_bilete[indx]);
+
+	//	cout << endl;
+	//}
+
+	//Afisare_lista_bilete(lista_bilete, nr_bilete);
 
 
-	//3. Stergere bilet
-	Stergere_info_bilet(lista_bilete, nr_bilete);
+	////2. Modificare bilet
+	//Modificare_info_bilete(lista_bilete, nr_bilete);
 
-	//4. Salvare bilete in fisier
-	f.open("Info_bilete.txt");
 
-	for (int indx = 0; indx < nr_bilete; indx++)
-	{
+	////3. Stergere bilet
+	//Stergere_info_bilet(lista_bilete, nr_bilete);
 
-		if (lista_bilete[indx] != nullptr)
-			f << (*lista_bilete[indx]);
+	////4. Salvare bilete in fisier
+	//f.open("Info_bilete.txt");
 
-	}
+	//for (int indx = 0; indx < nr_bilete; indx++)
+	//{
 
-	f.close();
+	//	if (lista_bilete[indx] != nullptr)
+	//		f << (*lista_bilete[indx]);
 
-		//5. Serializare filme
-		f.open("bilet.bin", ios::binary);
-	for (int indx = 0; indx < nr_bilete; indx++)
-	{
+	//}
 
-		if (lista_bilete[indx] != nullptr)
-			lista_bilete[indx]->serializare_bilet(f, (*lista_bilete[indx]));
+	//f.close();
 
-	}
+	//	//5. Serializare filme
+	//	f.open("bilet.bin", ios::binary);
+	//for (int indx = 0; indx < nr_bilete; indx++)
+	//{
 
-	f.close();
+	//	if (lista_bilete[indx] != nullptr)
+	//		lista_bilete[indx]->serializare_bilet(f, (*lista_bilete[indx]));
 
-	delete[] lista_filme;
-	delete[] lista_bilete;
+	//}
+
+	//f.close();
+
+	//delete[] lista_filme;
+	//delete[] lista_bilete;
 
 
 
@@ -2513,39 +2516,19 @@ int main()
 	//Client c;
 	//cin >> c;
 	//cout << c;
-	int** matrice = new int* [2];
-	for (int i = 0; i < 2; i++)
-	{
-		matrice[i] = new int[4];
-	}
-
-	matrice[0][0] = 0;
-	matrice[0][1] = 0;
-	matrice[0][2] = 1;
-	matrice[0][3] = 1;
-	matrice[0][4] = 0;
-	matrice[0][5] = 0;
-	matrice[1][0] = 0;
-	matrice[1][1] = 1;
-	matrice[1][2] = 1;
-	matrice[1][3] = 1;
-	matrice[1][4] = 1;
-	matrice[1][5] = 0;
-	matrice[2][0] = 1;
-	matrice[2][1] = 1;
-	matrice[2][2] = 1;
-	matrice[2][3] = 1;
-	matrice[2][4] = 1;
-	matrice[2][5] = 1;
-	matrice[3][0] = 0;
-	matrice[3][1] = 0;
-	matrice[3][2] = 0;
-	matrice[3][3] = 0;
-	matrice[3][4] = 0;
-	matrice[3][5] = 0;
+	//int** matrice = new int* [4];
+	//for (int i = 0; i < 2; i++)
+	//{
+	//	matrice[i] = new int[6];
+	//}
 
 
-	Sala s1((char*)"Venus", 4, 6, "3D");
+
+	Sala s1((char*)"Venus", 7, 5, "3D");
+	s1.getLocuriSala();
+	s1.setLocuriSala(3, 4);
+	s1.getLocuriSala();
+
 
 	//int ff1[] = { 0, 1, 1, 0, 0, 1, 0 };
 	//Film f1((char*)"The Call of the Wild", ff1, "Aventura", 90, "Venus", 3, 1, 1);
