@@ -3,6 +3,7 @@
 #include <vector>
 #include <fstream>
 #include <iomanip>
+
 using namespace std;
 
 class Bilete
@@ -34,6 +35,8 @@ public:
 		pret = 0.0;
 		rand = 0;
 		loc = 0;
+		Ora = 10;
+		Film = "";
 
 	}
 
@@ -915,25 +918,9 @@ ostream& operator<< (ostream& out, Bilete b)
 {
 
 
-	out << "Detalii Bilet :" << endl;
-	out << "=============================" << endl;
-
-	out << "Cod Bilet : " << b.codBilet << endl;
-
-	out << "ID Film: " << b.idFilm << endl;
-
-	if (b.dataBilet != nullptr)
-	{
-		out << "Data emitere: " << b.dataBilet << endl;
-	}
-
-	out << "Data spectacol: " << b.DataFilm << endl;
-
-	out << "Numar spectacole: " << b.nrFilme << endl;
-
-	out << "Pretul: " << b.pret << endl;
-	out << "Rand: " << b.rand << endl;
-	out << "Loc: " << b.loc << endl;
+	cout << setw(7) << left << b.codBilet << setw(15) << left << b.Film << setw(15) << left << b.dataBilet
+		<< setw(7) << left << b.Ora << setw(7) << left << b.rand << setw(7) << left << b.loc
+		<< setw(15) << left << b.sala << setw(15) << left << b.pret << endl;
 
 	return out;
 }
@@ -2503,7 +2490,7 @@ int main()
 
 	}
 
-	f.close()* /
+	f.close();
 
 		//5. Serializare filme
 		f.open("bilet.bin", ios::binary);
@@ -2560,20 +2547,20 @@ int main()
 
 	Sala s1((char*)"Venus", 4, 6, "3D");
 
-	int ff1[] = { 0, 1, 1, 0, 0, 1, 0 };
-	Film f1((char*)"The Call of the Wild", ff1, "Aventura", 90, "Venus", 3,1, 1);
-	Film f2((char*)"The Christmas Chronicles II", ff1, "Comedie", 90, "Venus", 3, 18, 1);
-	Film f3((char*)"Top Gun: Maverick", ff1, "Actiune", 90, "Venus", 3, 18, 1);
+	//int ff1[] = { 0, 1, 1, 0, 0, 1, 0 };
+	//Film f1((char*)"The Call of the Wild", ff1, "Aventura", 90, "Venus", 3, 1, 1);
+	//Film f2((char*)"The Christmas Chronicles II", ff1, "Comedie", 90, "Venus", 3, 18, 1);
+	//Film f3((char*)"Top Gun: Maverick", ff1, "Actiune", 90, "Venus", 3, 18, 1);
 
 	Rezervare r;
 	Sala s;
 
-	vector<Film> vectorFilm;
+	/*vector<Film> vectorFilm;
 
 	vectorFilm.push_back(f1);
 	vectorFilm.push_back(f2);
 	vectorFilm.push_back(f3);
-
+*/
 
 	int optiune = 0;
 	int optiuneFilm = 0;
@@ -2581,7 +2568,7 @@ int main()
 	int loc = 0;
 
 
-	while (true)
+	/*while (true)
 	{
 		cout << endl << "==== Meniu: ====" << endl << endl;
 		cout << "1. Filme" << endl;
@@ -2635,7 +2622,7 @@ int main()
 		}
 		break;
 
-	}
+	}*/
 
 
 	//Sala s1;
