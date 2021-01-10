@@ -849,7 +849,6 @@ ostream& operator<< (ostream& out, Film f)
 	return out;
 }
 
-
 //Operator citire info Filme
 istream& operator>> (istream& in, Film& f)
 {
@@ -911,7 +910,6 @@ istream& operator>> (istream& in, Film& f)
 
 	return in;
 }
-
 
 //Operator afisare info Bilete
 ostream& operator<< (ostream& out, Bilete b)
@@ -1018,7 +1016,6 @@ void Afisare_lista_filme(Film* lista_filme, int nr_filme)
 
 }
 
-
 class Client
 {
 private:
@@ -1038,7 +1035,7 @@ public:
 		email = "";
 	}
 
-	Client(char* nume, int* nrAsociatCard, int nrCarduri, string tipClient, bool abonat) : idClient(++nrClienti)
+	Client(char* nume, int nrCarduri, int* nrAsociatCard, string email) : idClient(++nrClienti)
 	{
 		if (nume != nullptr)
 		{
@@ -1233,7 +1230,7 @@ public:
 		return this->nume;
 	}
 
-	//Verifica daca clientul a selectat un numar de zile
+	//Verifica daca clientul a selectat un numar de carduri
 	bool operator!()
 	{
 		if (nrCarduri == 0)
@@ -1249,7 +1246,7 @@ public:
 		return c;
 	}
 
-	//Verifica daca doi clienti au selectat acelasi numar de zile
+	//Verifica daca doi clienti au selectat acelasi numar de carduri
 	bool operator==(Client& c)
 	{
 		if (nrCarduri == c.nrClienti)
@@ -1273,7 +1270,7 @@ public:
 
 	void deserializeClient()
 	{
-		ifstream f("Cliebt.bin", ios::binary);
+		ifstream f("Client.bin", ios::binary);
 		string buffer = "";
 		char c = 0;
 		while ((c = f.get()) != 0)
@@ -1336,10 +1333,10 @@ ostream& operator<<(ostream& out, Client c)
 
 istream& operator>>(istream& in, Client& c)
 {
-	cout << "Nume: ";
+	cout << endl << "Nume: ";
 	delete[] c.nume;
 	char buffer[50];
-	//in >> ws;
+	in >> ws;
 	in.getline(buffer, 49);
 	c.nume = new char[strlen(buffer) + 1];
 	strcpy_s(c.nume, strlen(buffer) + 1, buffer);
@@ -2221,7 +2218,6 @@ istream& operator>> (istream& in, Sala& s)
 	return in;
 }
 
-
 ofstream& operator<<(ofstream& of, Sala s)
 {
 	int locuriLibere = 0;
@@ -2370,7 +2366,6 @@ void Stergere_info_film(Film** lista_filme, int nr_filme)
 
 }
 
-
 void Stergere_info_bilet(Bilete** lista_bilete, int nr_bilete)
 {
 
@@ -2394,44 +2389,165 @@ void Stergere_info_bilet(Bilete** lista_bilete, int nr_bilete)
 
 }
 
+void administrareCinema()
+{
+	int nr_filme = 0;
+	Film** lista_filme = nullptr;
+
+	int nr_bilete = 0;
+	Bilete** lista_bilete = nullptr;
+	
+
+	int optiune = 0;
+	int opt1 = 0;
+	int opt2 = 0;
+	int opt3 = 0;
+	while (true)
+	{
+		cout << endl << "==== Meniu ====" << endl << endl <<
+			"1. Administrare sala" << endl <<
+			"2. Administrare film" << endl <<
+			"3. Administrare tip bilet" << endl <<
+			"0. Revenire la meniul anterior" << endl;
+
+		cout <<endl << "Selecteaza optiunea: ";
+		cin >> optiune;
+
+		switch (optiune)
+		{
+		case 0:
+			break;
+		case 1:
+			while (true)
+			{
+				cout << endl << "==== Meniu ====" << endl << endl <<
+					"1. Adaugare sala" << endl <<
+					"2. Modificare sala" << endl <<
+					"3. Stergere sala" << endl <<
+					"0. Revenire la meniul anterior" << endl;
+				cout << endl << "Selecteaza optiunea: ";
+				cin >> opt1;
+				switch (opt1)
+				{
+				case 0:
+					break;
+				case 1:
+					break;
+				case 2:
+					break;
+				case 3:
+					break;
+				default:
+					cout << "Optiunea este invalida! Incearca din nou!" << endl;
+				}
+				break;
+			}
+			continue;
+		case 2:
+			while (true)
+			{
+				cout << endl << "==== Meniu ====" << endl << endl <<
+					"1. Adaugare film" << endl <<
+					"2. Modificare film" << endl <<
+					"3. Stergere film" << endl <<
+					"0. Revenire la meniul anterior" << endl;
+				cout << endl << "Selecteaza optiunea: ";
+				cin >> opt2;
+				switch (opt2)
+				{
+				case 0:
+					break;
+				case 1:
+
+					cout << "Introdu nr de filme ce urmeaza a fi inregistrate: ";
+					do
+					{
+						cin >> nr_filme;
+
+					} while (nr_filme < 0);
+
+					lista_filme = new Film * [nr_filme];
+					for (int indx = 0; indx < nr_filme; indx++)
+					{
+
+						lista_filme[indx] = new Film();
+						cin >> (*lista_filme[indx]);
+
+						cout << endl;
+					}
+
+					Afisare_lista_filme(lista_filme, nr_filme);
+					break;
+				case 2:
+					Modificare_info_filme(lista_filme, nr_filme);
+					break;
+				case 3:
+					Stergere_info_film(lista_filme, nr_filme);
+					break;
+				default:
+					cout << "Optiunea este invalida! Incearca din nou!" << endl;
+				}
+				break;
+			}
+			continue;
+		case 3:
+			while (true)
+			{
+				cout << endl << "==== Meniu ====" << endl << endl <<
+					"1. Adaugare tip bilet" << endl <<
+					"2. Modificare tip bilet" << endl <<
+					"3. Stergere tip bilet" << endl <<
+					"0. Revenire la meniul anterior" << endl;
+				cout << endl << "Selecteaza optiunea: ";
+				cin >> opt3;
+				switch (opt3)
+				{
+				case 0:
+					break;
+				case 1:
+					cout << "Introdu nr de Bilete: ";
+					do
+					{
+
+						cin >> nr_bilete;
+
+					} while (nr_bilete < 0);
+
+					lista_bilete = new Bilete * [nr_bilete];
+
+					for (int indx = 0; indx < nr_bilete; indx++)
+					{
+
+						lista_bilete[indx] = new Bilete();
+						cin >> (*lista_bilete[indx]);
+
+						cout << endl;
+					}
+
+					Afisare_lista_bilete(lista_bilete, nr_bilete);
+					break;
+				case 2:
+					Modificare_info_bilete(lista_bilete, nr_bilete);
+					break;
+				case 3:
+					Stergere_info_bilet(lista_bilete, nr_bilete);
+					break;
+				default:
+					cout << "Optiunea este invalida! Incearca din nou!" << endl;
+				}
+				break;
+			}
+			continue;
+		default:
+			cout << "Optiunea este invalida! Incearca din nou!" << endl;
+		}
+		break;
+	}
+
+}
 
 int main()
 {
-
-	//OPERATII FILME
-
-	//1. Adaugare filme si afisare lista filme inregistrate
-	//int nr_filme = 0, opt;
-	//Film** lista_filme = nullptr;
-
-	//cout << "Introduceti nr de filme ce urmeaza a fi inregistrate: ";
-	//do
-	//{
-
-	//	cin >> nr_filme;
-
-	//} while (nr_filme < 0);
-
-	//lista_filme = new Film * [nr_filme];
-	//for (int indx = 0; indx < nr_filme; indx++)
-	//{
-
-	//	lista_filme[indx] = new Film();
-	//	cin >> (*lista_filme[indx]);
-
-	//	cout << endl;
-	//}
-
-	//Afisare_lista_filme(lista_filme, nr_filme);
-
-
-	////2. Modificare film
-	//Modificare_info_filme(lista_filme, nr_filme);
-
-
-	////3. Stergere film
-	//Stergere_info_film(lista_filme, nr_filme);
-
 
 	////4. Serializare filme
 	//ofstream f("film.bin", ios::binary);
@@ -2449,38 +2565,16 @@ int main()
 	////OPERATIUNI BILETE
 
 	////1. Adaugare Bilete si afisare lisa bilete emise
-	//int nr_bilete = 0;
-	//Bilete** lista_bilete = nullptr;
 
 	////system("cls");
-	//cout << "Introduceti nr de Bilete: ";
-	//do
-	//{
-
-	//	cin >> nr_bilete;
-
-	//} while (nr_bilete < 0);
-
-	//lista_bilete = new Bilete * [nr_bilete];
-
-	//for (int indx = 0; indx < nr_bilete; indx++)
-	//{
-
-	//	lista_bilete[indx] = new Bilete();
-	//	cin >> (*lista_bilete[indx]);
-
-	//	cout << endl;
-	//}
-
-	//Afisare_lista_bilete(lista_bilete, nr_bilete);
 
 
 	////2. Modificare bilet
-	//Modificare_info_bilete(lista_bilete, nr_bilete);
+	//
 
 
 	////3. Stergere bilet
-	//Stergere_info_bilet(lista_bilete, nr_bilete);
+	//
 
 	////4. Salvare bilete in fisier
 	//f.open("Info_bilete.txt");
@@ -2524,50 +2618,57 @@ int main()
 
 
 
-	Sala s1((char*)"Venus", 7, 5, "3D");
-	s1.getLocuriSala();
-	s1.setLocuriSala(3, 4);
-	s1.getLocuriSala();
+	//Sala s1((char*)"Venus", 7, 5, "3D");
+	//s1.getLocuriSala();
+	//s1.setLocuriSala(3, 4);
+	//s1.getLocuriSala();
 
-
-	//int ff1[] = { 0, 1, 1, 0, 0, 1, 0 };
-	//Film f1((char*)"The Call of the Wild", ff1, "Aventura", 90, "Venus", 3, 1, 1);
-	//Film f2((char*)"The Christmas Chronicles II", ff1, "Comedie", 90, "Venus", 3, 18, 1);
-	//Film f3((char*)"Top Gun: Maverick", ff1, "Actiune", 90, "Venus", 3, 18, 1);
+	int ore[] = { 12, 18, 21 };
+	int ff1[] = { 0, 1, 1, 0, 0, 1, 0 };
+	Film f1((char*)"The Call of the Wild", ff1, "Aventura", 90, "Venus", 3, ore, 1);
+	Film f2((char*)"The Christmas Chronicles II", ff1, "Comedie", 90, "Venus", 3, ore, 1);
+	Film f3((char*)"Top Gun: Maverick", ff1, "Actiune", 90, "Venus", 3, ore, 1);
 
 	Rezervare r;
-	Sala s;
+	Sala s((char*)"Venus", 7, 5, "3D");
+	Client c;
 
-	/*vector<Film> vectorFilm;
+	vector<Film> vectorFilm;
 
 	vectorFilm.push_back(f1);
 	vectorFilm.push_back(f2);
 	vectorFilm.push_back(f3);
-*/
 
+	string username = "administrator";
+	string password = "parola";
+	string revenireMeniu = "1";
 	int optiune = 0;
 	int optiuneFilm = 0;
 	int rand = 0;
 	int loc = 0;
 
 
-	/*while (true)
+	while (true)
 	{
-		cout << endl << "==== Meniu: ====" << endl << endl;
-		cout << "1. Filme" << endl;
-		cout << "2. Rezervare bilet" << endl;
-		cout << "0. Exit" << endl;
+		cout << endl <<
+			"==== Meniu: ====" << endl << endl <<
+			"1. Filme" << endl <<
+			"2. Rezervare bilet" << endl <<
+			"3. Modificare rezervare" << endl <<
+			"4. Administrare cinema" << endl <<
+			"0. Exit" << endl;
+
 		cout << endl << "Selecteaza optiunea: ";
 
 		cin >> optiune;
-		cout << endl;
+		//cout << endl;
 
 		switch (optiune)
 		{
 		case 0:
 			break;
 		case 1:
-
+			cout << endl;
 			for (int i = 0; i < 3; i++)
 			{
 				cout << vectorFilm[i];
@@ -2575,6 +2676,10 @@ int main()
 			continue;
 		case 2:
 
+			cout << "Apasa 1 pentru autentificare" << endl <<
+				"Apasa 2 pentru creare cont nou" << endl;
+			cout << "// Momentan nu exista optiunea asta, se creeaza cont nou by default" << endl;
+			cin >> c;
 			cin >> r;
 
 			for (int i = 0; i < 3; i++)
@@ -2587,7 +2692,7 @@ int main()
 			cin >> optiuneFilm;
 
 			cout << endl << "Selecteaza randul si locul: " << endl;
-			cout << s1 << endl;
+			s.getLocuriSala();
 
 
 			cout << "Rand: ";
@@ -2600,13 +2705,45 @@ int main()
 			cout << "Rezervarea a fost facuta cu succes!" << endl << endl;
 
 			break;
+		case 3:
+			break;
+		case 4:
+			while (true)
+			{
+				if (revenireMeniu == "0")
+				{
+					break;
+				}
+				cout << endl << "Autentificare: [nume default = 'administrator' parola default = 'parola']" << endl;
+				cout << "numele de utilizator: ";
+				cin >> ws;
+				getline(cin, username);
+				cout << "parola: ";
+				getline(cin, password);
+
+				if (username != "administrator" && password != "parola")
+				{
+					cout << endl << "---- Numele de utilizator sau parola sunt incorecte. Incearca din nou!----" << endl << endl <<
+						"Pentru schimbarea parolei sau a numelui de utilizator adreseaza-te departamentului IT!" << endl <<
+						"Apasa orice tasta pentru a incerca din nou, "
+						"apasa 0 pentru revenirea la meniul anterior ";
+					cin >> ws;
+					getline(cin, revenireMeniu);
+				}
+				else
+				{
+					cout << endl << "Bine ai venit, " << username << "!" << endl;
+					administrareCinema();
+					break;
+				}
+			}			
+			continue;
 		default:
 			cout << "Optiunea este invalida, incerca din nou!" << endl << endl;
 		}
 		break;
 
-	}*/
-
+	}
 
 	//Sala s1;
 	//cin >> s1;
@@ -2737,4 +2874,6 @@ int main()
 		//int nrBilete[] = { 1,2,3,4,5,6,7,8 };
 		//Rezervare r((char*)"12/10/2020", nrBilete, 8, true);
 		//cout << r.getNrBileteRezervate();
+
 }
+
