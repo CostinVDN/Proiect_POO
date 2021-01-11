@@ -541,7 +541,7 @@ public:
 		zileRulare = nullptr;
 		ora_film = nullptr;
 		gen = "";
-		durata = 0;
+		durata = 90;
 		pozitie_top = 20;
 		objSala = new Sala;
 	}
@@ -583,12 +583,12 @@ public:
 		{
 			ora_film = nullptr;
 		}
-		this->objSala = s;
+		objSala = s;
 		gen = "";
 		numeSala = "";
 		durata = 0;
 		pozitie_top = 20;
-		nr_proiectii = nr_proiectii;
+		nr_proiectii = 0;
 
 	}
 
@@ -695,7 +695,7 @@ public:
 			objSala = new Sala;
 			if(strlen(f.objSala->numeSala) != 0)
 			{
-				objSala->numeSala = new char[strlen(objSala->numeSala) + 1];
+				objSala->numeSala = new char[strlen(f.objSala->numeSala) + 1];
 				strcpy_s(objSala->numeSala, strlen(f.objSala->numeSala) + 1, f.objSala->numeSala);
 			}
 		else
@@ -1894,6 +1894,7 @@ public:
 
 	friend ostream& operator<<(ostream&, Client);
 	friend istream& operator>>(istream&, Client&);
+	friend class Rezervare;
 };
 
 int Client::nrClienti = 0;
@@ -1998,9 +1999,9 @@ private:
 	int* nrBileteRezervate;
 	int nrBilete;
 	bool achitat;
-	//Client idClient;
-	//Bilet idBilet;
-
+	Client* client;
+	Bilete* bilet;
+	
 public:
 	Rezervare() :idRezervare(++nrRezervari)
 	{
@@ -2008,8 +2009,19 @@ public:
 		nrBileteRezervate = nullptr;
 		nrBilete = 0;
 		achitat = false;
-		//idClient=0;
-		//idBilet=0;
+		client = new Client;
+		bilet = new Bilete;
+	}
+
+	Rezervare(Client* c, int nrBilete, Bilete* b) :idRezervare(++nrRezervari)
+	{
+		this->client = c;
+		dataRezervare = new char[1];
+		strcpy_s(dataRezervare, 1, "");
+		this->nrBilete = nrBilete;
+		nrBileteRezervate = new int[nrBilete];
+		achitat = false;
+		this->bilet = b;
 	}
 
 	Rezervare(char* dataRezervare, int* nrBileteRezervate, int nrBilete, bool achitat) :idRezervare(++nrRezervari)
@@ -2039,8 +2051,8 @@ public:
 			this->nrBilete = 0;
 		}
 		this->achitat = achitat;
-		//this->idClient=idClient;
-		//this->idBilet=idBilet;
+		client = new Client;
+		bilet = new Bilete;
 	}
 
 	Rezervare(const Rezervare& r) :idRezervare(r.idRezervare)
@@ -2070,20 +2082,53 @@ public:
 			nrBilete = 0;
 		}
 		achitat = r.achitat;
-		//idClient=r.idClient;
-		//idBilet=r.idBilet;
+
+		if (r.client != nullptr)
+		{
+			client = new Client;
+			if (r.client->nume != nullptr)
+			{
+				client->nume = new char[strlen(r.client->nume) + 1];
+				strcpy_s(client->nume, strlen(r.client->nume) + 1, r.client->nume);
+			}
+			else
+			{
+				client->nume = nullptr;
+			}
+
+			if (r.client->nrAsociatCard != nullptr)
+			{
+				client->nrCarduri = r.client->nrCarduri;
+				client->nrAsociatCard = new int[r.client->nrCarduri];
+				for (int i = 0; i < r.client->nrCarduri; i++)
+				{
+					client->nrAsociatCard[i] = r.client->nrAsociatCard[i];
+				}
+			}
+			else
+			{
+				client->nrAsociatCard = nullptr;
+				client->nrCarduri = 0;
+			}
+
+			client->email = r.client->email;
+		}
 	}
 
 	~Rezervare()
 	{
 		delete[]dataRezervare;
 		delete[]nrBileteRezervate;
+		delete client;
+		delete bilet;
 	}
 
 	Rezervare& operator=(const Rezervare& r)
 	{
 		delete[]dataRezervare;
 		delete[]nrBileteRezervate;
+		delete client;
+		delete bilet;
 		if (r.dataRezervare != nullptr)
 		{
 			dataRezervare = new char[strlen(r.dataRezervare) + 1];
@@ -2109,8 +2154,37 @@ public:
 			nrBilete = 0;
 		}
 		achitat = r.achitat;
-		//idClient=r.idClient;
-		//idBilet=r.idBilet;
+		
+		if (r.client != nullptr)
+		{
+			client = new Client;
+			if (r.client->nume != nullptr)
+			{
+				client->nume = new char[strlen(r.client->nume) + 1];
+				strcpy_s(client->nume, strlen(r.client->nume) + 1, r.client->nume);
+			}
+			else
+			{
+				client->nume = nullptr;
+			}
+
+			if (r.client->nrAsociatCard != nullptr)
+			{
+				client->nrCarduri = r.client->nrCarduri;
+				client->nrAsociatCard = new int[r.client->nrCarduri];
+				for (int i = 0; i < r.client->nrCarduri; i++)
+				{
+					client->nrAsociatCard[i] = r.client->nrAsociatCard[i];
+				}
+			}
+			else
+			{
+				client->nrAsociatCard = nullptr;
+				client->nrCarduri = 0;
+			}
+
+			client->email = r.client->email;
+		}
 
 		return *this;
 	}
