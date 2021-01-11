@@ -698,12 +698,12 @@ public:
 				objSala->numeSala = new char[strlen(f.objSala->numeSala) + 1];
 				strcpy_s(objSala->numeSala, strlen(f.objSala->numeSala) + 1, f.objSala->numeSala);
 			}
-		else
-		{
-			objSala->numeSala = nullptr;
-		}
+			else
+			{
+				objSala->numeSala = nullptr;
+			}
 
-		if (f.objSala->nrRanduri > 0 && f.objSala->nrLocuriPeRand > 0)
+			if (f.objSala->nrRanduri > 0 && f.objSala->nrLocuriPeRand > 0)
 		{
 			objSala->locuriSala = new int* [f.objSala->nrRanduri];
 			for (int i = 0; i < f.objSala->nrRanduri; i++)
@@ -718,13 +718,13 @@ public:
 				}
 			}
 		}
-		else
-		{
-			objSala->locuriSala = nullptr;
-		}
-		objSala->nrRanduri = f.objSala->nrRanduri;
-		objSala->nrLocuriPeRand = f.objSala->nrLocuriPeRand;
-		objSala->tipSala = f.objSala->tipSala;
+			else
+			{
+				objSala->locuriSala = nullptr;
+			}
+			objSala->nrRanduri = f.objSala->nrRanduri;
+			objSala->nrLocuriPeRand = f.objSala->nrLocuriPeRand;
+			objSala->tipSala = f.objSala->tipSala;
 		}
 	}
 
@@ -1082,6 +1082,7 @@ public:
 
 	friend ostream& operator<< (ostream&, Film);
 	friend istream& operator>> (istream&, Film&);
+	friend class Bilete;
 };
 
 int Film::nrFilme = 0;
@@ -1191,12 +1192,13 @@ private:
 	int nrFilme;
 	static int nrBileteEmise;
 	string sala;
-	string Film;
+	string nume_film;
 	int Ora;
 	float pret;
 	int idFilm;
 	int rand;
 	int loc;
+	Film* film;
 
 public:
 
@@ -1210,11 +1212,26 @@ public:
 		rand = 0;
 		loc = 0;
 		Ora = 10;
-		Film = "";
+		nume_film = "";
+		film = new Film;
 
 	}
 
-	Bilete(char* dataBilet, string DataFilm, int* filme, int nrFilme, int idFilm, string sala, int Ora, string Film, float pret, int rand, int loc) : codBilet{ ++nrBileteEmise }
+	Bilete(Film* f, int rand, int loc) :codBilet(++nrBileteEmise)
+	{
+		film = f;
+		dataBilet = new char[1];
+		strcpy_s(dataBilet, 1, "");
+		filme = nullptr;
+		nrFilme = 0;
+		sala = "";
+		Ora = 0;
+		pret = 0;
+		this->rand = rand;
+		this->loc = loc;
+	}
+
+	Bilete(char* dataBilet, string DataFilm, int* filme, int nrFilme, int idFilm, string sala, int Ora, string nume_film, float pret, int rand, int loc) : codBilet{ ++nrBileteEmise }
 	{
 
 		// Data se aloca automat
@@ -1252,7 +1269,7 @@ public:
 		}
 
 		this->sala = sala;
-		this->Film = Film;
+		this->nume_film = nume_film;
 		this->Ora = Ora;
 		this->nrFilme = nrFilme;
 		this->DataFilm = DataFilm;
@@ -1260,7 +1277,7 @@ public:
 		this->rand = rand;
 		this->loc = loc;
 		this->idFilm = idFilm;
-
+		film = new Film;
 	}
 
 	Bilete(const Bilete& b) : codBilet{ b.codBilet }
@@ -1301,7 +1318,7 @@ public:
 
 
 		this->sala = b.sala;
-		this->Film = b.Film;
+		this->nume_film = b.nume_film;
 		this->Ora = b.Ora;
 		this->DataFilm = b.DataFilm;
 		this->pret = b.pret;
@@ -1309,6 +1326,53 @@ public:
 		this->loc = b.loc;
 		this->idFilm = b.idFilm;
 
+		if (b.film != nullptr)
+		{
+			film = new Film;
+			if (b.film->nume != nullptr)
+			{
+				film->nume = new char[strlen(b.film->nume) + 1];
+				strcpy_s(film->nume, strlen(b.film->nume) + 1, b.film->nume);
+			}
+			else
+			{
+				film->nume = nullptr;
+			}
+
+			if (b.film->zileRulare != nullptr)
+			{
+				film->zileRulare = new int[7];
+				for (int i = 0; i < 7; i++)
+				{
+					film->zileRulare[i] = b.film->zileRulare[i];
+				}
+			}
+			else
+			{
+				film->zileRulare = nullptr;
+			}
+
+			if (b.film->ora_film != nullptr)
+			{
+				film->nr_proiectii = b.film->nr_proiectii;
+				film->ora_film = new int[b.film->nr_proiectii];
+				for (int i = 0; i < b.film->nr_proiectii; i++)
+				{
+					film->ora_film[i] = b.film->ora_film[i];
+				}
+			}
+			else
+			{
+				film->ora_film = nullptr;
+				film->nr_proiectii = 0;
+			}
+
+			film->gen = b.film->gen;
+			film->numeSala = b.film->numeSala;
+			film->durata = b.film->durata;
+			film->pozitie_top = b.film->pozitie_top;
+			film->objSala = b.film->objSala;
+		}
 	}
 
 	Bilete& operator=(const Bilete& b)
@@ -1316,7 +1380,7 @@ public:
 
 		delete[] dataBilet;
 		delete[] filme;
-
+		delete film;
 		if (this != &b)
 		{
 
@@ -1354,7 +1418,7 @@ public:
 			}
 
 			this->sala = b.sala;
-			this->Film = b.Film;
+			this->nume_film = b.nume_film;
 			this->Ora = b.Ora;
 			this->nrFilme = b.nrFilme;
 			this->DataFilm = b.DataFilm;
@@ -1362,6 +1426,54 @@ public:
 			this->rand = b.rand;
 			this->loc = b.loc;
 			this->idFilm = b.idFilm;
+		}
+
+		if (b.film != nullptr)
+		{
+			film = new Film;
+			if (b.film->nume != nullptr)
+			{
+				film->nume = new char[strlen(b.film->nume) + 1];
+				strcpy_s(film->nume, strlen(b.film->nume) + 1, b.film->nume);
+			}
+			else
+			{
+				film->nume = nullptr;
+			}
+
+			if (b.film->zileRulare != nullptr)
+			{
+				film->zileRulare = new int[7];
+				for (int i = 0; i < 7; i++)
+				{
+					film->zileRulare[i] = b.film->zileRulare[i];
+				}
+			}
+			else
+			{
+				film->zileRulare = nullptr;
+			}
+
+			if (b.film->ora_film != nullptr)
+			{
+				film->nr_proiectii = b.film->nr_proiectii;
+				film->ora_film = new int[b.film->nr_proiectii];
+				for (int i = 0; i < b.film->nr_proiectii; i++)
+				{
+					film->ora_film[i] = b.film->ora_film[i];
+				}
+			}
+			else
+			{
+				film->ora_film = nullptr;
+				film->nr_proiectii = 0;
+			}
+
+			film->gen = b.film->gen;
+			film->numeSala = b.film->numeSala;
+			film->durata = b.film->durata;
+			film->pozitie_top = b.film->pozitie_top;
+			film->objSala = b.film->objSala;
 		}
 
 		return*this;
@@ -1373,6 +1485,7 @@ public:
 
 		delete[] dataBilet;
 		delete[] filme;
+		delete film;
 
 	}
 
@@ -1501,9 +1614,9 @@ public:
 	{
 		int lungime_sir = 0;
 
-		lungime_sir = Film.length() + 1;
+		lungime_sir = nume_film.length() + 1;
 		f.write((char*)&lungime_sir, sizeof(lungime_sir));
-		f.write(Film.c_str(), lungime_sir);
+		f.write(nume_film.c_str(), lungime_sir);
 
 		f.write(dataBilet, (long long)strlen(dataBilet) + 1);
 
@@ -1530,7 +1643,7 @@ ostream& operator<< (ostream& out, Bilete b)
 {
 
 
-	cout << setw(7) << left << b.codBilet << setw(15) << left << b.Film << setw(15) << left << b.dataBilet
+	cout << setw(7) << left << b.codBilet << setw(15) << left << b.nume_film << setw(15) << left << b.dataBilet
 		<< setw(7) << left << b.Ora << setw(7) << left << b.rand << setw(7) << left << b.loc
 		<< setw(15) << left << b.sala << setw(15) << left << b.pret << endl;
 
@@ -1545,7 +1658,7 @@ istream& operator>> (istream& in, Bilete& b)
 
 	cout << "NUmele filmului pt care generati biletul: ";
 	in >> ws;
-	getline(in, b.Film);
+	getline(in, b.nume_film);
 
 	delete[] b.dataBilet;
 	cout << "Data emiterii (ZZ.LL.AAAA): ";
@@ -1599,7 +1712,7 @@ ofstream& operator<<(ofstream& file_out, Bilete b)
 	if (file_out.is_open())
 	{
 
-		file_out << b.Film << endl;
+		file_out << b.nume_film << endl;
 		file_out << b.DataFilm << endl;
 		file_out << b.Ora << endl;
 		file_out << b.sala << endl;
