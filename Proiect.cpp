@@ -278,7 +278,7 @@ public:
 			cout << "Nr de locuri libere in sala: " << locuriLibere << endl;
 			return matrice;
 		}
-			return nullptr;
+		return nullptr;
 	}
 
 
@@ -471,7 +471,7 @@ ostream& operator<< (ostream& out, Sala s)
 	{
 		for (int j = 0; j < 10; j++)
 		{
-			out << " " << s.orarSala[i][j];		
+			out << " " << s.orarSala[i][j];
 		}
 		out << endl;
 	}
@@ -589,11 +589,11 @@ private:
 public:
 	Film() : idFilm(++nrFilme)
 	{
-		nume = new char[] { "" };
+		nume = nullptr;
 		nrZile = 0;
-		zileProiectii = new int[1];
+		zileProiectii = nullptr;
 		nrProiectiiZi = 0;
-		oreProiectii = new int[1];
+		oreProiectii = nullptr;
 		gen = "";
 		durata = 90;
 		idSala = 0;
@@ -625,7 +625,7 @@ public:
 			this->zileProiectii = nullptr;
 			this->nrZile = 0;
 		}
-		
+
 		if (oreProiectii != nullptr && nrProiectiiZi > 0)
 		{
 			this->nrProiectiiZi = nrProiectiiZi;
@@ -659,11 +659,13 @@ public:
 			this->nume = nullptr;
 		}
 
-		if (f.zileProiectii != nullptr && nrZile > 0)
+		if (f.zileProiectii != nullptr && f.nrZile > 0)
 		{
-			this->zileProiectii = new int[nrZile];
+			this->nrZile = f.nrZile;
 
-			for (int i = 0; i < nrZile; i++)
+			this->zileProiectii = new int[f.nrZile];
+
+			for (int i = 0; i < f.nrZile; i++)
 			{
 				this->zileProiectii[i] = f.zileProiectii[i];
 			}
@@ -671,14 +673,14 @@ public:
 		else
 		{
 			this->zileProiectii = nullptr;
-			nrZile = 0;
+			this->nrZile = 0;
 		}
 
-		if (oreProiectii != nullptr && nrProiectiiZi > 0)
+		if (f.oreProiectii != nullptr && f.nrProiectiiZi > 0)
 		{
-			this->nrProiectiiZi = nrProiectiiZi;
-			this->oreProiectii = new int[nrProiectiiZi];
-			for (int i = 0; i < nrProiectiiZi; i++)
+			this->nrProiectiiZi = f.nrProiectiiZi;
+			this->oreProiectii = new int[f.nrProiectiiZi];
+			for (int i = 0; i < f.nrProiectiiZi; i++)
 			{
 				this->oreProiectii[i] = f.oreProiectii[i];
 			}
@@ -691,7 +693,7 @@ public:
 
 		this->gen = f.gen;
 		this->durata = f.durata;
-		this->idSala = f.idSala;	
+		this->idSala = f.idSala;
 	}
 
 	~Film()
@@ -752,13 +754,19 @@ public:
 	//	return ruleaza;
 	//}
 
+	static int getnrFilme()
+	{
+
+		return nrFilme;
+
+	}
 	void setNumeFilm(const char* nume)
 	{
 		if (this->nume != nullptr)
 		{
 			delete[] this->nume;
 		}
-		if(nume != nullptr)
+		if (nume != nullptr)
 		{
 			this->nume = new char[strlen(nume) + 1];
 			strcpy_s(this->nume, strlen(nume) + 1, nume);
@@ -895,11 +903,13 @@ public:
 		return true;
 	}
 
-	void serializareFilm()
+	void serializareFilm(ofstream &f, Film film_crt)
 	{
-		ofstream f("film.bin", ios::binary);
 
+		f.write((char*)&idFilm, sizeof(idFilm));
 		//f.write(nume, strlen(nume) + 1);
+
+		f.write(nume, (long long)strlen(nume) + 1);
 
 		f.write((char*)&nrZile, sizeof(nrZile));
 		for (int i = 0; i < nrZile; i++)
@@ -920,49 +930,49 @@ public:
 		f.write((char*)&durata, sizeof(durata));
 		f.write((char*)&idSala, sizeof(idSala));
 
-		f.close();
 	}
 
-	void deserializareFilm()
+	void deserializareFilm(ifstream& f2, Film film_crt)
 	{
-		ifstream f("film.bin", ios::binary);
 
-		//string buffer = "";
-		//char c = 0;
-		//while ((c = f.get()) != 0)
-		//{
-		//	buffer += c;
-		//}
-		//delete[] nume;
-		//nume = new char[buffer.length() + 1];
-		//strcpy_s(nume, buffer.length() + 1, buffer.c_str());
+		f2.read((char*)&idFilm, sizeof(idFilm));
 
-		f.read((char*)&nrZile, sizeof(nrZile));
+		string buffer = "";
+		char c = 0;
+		while ((c = f2.get()) != 0)
+		{
+			buffer += c;
+		}
+		delete[] nume;
+		nume = new char[buffer.length() + 1];
+		strcpy_s(nume, buffer.length() + 1, buffer.c_str());
+
+		f2.read((char*)&nrZile, sizeof(nrZile));
+
 		delete[] zileProiectii;
 		zileProiectii = new int[nrZile];
 		for (int i = 0; i < nrZile; i++)
 		{
-			f.read((char*)&zileProiectii[i], sizeof(zileProiectii[i]));
+			f2.read((char*)&zileProiectii[i], sizeof(zileProiectii[i]));
 		}
 
-		f.read((char*)&nrProiectiiZi, sizeof(nrProiectiiZi));
+		f2.read((char*)&nrProiectiiZi, sizeof(nrProiectiiZi));
 		delete[] oreProiectii;
 		oreProiectii = new int[nrProiectiiZi];
 		for (int i = 0; i < nrProiectiiZi; i++)
 		{
-			f.read((char*)&oreProiectii[i], sizeof(oreProiectii[i]));
+			f2.read((char*)&oreProiectii[i], sizeof(oreProiectii[i]));
 		}
 
 		int length2 = 0;
-		f.read((char*)&length2, sizeof(length2));
+		f2.read((char*)&length2, sizeof(length2));
 		char* aux = new char[length2];
-		f.read(aux, length2);
+		f2.read(aux, length2);
 		gen = aux;
 
-		f.read((char*)&durata, sizeof(durata));
-		f.read((char*)&idSala, sizeof(idSala));
+		f2.read((char*)&durata, sizeof(durata));
+		f2.read((char*)&idSala, sizeof(idSala));
 
-		f.close();
 	}
 
 	friend ostream& operator<< (ostream&, Film);
@@ -975,28 +985,35 @@ int Film::nrFilme = 0;
 //Operator afisare info Filme
 ostream& operator<< (ostream& out, Film f)
 {
+	out << endl;
 	if (f.nume != nullptr)
 	{
-		out << "Nume film: " << f.nume << endl;
+		out << "Nume film: " << f.nume;
 	}
+	
+	out << endl;
+
 	if (f.zileProiectii != nullptr && f.nrZile > 0)
 	{
 		cout << "Zile proiectii: ";
 		for (int i = 0; i < f.nrZile; i++)
 		{
 			out << f.zileProiectii[i] << " ";
-			out << endl;
 		}
 	}
+
+	out << endl;
+	
 	if (f.oreProiectii != nullptr && f.nrProiectiiZi > 0)
 	{
 		out << "Ore proiectii: ";
 		for (int i = 0; i < f.nrProiectiiZi; i++)
 		{
 			out << f.oreProiectii[i] << " ";
-			out << endl;
 		}
 	}
+
+	out << endl;
 
 	cout << "Genul filmului: " << f.gen << endl;
 	cout << "Durata filmului: " << f.durata << endl;
@@ -1008,15 +1025,18 @@ ostream& operator<< (ostream& out, Film f)
 //Operator citire info Filme
 istream& operator>> (istream& in, Film& f)
 {
-	cout << endl << "Nume film: ";
+
+	cout << endl <<"Nume film: ";
 	delete[] f.nume;
 	char buffer[50];
 	in >> ws;
 	in.getline(buffer, 49);
 	f.nume = new char[strlen(buffer) + 1];
 	strcpy_s(f.nume, strlen(buffer) + 1, buffer);
-	cout << endl << "Introdu numarul zilelor din saptamana in care va rula filmul: ";
+
+	cout << "Introdu numarul zilelor din saptamana in care va rula filmul: ";
 	in >> f.nrZile;
+	
 	if (f.nrZile > 0)
 	{
 		cout << "Pentru ziua 'luni' introdu 1:" << endl;
@@ -1027,19 +1047,20 @@ istream& operator>> (istream& in, Film& f)
 			in >> f.zileProiectii[i];
 		}
 	}
-	cout << endl << "Introdu numarul proiectiilor pe zi: ";
+
+	cout << "Introdu numarul proiectiilor pe zi: ";
 	in >> f.nrProiectiiZi;
 	if (f.nrProiectiiZi > 0)
 	{
-		f.zileProiectii = new int[f.nrZile];
-		for (int i = 0; i < f.nrZile; i++)
+		f.oreProiectii = new int[f.nrProiectiiZi];
+		for (int i = 0; i < f.nrProiectiiZi; i++)
 		{
-			cout << "Ora " << i + 1 << ": ";
-			in >> f.zileProiectii[i];
+			cout << "Ora [" << i + 1 << "]: ";
+			in >> f.oreProiectii[i];
 		}
 	}
 
-	cout <<endl << "Gen: ";
+	cout << "Gen: ";
 	in >> ws;
 	getline(in, f.gen);
 
@@ -1048,7 +1069,6 @@ istream& operator>> (istream& in, Film& f)
 
 	cout << "Id sala: ";
 	in >> f.idSala;
-	cout << endl;
 
 	return in;
 }
@@ -1069,59 +1089,80 @@ public:
 
 	Bilet() : codBilet{ ++nrBileteEmise }
 	{
-		dataFilm = new char[] {""};
+		dataFilm = nullptr;
 		rand = 0;
 		nrLocuri = 0;
-		locuri = new int[1];
+		locuri = nullptr;
 		idFilm = 0;
 	}
 
-	Bilet( int rand, int nrLocuri, int* locuri, int idFilm) :codBilet(++nrBileteEmise)
+	Bilet(char* dataFilm, int rand, int nrLocuri, int* locuri, int idFilm) :codBilet(++nrBileteEmise)
 	{
-		this->rand = rand;
 
-		if (locuri != nullptr && nrLocuri > 0) {
-			this->locuri = new int[nrLocuri];
-			for (int i = 0; i < nrLocuri; i++) {
-				this->locuri[i] = locuri[i];
-			}
-			this->nrLocuri = nrLocuri;
+		if (dataFilm != nullptr)
+		{
+
+			this->dataFilm = new char[strlen(dataFilm)+1];
+			strcpy_s(this->dataFilm,strlen(dataFilm)+1, dataFilm);
+
 		}
-		else {
+		else
+		{
+
+			this->dataFilm = nullptr;
+
+		}
+
+		this->rand = rand;
+		this->nrLocuri = nrLocuri;
+
+		if (locuri != nullptr && nrLocuri > 0) 
+		{
+			this->locuri = new int[nrLocuri];
+			for (int i = 0; i < nrLocuri; i++)
+				this->locuri[i] = locuri[i];
+		}
+		else 
+		{
 			this->locuri = nullptr;
 			this->nrLocuri = 0;
 		}
 
-		dataFilm = new char[] {""};
 		this->idFilm = idFilm;
 	}
 
 	Bilet(const Bilet& b) : codBilet{ b.codBilet }
 	{
-		rand = b.rand;
-		if (b.locuri != nullptr && b.nrLocuri > 0) {
-			locuri = new int[b.nrLocuri];
-			for (int i = 0; i < b.nrLocuri; i++) {
-				locuri[i] = b.locuri[i];
-			}
-			nrLocuri = b.nrLocuri;
-		}
-		else {
-			locuri = nullptr;
-			nrLocuri = 0;
-		}
-
 		if (b.dataFilm != nullptr)
 		{
-			dataFilm = new char[strlen(b.dataFilm) + 1];
-			strcpy_s(dataFilm, strlen(b.dataFilm) + 1, b.dataFilm);
+
+			this->dataFilm = new char[strlen(b.dataFilm) + 1];
+			strcpy_s(this->dataFilm, strlen(b.dataFilm) + 1, dataFilm);
+
 		}
 		else
 		{
-			dataFilm = nullptr;
+
+			this->dataFilm = nullptr;
 		}
 
-		idFilm = b.idFilm;
+		this->rand = b.rand;
+		this->nrLocuri = b.nrLocuri;
+
+		if (b.locuri != nullptr && b.nrLocuri > 0) 
+		{
+			locuri = new int[b.nrLocuri];
+			for (int i = 0; i < b.nrLocuri; i++)
+				locuri[i] = b.locuri[i];
+			
+		}
+		else 
+		{
+			this->locuri = nullptr;
+			this->nrLocuri = 0;
+		}
+
+		this->idFilm = b.idFilm;
 	}
 
 	Bilet& operator=(const Bilet& b)
@@ -1132,31 +1173,38 @@ public:
 
 		if (this != &b)
 		{
-			rand = b.rand;
-			if (b.locuri != nullptr && b.nrLocuri > 0) {
-				locuri = new int[b.nrLocuri];
-				for (int i = 0; i < b.nrLocuri; i++) {
-					locuri[i] = b.locuri[i];
-				}
-				nrLocuri = b.nrLocuri;
-			}
-			else {
-				locuri = nullptr;
-				nrLocuri = 0;
-			}
 
 			if (b.dataFilm != nullptr)
 			{
-				dataFilm = new char[strlen(b.dataFilm) + 1];
-				strcpy_s(dataFilm, strlen(b.dataFilm) + 1, b.dataFilm);
+
+				this->dataFilm = new char[strlen(b.dataFilm) + 1];
+				strcpy_s(this->dataFilm, strlen(b.dataFilm) + 1, dataFilm);
+
 			}
 			else
 			{
-				dataFilm = nullptr;
+
+				this->dataFilm = nullptr;
+			}
+			
+			this->rand = b.rand;
+			if (b.locuri != nullptr && b.nrLocuri > 0) 
+			{
+				this->nrLocuri = b.nrLocuri;
+				this->locuri = new int[b.nrLocuri];
+				
+				for (int i = 0; i < b.nrLocuri; i++) 
+					this->locuri[i] = b.locuri[i];
+				
+			}
+			else 
+			{
+				this->locuri = nullptr;
+				this->nrLocuri = 0;
 			}
 
-			idFilm = b.idFilm;
-		}		
+			this->idFilm = b.idFilm;
+		}
 		return*this;
 	}
 
@@ -1280,17 +1328,16 @@ istream& operator>> (istream& in, Bilet& b)
 
 	string buffer;
 
-	cout << "NUmele filmului pt care generati biletul: ";
-
 	delete[] b.dataFilm;
-	cout << "Data emiterii (ZZ.LL.AAAA): ";
+	cout << "Data Filmului (ZZ.LL.AAAA): ";
 	getline(in, buffer);
 	b.dataFilm = new char[buffer.length() + 1];
 	strcpy_s(b.dataFilm, buffer.length() + 1, buffer.c_str());
 
-	cout << "Data spectacol (ZZ.LL.AAAA): ";
+	cout << "Nuarul randului: ";
+	in >> b.rand;
 
-	cout << "Numar filme pentru care este emis biletul: ";
+	cout << "Nuarul de locuti dorite: ";
 	in >> b.nrLocuri;
 
 	delete[] b.locuri;
@@ -1298,15 +1345,12 @@ istream& operator>> (istream& in, Bilet& b)
 	for (int indx = 0; indx < b.nrLocuri; indx++)
 	{
 
-		cout << "IDFilm " << indx + 1 << ": ";
+		cout << "Locul [" << indx + 1 << "]: ";
 		in >> b.locuri[indx];
 
 	}
 
-	cout << "Rand: ";
-	in >> b.rand;
-
-	cout << "Pret bilet: ";
+	cout << "ID Film: ";
 	in >> b.idFilm;
 
 	return in;
@@ -1318,10 +1362,17 @@ ofstream& operator<<(ofstream& file_out, Bilet b)
 
 	if (file_out.is_open())
 	{
+	
+		file_out << b.dataFilm << endl;
 		file_out << b.rand << endl;
-		file_out << b.idFilm << endl;
+		file_out << b.nrLocuri << endl;
+		for (int indx = 0; indx < b.nrLocuri; indx++)
+		{
 
+			file_out << b.locuri[indx]<< endl;
+		}
 	}
+
 	return file_out;
 }
 
@@ -2044,7 +2095,7 @@ Rezervare operator--(Rezervare r)
 
 class null_exception : public exception
 {
-public:
+	public:
 	null_exception()
 	{
 
@@ -2052,104 +2103,92 @@ public:
 
 	null_exception(const char* message) : exception(message)
 	{
-
+		
 	}
 };
 
-class Repo
-{
-public:
-
-	int nrSali = 0;
-	Sala** vectorSali = nullptr;
-
-	int nrFilme = 0;
-	Film** vectorFilme = nullptr;
-
-	int nrClienti = 0;
-	Client** vectorClient = nullptr;
-
-	int nrBilete = 0;
-	Bilet** vectorBilete = nullptr;
-
-	int nrRezervari = 0;
-	Rezervare** vectorRezervari = nullptr;
-
-
-	void administrareCinema()
-	{
-		int optiune = 0;
-		while (true)
-		{
-			cout << endl << "==== Meniu ====" << endl << endl <<
-				"1. Adaugare sala" << endl <<
-				"2. Modificare sala" << endl <<
-				"3. Stergere sala" << endl << endl <<
-				"4. Adaugare film" << endl <<
-				"5. Modificare film" << endl <<
-				"6. Stergere film" << endl << endl <<
-				"0. Revenire la meniul anterior" << endl;
-
-			cout << endl << "Selecteaza optiunea: ";
-			cin >> optiune;
-
-			switch (optiune)
-			{
-			case 0:
-				break;
-			case 1:
-				break;
-			case 2:
-				break;
-			case 3:
-				break;
-			case 4:
-				adaugareFilme();
-				continue;
-			case 5:
-				break;
-			case 6:
-				break;
-			default:
-				cout << "Optiunea este invalida, incerca din nou!" << endl << endl;
-			}
-			break;
-		}
-	}
-
-	void adaugareFilme()
-	{
-		fstream find("film.bin", ios::_Nocreate | ios::binary | ios::in);
-		int size = sizeof(nrFilme);
-		find.seekg(-size, ios::end);
-		find.read((char*)&nrFilme, size);
-		find.close();
-		cout << nrFilme;
-
-		if (nrFilme > 0)
-		{
-			int sizeVector = nrFilme + 1;
-			vectorFilme = new Film * [sizeVector];
-			ifstream f("film.bin", ios::binary);
-
-			for (int i = 0; i < nrFilme; i++)
-			{
-				vectorFilme[i]->deserializareFilm();
-			}
-				
-
-			f.read((char*)&nrFilme, sizeof(nrFilme));
-			vectorFilme[nrFilme + 1] = new Film();
-			cin >> *vectorFilme[nrFilme + 1];
-			f.close();
-		}
-		else if (nrFilme == 0)
-		{
-			vectorFilme = new Film * [nrFilme + 1];
-			vectorFilme[nrFilme] = new Film();
-			cin >> *vectorFilme[nrFilme];
-		}
-
+//class Repo
+//{
+//public:
+//
+//
+//	void administrareCinema()
+//	{
+//		int optiune = 0;
+//		while (true)
+//		{
+//			cout << endl << "==== Meniu ====" << endl << endl <<
+//				"1. Adaugare sala" << endl <<
+//				"2. Modificare sala" << endl <<
+//				"3. Stergere sala" << endl << endl <<
+//				"4. Adaugare film" << endl <<
+//				"5. Modificare film" << endl <<
+//				"6. Stergere film" << endl << endl <<
+//				"7. Adaugare bilet" << endl <<
+//				"8. Modificare bilet" << endl <<
+//				"9. Stergere bilet" << endl << endl <<
+//				"0. Revenire la meniul anterior" << endl;
+//
+//			cout << endl << "Selecteaza optiunea: ";
+//			cin >> optiune;
+//
+//			switch (optiune)
+//			{
+//			case 0:
+//				break;
+//			case 1:
+//				break;
+//			case 2:
+//				break;
+//			case 3:
+//				break;
+//			case 4:
+//				adaugareFilme();
+//				continue;
+//			case 5:
+//				break;
+//			case 6:
+//				break;
+//			default:
+//				cout << "Optiunea este invalida, incerca din nou!" << endl << endl;
+//			}
+//			break;
+//		}
+//	}
+//
+//void adaugareFilme()
+//	{
+//		fstream find("film.bin", ios::_Nocreate | ios::binary | ios::in);
+//		int size = sizeof(nrFilme);
+//		find.seekg(-size, ios::end);
+//		find.read((char*)&nrFilme, size);
+//		find.close();
+//		cout << nrFilme;
+//
+//		if (nrFilme > 0)
+//		{
+//			int sizeVector = nrFilme + 1;
+//			vectorFilme = new Film * [sizeVector];
+//			ifstream f("film.bin", ios::binary);
+//
+//			for (int i = 0; i < nrFilme; i++)
+//			{
+//				vectorFilme[i]->deserializareFilm();
+//			}
+//
+//
+//			f.read((char*)&nrFilme, sizeof(nrFilme));
+//			vectorFilme[nrFilme + 1] = new Film();
+//			cin >> *vectorFilme[nrFilme + 1];
+//			f.close();
+//		}
+//		else if (nrFilme == 0)
+//		{
+//			vectorFilme = new Film * [nrFilme + 1];
+//			vectorFilme[nrFilme] = new Film();
+//			cin >> *vectorFilme[nrFilme];
+//		}
+//
 
 		//cout << *vectorFilme[nrFilme];
 
@@ -2157,7 +2196,7 @@ public:
 		//{
 		//	cout << *vectorFilme[i];
 		//}
-		nrFilme++;
+		/*nrFilme++;
 
 		ofstream f("film.bin", ios::binary);
 		for (int i = 0; i < nrFilme; i++)
@@ -2168,11 +2207,271 @@ public:
 
 		f.close();
 	}
-};
+};*/
 
+Film** administrare_filme(Film** lista_filme, int nr_filme)
+{
+	int optiune;
+	ofstream f1;
+	ifstream f2;
+
+	system("cls");
+
+	do
+	{
+		cout << endl <<
+			"==== Administrare filme: ====" << endl << endl <<
+			"1. Adaugare filme" << endl <<
+			"2. Modificare film" << endl <<
+			"3. Stergere film" << endl <<
+			"4. Afisare info filme" << endl <<
+			"5. Salvare date in fisier" << endl << 
+			"6. Citire date din fisier" << endl <<
+			"0. Exit" << endl;
+
+		cout << endl << "Selecteaza optiunea: ";
+
+		cin >> optiune;
+
+		switch (optiune)
+		{
+
+			case 1:
+				//Inregistrare filme noi
+				cout << "Introduceti nr. de fime pe care doriti sa le inregistrati :";
+				cin >> nr_filme;
+				lista_filme = new Film * [nr_filme];
+
+				for (int indx = 0; indx < nr_filme; indx++)
+				{
+					lista_filme[indx] = new Film();
+					cin >> (*lista_filme[indx]);
+				}
+
+			break;
+		case 2:
+			// Modificare info film
+			int IDFilm;
+			cout << "Introduceti ID Film pe care doriti sa-l modificati ";
+			do
+			{
+
+				cin >> IDFilm;
+
+			} while ((IDFilm < 1) || (IDFilm > nr_filme));
+
+			cin >> (*lista_filme[IDFilm - 1]);
+
+			break;
+		case 3:
+			break;
+		case 4:
+			//Afisare lista filme			
+			cout << "Lista filme inregistrate" << endl;
+			cout << "===========================" << endl;
+
+			for (int indx = 0; indx < nr_filme; indx++)
+			{
+
+				if (lista_filme[indx] != nullptr)
+					cout << (*lista_filme[indx]);
+
+			}
+			break;
+		case 5:
+			f1.open("film.bin", ios::binary);
+				
+				//Se scrie nr. de filme in fisier
+				f1.write((char*)&nr_filme, sizeof(nr_filme));
+				for (int indx=0; indx < nr_filme; indx++)
+					lista_filme[indx]->serializareFilm(f1, *lista_filme[indx]);
+
+			f1.close();
+
+			break;
+		case 6:
+			f2.open("film.bin", ios::binary);
+
+			//Se citesc nr. de filme
+			f2.read((char*)&nr_filme, sizeof(nr_filme));
+			lista_filme = new Film * [nr_filme + 1];
+
+			for (int indx = 0; indx < nr_filme-1; indx++)
+			{
+				lista_filme[indx] = new Film();
+				lista_filme[indx]->deserializareFilm(f2, *lista_filme[indx]);
+			}
+
+			f2.close();
+
+			break;
+		}
+	} while (optiune != 0);
+
+	return lista_filme;
+}
 
 int main()
 {
+
+	//Repo repo;
+	string username = "administrator";
+	string password = "parola";
+	string revenireMeniu = "1";
+	int nr_sali, nr_filme, nr_bilete, nr_clienti, nr_rezervari;
+	int optiuneFilm = 0;
+	int rand = 0;
+	int loc = 0;
+	int optiune;
+
+	Sala** lista_sali= nullptr;
+	Film** lista_filme = nullptr;
+	Client** lista_clienti= nullptr;
+	Bilet** lista_bilete = nullptr;
+	Rezervare** lista_rezervari = nullptr;
+
+	do
+	{
+		cout << endl <<
+			"==== Meniu: ====" << endl << endl <<
+			"1. Administrare sali" << endl <<
+			"2. Administrare filme" << endl <<
+			"3. Administrare bilete" << endl <<
+			"4. Administrae rezervare" << endl <<
+			"5. Administrare clienti" << endl <<
+			"6. Cont client" << endl <<
+			"0. Exit" << endl;
+
+		cout << endl << "Selecteaza optiunea: ";
+
+		cin >> optiune;
+
+		switch (optiune)
+		{
+			case 1:
+				for (int indx = 0; indx < Film::getnrFilme(); indx++)
+				{
+
+					if (lista_filme[indx] != nullptr)
+						cout << (*lista_filme[indx]);
+				}
+				break;
+			case 2:
+				lista_filme = administrare_filme(lista_filme, Film::getnrFilme());
+				break;
+			case 3:
+				break;
+			case 4:
+				break;
+			case 5:
+				break;
+			case 6:
+				break;
+		}
+	} while (optiune != 0);
+
+
+
+	//while (true)
+	//{
+	//	cout << endl <<
+	//		"==== Meniu: ====" << endl << endl <<
+	//		"1. Afisare Filme" << endl <<
+	//		"2. Rezervare bilet" << endl <<
+	//		"3. Modificare rezervare" << endl <<
+	//		"4. Administrare cinema" << endl <<
+	//		"5. Cont client" << endl <<
+	//		"0. Exit" << endl;
+
+	//	cout << endl << "Selecteaza optiunea: ";
+
+	//	cin >> optiune;
+	//	//cout << endl;
+
+	//	switch (optiune)
+	//	{
+	//	case 0:
+	//		break;
+	//	case 1:
+	//		cout << endl;
+	//		for (int i = 0; i < 3; i++)
+	//		{
+	//			//cout << vectorFilm[i];
+	//		}
+	//		continue;
+	//	case 2:
+
+	//		cout << "Apasa 1 pentru autentificare" << endl <<
+	//			"Apasa 2 pentru creare cont nou" << endl;
+	//		cout << "// Momentan nu exista optiunea asta, se creeaza cont nou by default" << endl;
+	//		cin >> c;
+	//		cin >> r;
+
+	//		for (int i = 0; i < 3; i++)
+	//		{
+	//			cout << endl << "Apasa " << i + 1 << " pentru filmul: " << endl;
+	//			//cout << vectorFilm[i];
+	//		}
+
+	//		cout << endl << "Selecteaza filmul: ";
+	//		cin >> optiuneFilm;
+
+	//		cout << endl << "Selecteaza randul si locul: " << endl;
+	//		//s.getLocuriSala();
+
+
+	//		cout << "Rand: ";
+	//		cin >> rand;
+	//		cout << "Loc: ";
+	//		cin >> loc;
+
+	//		cout << endl << "Ati selectat filmul: " << endl; // << vectorFilm[optiuneFilm] << endl;
+	//		cout << "Locul " << loc << " randul " << rand << endl;
+	//		cout << "Rezervarea a fost facuta cu succes!" << endl << endl;
+
+	//		break;
+	//	case 3:
+	//		break;
+	//	case 4:
+	//		repo.administrareCinema();
+	//		break;
+	//		while (true)
+	//		{
+	//			if (revenireMeniu == "0")
+	//			{
+	//				break;
+	//			}
+	//			cout << endl << "Autentificare: [nume default = 'administrator' parola default = 'parola']" << endl;
+	//			cout << "numele de utilizator: ";
+	//			cin >> ws;
+	//			getline(cin, username);
+	//			cout << "parola: ";
+	//			getline(cin, password);
+
+	//			if (username != "administrator" && password != "parola")
+	//			{
+	//				cout << endl << "---- Numele de utilizator sau parola sunt incorecte. Incearca din nou!----" << endl << endl <<
+	//					"Pentru schimbarea parolei sau a numelui de utilizator adreseaza-te departamentului IT!" << endl <<
+	//					"Apasa orice tasta pentru a incerca din nou, "
+	//					"apasa 0 pentru revenirea la meniul anterior ";
+	//				cin >> ws;
+	//				getline(cin, revenireMeniu);
+	//			}
+	//			else
+	//			{
+	//				cout << endl << "Bine ai venit, " << username << "!" << endl;
+	//				repo.administrareCinema();
+	//				break;
+	//			}
+	//		}
+	//		continue;
+	//	default:
+	//		cout << "Optiunea este invalida, incerca din nou!" << endl << endl;
+	//	}
+	//	break;
+	//}
+
+
 	//vector<Film> vectorF;
 	//Film f1;
 	//Film f2;
@@ -2194,13 +2493,13 @@ int main()
 	//}
 
 
-	Film f67;
-	Film f68;
-	cin >> f67;
-	f67.serializareFilm();
-	f68.deserializareFilm();
-	//cout << f67;
-	cout << f68;
+	//Film f67;
+	//Film f68;
+	//cin >> f67;
+	//f67.serializareFilm();
+	//f68.deserializareFilm();
+	////cout << f67;
+	//cout << f68;
 
 
 	////OPERATIUNI BILETE
@@ -2268,119 +2567,11 @@ int main()
 	//Film f2((char*)"The Christmas Chronicles II", ff1, "Comedie", 90, "Venus", 3, ore, 1);
 	//Film f3((char*)"Top Gun: Maverick", ff1, "Actiune", 90, "Venus", 3, ore, 1);
 
-	Rezervare r;
-	Sala s((char*)"Venus", 7, 5, "3D");
-	Client c;
+	//Rezervare r;
+	//Sala s((char*)"Venus", 7, 5, "3D");
+	//Client c;
 
 
-	Repo repo;
-	string username = "administrator";
-	string password = "parola";
-	string revenireMeniu = "1";
-	int optiune = 0;
-	int optiuneFilm = 0;
-	int rand = 0;
-	int loc = 0;
-
-
-	while (true)
-	{
-		cout << endl <<
-			"==== Meniu: ====" << endl << endl <<
-			"1. Afisare Filme" << endl <<
-			"2. Rezervare bilet" << endl <<
-			"3. Modificare rezervare" << endl <<
-			"4. Administrare cinema" << endl <<
-			"5. Cont client" << endl <<
-			"0. Exit" << endl;
-
-		cout << endl << "Selecteaza optiunea: ";
-
-		cin >> optiune;
-		//cout << endl;
-
-		switch (optiune)
-		{
-		case 0:
-			break;
-		case 1:
-			cout << endl;
-			for (int i = 0; i < 3; i++)
-			{
-				//cout << vectorFilm[i];
-			}
-			continue;
-		case 2:
-
-			cout << "Apasa 1 pentru autentificare" << endl <<
-				"Apasa 2 pentru creare cont nou" << endl;
-			cout << "// Momentan nu exista optiunea asta, se creeaza cont nou by default" << endl;
-			cin >> c;
-			cin >> r;
-
-			for (int i = 0; i < 3; i++)
-			{
-				cout << endl << "Apasa " << i + 1 << " pentru filmul: " << endl;
-				//cout << vectorFilm[i];
-			}
-
-			cout << endl << "Selecteaza filmul: ";
-			cin >> optiuneFilm;
-
-			cout << endl << "Selecteaza randul si locul: " << endl;
-			s.getLocuriSala();
-
-
-			cout << "Rand: ";
-			cin >> rand;
-			cout << "Loc: ";
-			cin >> loc;
-
-			cout << endl << "Ati selectat filmul: " << endl; // << vectorFilm[optiuneFilm] << endl;
-			cout << "Locul " << loc << " randul " << rand << endl;
-			cout << "Rezervarea a fost facuta cu succes!" << endl << endl;
-
-			break;
-		case 3:
-			break;
-		case 4:
-			repo.administrareCinema();
-			break;
-			while (true)
-			{
-				if (revenireMeniu == "0")
-				{
-					break;
-				}
-				cout << endl << "Autentificare: [nume default = 'administrator' parola default = 'parola']" << endl;
-				cout << "numele de utilizator: ";
-				cin >> ws;
-				getline(cin, username);
-				cout << "parola: ";
-				getline(cin, password);
-
-				if (username != "administrator" && password != "parola")
-				{
-					cout << endl << "---- Numele de utilizator sau parola sunt incorecte. Incearca din nou!----" << endl << endl <<
-						"Pentru schimbarea parolei sau a numelui de utilizator adreseaza-te departamentului IT!" << endl <<
-						"Apasa orice tasta pentru a incerca din nou, "
-						"apasa 0 pentru revenirea la meniul anterior ";
-					cin >> ws;
-					getline(cin, revenireMeniu);
-				}
-				else
-				{
-					cout << endl << "Bine ai venit, " << username << "!" << endl;
-					repo.administrareCinema();
-					break;
-				}
-			}
-			continue;
-		default:
-			cout << "Optiunea este invalida, incerca din nou!" << endl << endl;
-		}
-		break;
-	}
 
 	//Sala s1;
 	//cin >> s1;
@@ -2439,7 +2630,6 @@ int main()
 		//}
 
 		/*cout << ++filme[2];
-
 		cout << filme[2]++;*/
 
 		//Sala sala_noua;
@@ -2451,24 +2641,19 @@ int main()
 		{
 			matrice1[i] = new int[2];
 		}
-
 		int** matrice2 = new int* [2];
 		for (int i = 0; i < 2; i++)
 		{
 			matrice2[i] = new int[4];
 		}
-
 		matrice1[0][0] = 1;
 		matrice1[0][1] = 0;
 		matrice1[1][0] = 0;
 		matrice1[1][1] = 1;
-
 		//Sala sala_1((char*)"Venus", matrice1, 2, 2, "3D");
 		//cout << "Nr de locuri libere in sala:";
 		//cin >> sala_1;
 		cout << sala_1 << endl;
-
-
 		matrice2[0][0] = 1;
 		matrice2[0][1] = 0;
 		matrice2[0][2] = 0;
@@ -2477,12 +2662,10 @@ int main()
 		matrice2[1][1] = 0;
 		matrice2[1][2] = 1;
 		matrice2[1][3] = 0;
-
 		Sala sala_2((char*)"Terra", matrice2, 2, 4, "2D");
 		cout << "Nr de locuri libere in sala:";
 		//cin >> sala_2;
 		cout << sala_2[1] << endl;
-
 		if (sala_1 == sala_2)
 			cout << "Salile au acelasi numar de locuri ocupate.";
 		else
@@ -2513,6 +2696,5 @@ int main()
 		//cout << r.getNrBileteRezervate();
 
 }
-
 
 
