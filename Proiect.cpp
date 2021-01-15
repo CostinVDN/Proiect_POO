@@ -760,6 +760,14 @@ public:
 		return nrFilme;
 
 	}
+
+	static void setnrFilme(int nrfilme)
+	{
+
+		Film::nrFilme = nrfilme;
+
+	}
+
 	void setNumeFilm(const char* nume)
 	{
 		if (this->nume != nullptr)
@@ -986,6 +994,9 @@ int Film::nrFilme = 0;
 ostream& operator<< (ostream& out, Film f)
 {
 	out << endl;
+	if (f.idFilm != 0)
+		out << "ID Film: " << f.idFilm << endl;
+
 	if (f.nume != nullptr)
 	{
 		out << "Nume film: " << f.nume;
@@ -2139,7 +2150,7 @@ class null_exception : public exception
 //			case 1:
 //				break;
 //			case 2:
-//				break;
+//				brea;
 //			case 3:
 //				break;
 //			case 4:
@@ -2209,9 +2220,12 @@ class null_exception : public exception
 	}
 };*/
 
-Film** administrare_filme(Film** lista_filme, int nr_filme)
+Film** administrare_filme(Film** lista_filme)
 {
 	int optiune;
+	int nr_filme = 0;
+	int nr_filme_noi = 0;
+	bool exista_idfilm = false;
 	ofstream f1;
 	ifstream f2;
 
@@ -2219,93 +2233,206 @@ Film** administrare_filme(Film** lista_filme, int nr_filme)
 
 	do
 	{
+
 		cout << endl <<
 			"==== Administrare filme: ====" << endl << endl <<
 			"1. Adaugare filme" << endl <<
 			"2. Modificare film" << endl <<
 			"3. Stergere film" << endl <<
 			"4. Afisare info filme" << endl <<
-			"5. Salvare date in fisier" << endl << 
-			"6. Citire date din fisier" << endl <<
 			"0. Exit" << endl;
 
 		cout << endl << "Selecteaza optiunea: ";
 
 		cin >> optiune;
 
-		switch (optiune)
-		{
+		//Se citesc nr. de filme salvate din fisier
+		f2.open("film.bin", ios::_Nocreate | ios::binary);
+		f2.read((char*)&nr_filme, sizeof(nr_filme)); //nr filme inregistrate in fisier
 
-			case 1:
-				//Inregistrare filme noi
-				cout << "Introduceti nr. de fime pe care doriti sa le inregistrati :";
-				cin >> nr_filme;
+		if (nr_filme != 0)
+		{
+			if (optiune == 1)
+			{
+
+				cout << "Introduceti nr. de fime pe care doriti sa le adaugati:";
+				cin >> nr_filme_noi;
+
+				lista_filme = new Film * [nr_filme + nr_filme_noi];
+			}
+			else
+			{
+
 				lista_filme = new Film * [nr_filme];
 
-				for (int indx = 0; indx < nr_filme; indx++)
-				{
-					lista_filme[indx] = new Film();
-					cin >> (*lista_filme[indx]);
-				}
-
-			break;
-		case 2:
-			// Modificare info film
-			int IDFilm;
-			cout << "Introduceti ID Film pe care doriti sa-l modificati ";
-			do
-			{
-
-				cin >> IDFilm;
-
-			} while ((IDFilm < 1) || (IDFilm > nr_filme));
-
-			cin >> (*lista_filme[IDFilm - 1]);
-
-			break;
-		case 3:
-			break;
-		case 4:
-			//Afisare lista filme			
-			cout << "Lista filme inregistrate" << endl;
-			cout << "===========================" << endl;
-
-			for (int indx = 0; indx < nr_filme; indx++)
-			{
-
-				if (lista_filme[indx] != nullptr)
-					cout << (*lista_filme[indx]);
-
 			}
-			break;
-		case 5:
-			f1.open("film.bin", ios::binary);
-				
-				//Se scrie nr. de filme in fisier
-				f1.write((char*)&nr_filme, sizeof(nr_filme));
-				for (int indx=0; indx < nr_filme; indx++)
-					lista_filme[indx]->serializareFilm(f1, *lista_filme[indx]);
-	
-			f1.close();
 
-			break;
-		case 6:
-			f2.open("film.bin", ios::binary);
-
-			//Se citesc nr. de filme
-			f2.read((char*)&nr_filme, sizeof(nr_filme));
-			lista_filme = new Film * [nr_filme];
-
+			//Se citesc filmele din fisierul binar
 			for (int indx = 0; indx < nr_filme; indx++)
 			{
 				lista_filme[indx] = new Film();
 				lista_filme[indx]->deserializareFilm(f2, *lista_filme[indx]);
 			}
 
-			f2.close();
+			cout << "Filmele salvate in fisierul binar au fost incarcate cu succes!" << endl;
+		}
+		else
+		{
+
+			if (optiune == 1)
+			{
+
+				cout << "Introduceti nr. de fime pe care doriti sa le adaugati:";
+				cin >> nr_filme_noi;
+
+				lista_filme = new Film * [nr_filme_noi];
+
+			}
+			else
+			{
+			
+				cout << "Nu exista filme salvate in fisierul binar!" << endl;
+			
+			}
+
+		}
+
+		f2.close();
+
+		switch (optiune)
+		{
+
+		case 1:
+			//Inregistrare filme noi
+
+			if (nr_filme !=0)
+				Film::setnrFilme(nr_filme);
+
+			for (int indx = nr_filme; indx < nr_filme + nr_filme_noi; indx++)
+			{
+				lista_filme[indx] = new Film();
+				cin >> (*lista_filme[indx]);
+			}
+
+			// Se seteaza nr de file la nr de filme din fisierul bina + nr filme noi inregistrate 
+			nr_filme += nr_filme_noi;
 
 			break;
+
+		case 2:
+			// Modificare info film
+			int IDFilm;
+
+			if (nr_filme != 0)
+			{
+				cout << "Introduceti ID Film pe care doriti sa-l modificati ";
+				do
+				{
+
+					cin >> IDFilm;
+
+				} while ((IDFilm < 1) || (IDFilm > nr_filme));
+
+				cin >> (*lista_filme[IDFilm - 1]);
+			}
+			break;
+
+		case 3:
+			//Stergere filme
+			if (nr_filme != 0)
+			{
+				cout << "Introduceti ID Film pe care doriti sa-l stergeti ";
+				cin >> IDFilm;
+
+				for (int indx = 0; indx < nr_filme; indx++)
+				{
+
+					if (lista_filme[indx]->getIdFilm() == IDFilm)
+					{
+
+						exista_idfilm = true;
+						delete lista_filme[indx];
+						lista_filme[indx] = nullptr;
+
+						//Setam nr filme cu unu mai putin
+						nr_filme_noi = nr_filme - 1;
+
+					}
+
+				}
+
+				if (!exista_idfilm)
+					cout << "Nu exista Filmul cu ID-ul: " << IDFilm;
+				
+			}
+			break;
+		case 4:
+			//Afisare lista filme			
+			if (nr_filme != 0)
+			{
+				cout << "Lista filme inregistrate" << endl;
+				cout << "===========================" << endl;
+
+				for (int indx = 0; indx < nr_filme; indx++)
+				{
+
+					if (lista_filme[indx] != nullptr)
+						cout << (*lista_filme[indx]);
+
+				}
+			}
+			break;
+			//case 5:
+			//	f1.open("film.bin", ios::binary);
+			//		
+			//		//Se scrie nr. de filme in fisier
+			//		f1.write((char*)&nr_filme, sizeof(nr_filme));
+			//		for (int indx=0; indx < nr_filme; indx++)
+			//			lista_filme[indx]->serializareFilm(f1, *lista_filme[indx]);
+
+			//	f1.close();
+
+			//	break;
+			//case 6:
+			//			break;'=
 		}
+
+		// La finalul oricarei operatiuni se inregistreaza filme in fisierul binar daca exista filem de inregistrat
+		if (nr_filme != 0 && optiune != 4)
+		{
+
+			f1.open("film.bin", ios::binary);
+
+			//Se scrie nr. de filme in fisier
+			if (optiune == 3)
+			{
+
+				f1.write((char*)&nr_filme_noi, sizeof(nr_filme));
+
+			}
+			else
+			{
+
+				f1.write((char*)&nr_filme, sizeof(nr_filme));
+
+			}
+
+			for (int indx = 0; indx < nr_filme; indx++)
+			{
+
+				if (lista_filme[indx] != nullptr)
+					lista_filme[indx]->serializareFilm(f1, *lista_filme[indx]);
+
+			}
+			
+			f1.close();
+
+			if (optiune == 3)
+				nr_filme = nr_filme_noi;
+
+			cout << "Datele despre filme au fost salvate in fisierul binar!" << endl;
+		}
+
 	} while (optiune != 0);
 
 	return lista_filme;
@@ -2318,7 +2445,7 @@ int main()
 	string username = "administrator";
 	string password = "parola";
 	string revenireMeniu = "1";
-	int nr_sali, nr_filme, nr_bilete, nr_clienti, nr_rezervari;
+	int nr_sali, nr_bilete, nr_clienti, nr_rezervari;
 	int optiuneFilm = 0;
 	int rand = 0;
 	int loc = 0;
@@ -2349,15 +2476,9 @@ int main()
 		switch (optiune)
 		{
 			case 1:
-				for (int indx = 0; indx < Film::getnrFilme(); indx++)
-				{
-
-					if (lista_filme[indx] != nullptr)
-						cout << (*lista_filme[indx]);
-				}
 				break;
 			case 2:
-				lista_filme = administrare_filme(lista_filme, Film::getnrFilme());
+				administrare_filme(lista_filme);
 				break;
 			case 3:
 				break;
