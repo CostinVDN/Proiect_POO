@@ -2285,7 +2285,7 @@ Film** administrare_filme(Film** lista_filme, int nr_filme)
 				f1.write((char*)&nr_filme, sizeof(nr_filme));
 				for (int indx=0; indx < nr_filme; indx++)
 					lista_filme[indx]->serializareFilm(f1, *lista_filme[indx]);
-
+	
 			f1.close();
 
 			break;
@@ -2294,9 +2294,9 @@ Film** administrare_filme(Film** lista_filme, int nr_filme)
 
 			//Se citesc nr. de filme
 			f2.read((char*)&nr_filme, sizeof(nr_filme));
-			lista_filme = new Film * [nr_filme + 1];
+			lista_filme = new Film * [nr_filme];
 
-			for (int indx = 0; indx < nr_filme-1; indx++)
+			for (int indx = 0; indx < nr_filme; indx++)
 			{
 				lista_filme[indx] = new Film();
 				lista_filme[indx]->deserializareFilm(f2, *lista_filme[indx]);
