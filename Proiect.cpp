@@ -3417,6 +3417,7 @@ int main()
 		switch (optiune)
 		{
 		case 1:
+			administrareSala(lista_sali);
 			break;
 		case 2:
 			administrare_filme(lista_filme);
