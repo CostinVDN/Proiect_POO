@@ -15,7 +15,7 @@ private:
 	int nrRanduri;
 	int nrLocuriPeRand;
 	int** locuriSala;
-	int** orarSala;
+	int orarSala[7][10];
 	int pretLocSala;
 	string tipSala;
 
@@ -23,10 +23,19 @@ public:
 	Sala() : nrSala(++nrTotalSali)
 	{
 		numeSala = nullptr;
-		locuriSala = nullptr;
-		tipSala = "2D";
-		nrLocuriPeRand = 0;
 		nrRanduri = 0;
+		nrLocuriPeRand = 0;
+		locuriSala = nullptr;
+		for (int i = 0; i < 7; i++) {
+			for (int j = 0; j < 10; j++)
+			{
+				orarSala[i][j] = 0;
+			}
+		}
+		pretLocSala = 25;
+		tipSala = "2D";
+
+
 		pretLocSala = 25;
 	}
 
@@ -62,13 +71,7 @@ public:
 			this->locuriSala = nullptr;
 		}
 
-		orarSala = new int* [7];
-		for (int i = 0; i < 7; i++)
-		{
-			orarSala[i] = new int[10];
-		}
-		for (int i = 0; i < 7; i++)
-		{
+		for (int i = 0; i < 7; i++) {
 			for (int j = 0; j < 10; j++)
 			{
 				orarSala[i][j] = 0;
@@ -114,16 +117,10 @@ public:
 			this->locuriSala = nullptr;
 		}
 
-		orarSala = new int* [7];
-		for (int i = 0; i < 7; i++)
-		{
-			orarSala[i] = new int[10];
-		}
-		for (int i = 0; i < 7; i++)
-		{
+		for (int i = 0; i < 7; i++) {
 			for (int j = 0; j < 10; j++)
 			{
-				orarSala[i][j] = 0;
+				orarSala[i][j] = s.orarSala[i][j];
 			}
 		}
 
@@ -138,7 +135,6 @@ public:
 	{
 		delete[] numeSala;
 		delete[] locuriSala;
-		delete[] orarSala;
 
 		if (this != &s)
 		{
@@ -173,13 +169,7 @@ public:
 				this->locuriSala = nullptr;
 			}
 
-			orarSala = new int* [7];
-			for (int i = 0; i < 7; i++)
-			{
-				orarSala[i] = new int[10];
-			}
-			for (int i = 0; i < 7; i++)
-			{
+			for (int i = 0; i < 7; i++) {
 				for (int j = 0; j < 10; j++)
 				{
 					orarSala[i][j] = s.orarSala[i][j];
@@ -198,7 +188,6 @@ public:
 	{
 		delete[] numeSala;
 		delete[] locuriSala;
-		delete[] orarSala;
 	}
 
 	//setter adaugat
@@ -219,24 +208,28 @@ public:
 		//}
 	}
 
-	void setAdaugareRanduri(int nr)
-	{
-		this->nrRanduri = this->nrRanduri + nr;
-	}
-
-	//setter adaugat
-	void setnrRanduri(int nrRanduri)
-	{
-		if (nrRanduri > 0)
-		{
-			this->nrRanduri = nrRanduri;
-		}
-	}
-
 
 	void setLocuriSala(int rand, int loc)
 	{
 		locuriSala[rand - 1][loc - 1] = 1;
+	}
+
+	void setOrarSala(int zi, int ora)
+	{
+		while (true)
+		{
+			if (zi > 0 && zi < 8 && ora > 9 && ora < 20)
+			{
+				zi -= 1;
+				ora -= 10;
+				orarSala[zi][ora] = 1;
+				break;
+			}
+			else
+			{
+				cout << "Ziua si ora sunt invalide! Incearca din nou! [zi intre 1-7, ora intre 10-19]" << endl;
+			}
+		}
 	}
 
 	void setPretLocSala(int pret)
@@ -279,6 +272,29 @@ public:
 			return matrice;
 		}
 		return nullptr;
+	}
+
+	void getOrarSala()
+	{
+		string zile[7] = { "L ", "Ma", "Mi", "J ", "V ", "S ", "D " };
+		int ore[10] = { 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
+		cout << "Ora: ";
+		for (int i = 0; i < 10; i++)
+		{
+			cout << ore[i] << " ";
+		}
+		cout << endl;
+
+		for (int i = 0; i < 7; i++)
+		{
+			cout << zile[i] << " : ";
+			for (int j = 0; j < 10; j++)
+			{
+				cout << orarSala[i][j] << "  ";
+			}
+			cout << endl;
+		}
+		cout << endl;
 	}
 
 
@@ -2440,6 +2456,10 @@ Film** administrare_filme(Film** lista_filme)
 
 int main()
 {
+	//Sala s;
+	//s.getOrarSala();
+	//s.setOrarSala(3, 12);
+	//s.getOrarSala();
 
 	//Repo repo;
 	string username = "administrator";
