@@ -927,7 +927,7 @@ public:
 		return true;
 	}
 
-	void serializareFilm(ofstream &f, Film film_crt)
+	void serializareFilm(ofstream& f, Film film_crt)
 	{
 
 		f.write((char*)&idFilm, sizeof(idFilm));
@@ -1017,7 +1017,7 @@ ostream& operator<< (ostream& out, Film f)
 	{
 		out << "Nume film: " << f.nume;
 	}
-	
+
 	out << endl;
 
 	if (f.zileProiectii != nullptr && f.nrZile > 0)
@@ -1030,7 +1030,7 @@ ostream& operator<< (ostream& out, Film f)
 	}
 
 	out << endl;
-	
+
 	if (f.oreProiectii != nullptr && f.nrProiectiiZi > 0)
 	{
 		out << "Ore proiectii: ";
@@ -1053,7 +1053,7 @@ ostream& operator<< (ostream& out, Film f)
 istream& operator>> (istream& in, Film& f)
 {
 
-	cout << endl <<"Nume film: ";
+	cout << endl << "Nume film: ";
 	delete[] f.nume;
 	char buffer[50];
 	in >> ws;
@@ -1061,9 +1061,19 @@ istream& operator>> (istream& in, Film& f)
 	f.nume = new char[strlen(buffer) + 1];
 	strcpy_s(f.nume, strlen(buffer) + 1, buffer);
 
+	cout << "Gen: ";
+	in >> ws;
+	getline(in, f.gen);
+
+	cout << "Durata: ";
+	in >> f.durata;
+
+	cout << "Id sala: ";
+	in >> f.idSala;
+
 	cout << "Introdu numarul zilelor din saptamana in care va rula filmul: ";
 	in >> f.nrZile;
-	
+
 	if (f.nrZile > 0)
 	{
 		cout << "Pentru ziua 'luni' introdu 1:" << endl;
@@ -1086,16 +1096,6 @@ istream& operator>> (istream& in, Film& f)
 			in >> f.oreProiectii[i];
 		}
 	}
-
-	cout << "Gen: ";
-	in >> ws;
-	getline(in, f.gen);
-
-	cout << "Durata: ";
-	in >> f.durata;
-
-	cout << "Id sala: ";
-	in >> f.idSala;
 
 	return in;
 }
@@ -1129,8 +1129,8 @@ public:
 		if (dataFilm != nullptr)
 		{
 
-			this->dataFilm = new char[strlen(dataFilm)+1];
-			strcpy_s(this->dataFilm,strlen(dataFilm)+1, dataFilm);
+			this->dataFilm = new char[strlen(dataFilm) + 1];
+			strcpy_s(this->dataFilm, strlen(dataFilm) + 1, dataFilm);
 
 		}
 		else
@@ -1143,13 +1143,13 @@ public:
 		this->rand = rand;
 		this->nrLocuri = nrLocuri;
 
-		if (locuri != nullptr && nrLocuri > 0) 
+		if (locuri != nullptr && nrLocuri > 0)
 		{
 			this->locuri = new int[nrLocuri];
 			for (int i = 0; i < nrLocuri; i++)
 				this->locuri[i] = locuri[i];
 		}
-		else 
+		else
 		{
 			this->locuri = nullptr;
 			this->nrLocuri = 0;
@@ -1176,14 +1176,14 @@ public:
 		this->rand = b.rand;
 		this->nrLocuri = b.nrLocuri;
 
-		if (b.locuri != nullptr && b.nrLocuri > 0) 
+		if (b.locuri != nullptr && b.nrLocuri > 0)
 		{
 			locuri = new int[b.nrLocuri];
 			for (int i = 0; i < b.nrLocuri; i++)
 				locuri[i] = b.locuri[i];
-			
+
 		}
-		else 
+		else
 		{
 			this->locuri = nullptr;
 			this->nrLocuri = 0;
@@ -1213,18 +1213,18 @@ public:
 
 				this->dataFilm = nullptr;
 			}
-			
+
 			this->rand = b.rand;
-			if (b.locuri != nullptr && b.nrLocuri > 0) 
+			if (b.locuri != nullptr && b.nrLocuri > 0)
 			{
 				this->nrLocuri = b.nrLocuri;
 				this->locuri = new int[b.nrLocuri];
-				
-				for (int i = 0; i < b.nrLocuri; i++) 
+
+				for (int i = 0; i < b.nrLocuri; i++)
 					this->locuri[i] = b.locuri[i];
-				
+
 			}
-			else 
+			else
 			{
 				this->locuri = nullptr;
 				this->nrLocuri = 0;
@@ -1389,14 +1389,14 @@ ofstream& operator<<(ofstream& file_out, Bilet b)
 
 	if (file_out.is_open())
 	{
-	
+
 		file_out << b.dataFilm << endl;
 		file_out << b.rand << endl;
 		file_out << b.nrLocuri << endl;
 		for (int indx = 0; indx < b.nrLocuri; indx++)
 		{
 
-			file_out << b.locuri[indx]<< endl;
+			file_out << b.locuri[indx] << endl;
 		}
 	}
 
@@ -2122,7 +2122,7 @@ Rezervare operator--(Rezervare r)
 
 class null_exception : public exception
 {
-	public:
+public:
 	null_exception()
 	{
 
@@ -2130,7 +2130,7 @@ class null_exception : public exception
 
 	null_exception(const char* message) : exception(message)
 	{
-		
+
 	}
 };
 
@@ -2290,7 +2290,6 @@ Film** administrare_filme(Film** lista_filme)
 				lista_filme[indx]->deserializareFilm(f2, *lista_filme[indx]);
 			}
 
-			cout << "Filmele salvate in fisierul binar au fost incarcate cu succes!" << endl;
 		}
 		else
 		{
@@ -2306,9 +2305,9 @@ Film** administrare_filme(Film** lista_filme)
 			}
 			else
 			{
-			
+
 				cout << "Nu exista filme salvate in fisierul binar!" << endl;
-			
+
 			}
 
 		}
@@ -2321,8 +2320,22 @@ Film** administrare_filme(Film** lista_filme)
 		case 1:
 			//Inregistrare filme noi
 
-			if (nr_filme !=0)
-				Film::setnrFilme(nr_filme);
+			//Se verifica ultimul ID de film inregistrat pt a se porni contorul pt filmele noi din acel loc
+			if (nr_filme != 0)
+			{
+
+				int index_film = 1;
+				for (int indx = 0; indx < nr_filme; indx++)
+				{
+
+					if (lista_filme[indx]->getIdFilm() > index_film)
+						index_film = lista_filme[indx]->getIdFilm();
+
+				}
+
+				Film::setnrFilme(index_film);
+
+			}
 
 			for (int indx = nr_filme; indx < nr_filme + nr_filme_noi; indx++)
 			{
@@ -2344,12 +2357,27 @@ Film** administrare_filme(Film** lista_filme)
 				cout << "Introduceti ID Film pe care doriti sa-l modificati ";
 				do
 				{
+					//Se verifica daca ID-ul filmului este valid (este ID-ul unui film existent)
 
 					cin >> IDFilm;
+					exista_idfilm = false;
 
-				} while ((IDFilm < 1) || (IDFilm > nr_filme));
+					for (int indx = 0; indx < nr_filme; indx++)
+					{
 
-				cin >> (*lista_filme[IDFilm - 1]);
+						if (lista_filme[indx]->getIdFilm() == IDFilm)
+						{
+
+							exista_idfilm = true;
+							cin >> (*lista_filme[indx]);
+						}
+					}
+
+					if (!exista_idfilm)
+						cout << "Introduceti un ID valid!: ";
+
+				} while ((!exista_idfilm) || (IDFilm < 1));
+
 			}
 			break;
 
@@ -2358,7 +2386,25 @@ Film** administrare_filme(Film** lista_filme)
 			if (nr_filme != 0)
 			{
 				cout << "Introduceti ID Film pe care doriti sa-l stergeti ";
-				cin >> IDFilm;
+				
+				do
+				{
+					//Se verifica daca ID-ul filmului este valid (este ID-ul unui film existent)
+
+					cin >> IDFilm;
+					exista_idfilm = false;
+
+					for (int indx = 0; indx < nr_filme; indx++)
+					{
+
+						if (lista_filme[indx]->getIdFilm() == IDFilm)
+							exista_idfilm = true;
+					}
+
+					if (!exista_idfilm)
+						cout << "Introduceti un ID valid!: ";
+
+				} while ((!exista_idfilm) || (IDFilm < 1));
 
 				for (int indx = 0; indx < nr_filme; indx++)
 				{
@@ -2376,10 +2422,6 @@ Film** administrare_filme(Film** lista_filme)
 					}
 
 				}
-
-				if (!exista_idfilm)
-					cout << "Nu exista Filmul cu ID-ul: " << IDFilm;
-				
 			}
 			break;
 		case 4:
@@ -2414,7 +2456,7 @@ Film** administrare_filme(Film** lista_filme)
 		}
 
 		// La finalul oricarei operatiuni se inregistreaza filme in fisierul binar daca exista filem de inregistrat
-		if (nr_filme != 0 && optiune != 4)
+		if (nr_filme != 0 && optiune  < 4 )
 		{
 
 			f1.open("film.bin", ios::binary);
@@ -2440,13 +2482,28 @@ Film** administrare_filme(Film** lista_filme)
 					lista_filme[indx]->serializareFilm(f1, *lista_filme[indx]);
 
 			}
-			
+
 			f1.close();
 
 			if (optiune == 3)
 				nr_filme = nr_filme_noi;
 
-			cout << "Datele despre filme au fost salvate in fisierul binar!" << endl;
+			switch (optiune)
+			{
+
+				case 1:
+					cout << endl << "Datele despre filme au fost inregistrate cu succes in fisierul binar!" << endl;
+					break;
+
+				case 2:
+					cout << endl <<"Infrmatiile au fost actualizate cu succes in fisierul binar!" << endl;
+					break;
+
+				case 3:
+					cout << endl << "Infrmatiile au fost sterse din fisierul binar!" << endl;
+					break;
+			}
+			
 		}
 
 	} while (optiune != 0);
@@ -2471,9 +2528,9 @@ int main()
 	int loc = 0;
 	int optiune;
 
-	Sala** lista_sali= nullptr;
+	Sala** lista_sali = nullptr;
 	Film** lista_filme = nullptr;
-	Client** lista_clienti= nullptr;
+	Client** lista_clienti = nullptr;
 	Bilet** lista_bilete = nullptr;
 	Rezervare** lista_rezervari = nullptr;
 
@@ -2495,19 +2552,19 @@ int main()
 
 		switch (optiune)
 		{
-			case 1:
-				break;
-			case 2:
-				administrare_filme(lista_filme);
-				break;
-			case 3:
-				break;
-			case 4:
-				break;
-			case 5:
-				break;
-			case 6:
-				break;
+		case 1:
+			break;
+		case 2:
+			administrare_filme(lista_filme);
+			break;
+		case 3:
+			break;
+		case 4:
+			break;
+		case 5:
+			break;
+		case 6:
+			break;
 		}
 	} while (optiune != 0);
 
