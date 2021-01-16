@@ -1803,9 +1803,10 @@ public:
 		this->nrBilete = nrBilete;
 		nrBileteRezervate = new int[nrBilete];
 		achitat = false;
+		numeUtilizatorClient = "";
 	}
 
-	Rezervare(char* dataRezervare, int* nrBileteRezervate, int nrBilete, bool achitat) :idRezervare(++nrRezervari)
+	Rezervare(char* dataRezervare, int* nrBileteRezervate, int nrBilete, bool achitat, string numeUtilizatorClient) :idRezervare(++nrRezervari)
 	{
 		if (dataRezervare != nullptr)
 		{
@@ -1832,6 +1833,7 @@ public:
 			this->nrBilete = 0;
 		}
 		this->achitat = achitat;
+		this->numeUtilizatorClient = numeUtilizatorClient;
 
 	}
 
@@ -1862,6 +1864,7 @@ public:
 			nrBilete = 0;
 		}
 		achitat = r.achitat;
+		numeUtilizatorClient = r.numeUtilizatorClient;
 	}
 
 	~Rezervare()
@@ -1899,6 +1902,7 @@ public:
 			nrBilete = 0;
 		}
 		achitat = r.achitat;
+		numeUtilizatorClient = r.numeUtilizatorClient;
 
 		return *this;
 	}
@@ -2014,6 +2018,7 @@ public:
 		{
 			f.write((char*)&nrBileteRezervate[i], sizeof(nrBileteRezervate[i]));
 		}
+		f.write(numeUtilizatorClient.c_str(), numeUtilizatorClient.length() + 1);
 		f.close();
 	}
 
@@ -2037,6 +2042,8 @@ public:
 		{
 			f.read((char*)&nrBileteRezervate[i], sizeof(nrBileteRezervate[i]));
 		}
+
+		f.read((char*)&numeUtilizatorClient, sizeof(numeUtilizatorClient));
 
 		f.close();
 	}
@@ -2069,6 +2076,9 @@ ostream& operator<<(ostream& out, Rezervare r)
 		out << "Achitat";
 	out << endl;
 
+	out << "Numele utilizatorului: " << r.numeUtilizatorClient;
+	out << endl;
+
 	return out;
 }
 
@@ -2094,7 +2104,8 @@ istream& operator>>(istream& in, Rezervare& r)
 
 	//cout << "Introduceti 0 daca nu ati achitat sau 1 daca ati achitat ";
 	//in >> r.achitat;
-
+	cout << "Numele utilizatorului: ";
+	in >> r.numeUtilizatorClient;
 	return in;
 }
 
