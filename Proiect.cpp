@@ -22,10 +22,23 @@ private:
 public:
 	Sala() : nrSala(++nrTotalSali)
 	{
-		numeSala = nullptr;
-		nrRanduri = 0;
-		nrLocuriPeRand = 0;
-		locuriSala = nullptr;
+		numeSala = new char[] {""};
+		nrRanduri = 10;
+		nrLocuriPeRand = 10;
+
+		locuriSala = new int* [nrRanduri];
+		for (int i = 0; i < nrRanduri; i++)
+		{
+			this->locuriSala[i] = new int[nrLocuriPeRand];
+		}
+		for (int i = 0; i < nrRanduri; i++)
+		{
+			for (int j = 0; j < nrLocuriPeRand; j++)
+			{
+				this->locuriSala[i][j] = 0;
+			}
+		}
+
 		for (int i = 0; i < 7; i++) {
 			for (int j = 0; j < 10; j++)
 			{
@@ -34,14 +47,11 @@ public:
 		}
 		pretLocSala = 25;
 		tipSala = "2D";
-
-
-		pretLocSala = 25;
 	}
 
 	Sala(char* numeSala, int nrRanduri, int nrLocuriPeRand, string tipSala) :nrSala(++nrTotalSali)
 	{
-		if (strlen(numeSala) != 0)
+		if (numeSala != nullptr)
 		{
 			this->numeSala = new char[strlen(numeSala) + 1];
 			strcpy_s(this->numeSala, strlen(numeSala) + 1, numeSala);
@@ -138,7 +148,7 @@ public:
 
 		if (this != &s)
 		{
-			if (strlen(s.numeSala) != 0)
+			if (s.numeSala != nullptr)
 			{
 				this->numeSala = new char[strlen(s.numeSala) + 1];
 				strcpy_s(this->numeSala, strlen(s.numeSala) + 1, s.numeSala);
@@ -191,6 +201,13 @@ public:
 	}
 
 	//setter adaugat
+
+
+	static void setNrSala(int nr)
+	{
+		Sala::nrTotalSali = nr;
+	}
+
 	void setDenumireSala(char* denumireSala)
 	{
 		//if (denumireSala != nullptr)
@@ -250,13 +267,18 @@ public:
 		pretLocSala = pret;
 	}
 
-	//getter nume sala
+	int getIdSala()
+	{
+		return nrSala;
+	}
+
+	//getter nume sala!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!>>>>>>>>>>>>>>>>>>
 	char* getDenumireSala()
 	{
 		return numeSala;
 	}
 
-	int** getLocuriSala()
+	void getLocuriSala()
 	{
 		int locuriLibere = 0;
 		if (locuriSala != nullptr)
@@ -266,6 +288,9 @@ public:
 			{
 				matrice[i] = new int[nrLocuriPeRand];
 			}
+
+			cout << numeSala << ", id " << nrSala << endl;
+			cout << "====================================" << endl;
 
 			for (int i = 0; i < nrRanduri; i++)
 			{
@@ -281,14 +306,15 @@ public:
 				}
 				cout << endl;
 			}
-			cout << "Nr de locuri libere in sala: " << locuriLibere << endl;
-			return matrice;
+			cout << endl;
+			cout << "Locuri disponibile: " << locuriLibere << endl << endl;
 		}
-		return nullptr;
 	}
 
 	void getOrarSala()
 	{
+		cout << numeSala << ", id " << nrSala << endl;
+		cout << "==================================" << endl;
 		string zile[7] = { "L ", "Ma", "Mi", "J ", "V ", "S ", "D " };
 		int ore[10] = { 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
 		cout << "Ora: ";
@@ -404,40 +430,41 @@ public:
 
 
 	//serializare adaugata
-	void serializare()
+	void serializareSala(ofstream& f, Sala s)
 	{
-
-		ofstream f("sala.bin", ios::binary);
 
 		f.write((char*)&nrSala, sizeof(nrSala));
 		f.write(numeSala, (long long)strlen(numeSala) + 1);
-		f.write((char*)&locuriSala, sizeof(locuriSala));
-		f.write((char*)&nrLocuriPeRand, sizeof(nrLocuriPeRand));
 		f.write((char*)&nrRanduri, sizeof(nrRanduri));
-
-		f.write(tipSala.c_str(), tipSala.length() + 1);
-
 		f.write((char*)&nrLocuriPeRand, sizeof(nrLocuriPeRand));
+		for (int i = 0; i < nrRanduri; i++)
+		{
+			for (int j = 0; j < nrLocuriPeRand; j++)
+			{
+				f.write((char*)&locuriSala[i][j], sizeof(locuriSala[i][j]));
+			}
+		}
 
-		f.close();
+		for (int i = 0; i < 7; i++)
+		{
+			for (int j = 0; j < 10; j++)
+			{
+				f.write((char*)&orarSala[i][j], sizeof(orarSala[i][j]));
+			}
+		}
+
+		f.write((char*)&pretLocSala, sizeof(pretLocSala));
+		int length = tipSala.length() + 1;
+		f.write((char*)&length, sizeof(length));
+		f.write(tipSala.c_str(), length);
+
 	}
 
 
-	void deserializare()
+	void deserializareSala(ifstream& f, Sala s)
 	{
-		ifstream f("sala.bin", ios::binary);
-		int length = 0;
-		f.read((char*)&length, sizeof(length));
-		char* aux = new char[length];
-		f.read(aux, length);
-		tipSala = aux;
 
 		f.read((char*)&nrSala, sizeof(nrSala));
-		f.read(numeSala, (long long)strlen(numeSala) + 1);
-		f.read((char*)&locuriSala, sizeof(locuriSala));
-		f.read((char*)&nrLocuriPeRand, sizeof(nrLocuriPeRand));
-		f.read((char*)&nrRanduri, sizeof(nrRanduri));
-		f.read((char*)&tipSala, sizeof(tipSala));
 
 		string buffer = "";
 		char c = 0;
@@ -449,8 +476,39 @@ public:
 		numeSala = new char[buffer.length() + 1];
 		strcpy_s(numeSala, buffer.length() + 1, buffer.c_str());
 
-		f.read((char*)&nrSala, sizeof(nrSala));
-		f.close();
+		f.read((char*)&nrRanduri, sizeof(nrRanduri));
+		f.read((char*)&nrLocuriPeRand, sizeof(nrLocuriPeRand));
+
+		delete[] locuriSala;
+		locuriSala = new int* [s.nrRanduri];
+		for (int i = 0; i < s.nrRanduri; i++)
+		{
+			locuriSala[i] = new int[s.nrLocuriPeRand];
+		}
+		for (int i = 0; i < s.nrRanduri; i++)
+		{
+			for (int j = 0; j < s.nrLocuriPeRand; j++)
+			{
+				f.read((char*)&locuriSala[i][j], sizeof(locuriSala[i][j]));
+			}
+		}
+
+		for (int i = 0; i < 7; i++)
+		{
+			for (int j = 0; j < 10; j++)
+			{
+				f.read((char*)&locuriSala[i][j], sizeof(locuriSala[i][j]));
+			}
+		}
+
+		int length = 0;
+		f.read((char*)&length, sizeof(length));
+		char* aux = new char[length];
+		f.read(aux, length);
+		tipSala = aux;
+
+		f.read((char*)&pretLocSala, sizeof(pretLocSala));
+
 	}
 
 	friend ostream& operator<< (ostream&, Sala);
@@ -470,41 +528,34 @@ int Sala::nrTotalSali = 0; //static
 
 ostream& operator<< (ostream& out, Sala s)
 {
-	int locuriLibere = 0;
 
-	out << "Detalii Sala:" << endl;
-	out << "=========================" << endl;
 	out << "Nr Sala: " << s.nrSala << endl;
 	if (s.numeSala != nullptr)
 	{
 		out << "Nume sala: " << s.numeSala << endl;
 	}
-	out << "Tip sala: " << s.tipSala << endl;
-	out << "Nr total de locuri in sala: " << s.nrRanduri * s.nrLocuriPeRand << endl << endl;
-	out << "Locuri disponibile: " << endl;
-	out << "-------------------------" << endl;
-	for (int i = 0; i < s.nrRanduri; i++)
-	{
-		out << "Rand " << i + 1 << ": ";
-		for (int j = 0; j < s.nrLocuriPeRand; j++)
-		{
-			out << " " << s.locuriSala[i][j];
-			if (s.locuriSala[i][j] == 0)
-				locuriLibere++;
-		}
-		out << endl;
-	}
-	out << "Nr de locuri libere in sala: " << locuriLibere << endl;
+	out << "Randuri: " << s.nrRanduri << endl;
+	out << "Locuri pe rand: " << s.nrLocuriPeRand << endl;
+	out << "Pret loc sala: " << s.pretLocSala << endl;
+	out << "Tip sala: " << s.tipSala << endl << endl;
+	//for (int i = 0; i < s.nrRanduri; i++)
+	//{
+	//	out << "Rand " << i + 1 << ": ";
+	//	for (int j = 0; j < s.nrLocuriPeRand; j++)
+	//	{
+	//		out << " " << s.locuriSala[i][j];
+	//		if (s.locuriSala[i][j] == 0)
+	//		{
+	//			locuriLibere++;
+	//		}
+	//	}
+	//	out << endl;
+	//}
+	//out << "Locuri disponibile: " << locuriLibere << endl << endl;
 
-	for (int i = 0; i < 7; i++)
-	{
-		for (int j = 0; j < 10; j++)
-		{
-			out << " " << s.orarSala[i][j];
-		}
-		out << endl;
-	}
-	//out << "Au fost adaugate " << adaugareLocuripeRand << "locuri pe randul:" << rand <<endl;
+	//s.getLocuriSala();
+	//s.getOrarSala();
+
 	return out;
 }
 
@@ -520,16 +571,13 @@ istream& operator>> (istream& in, Sala& s)
 	s.numeSala = new char[buffer.length() + 1];
 	strcpy_s(s.numeSala, buffer.length() + 1, buffer.c_str());
 
-	cout << endl;
-
 	delete[] s.locuriSala;
-	cout << "Cate randuri sunt in sala? ";
+	cout << "Randuri: ";
 	in >> s.nrRanduri;
-	cout << endl;
+	//cout << endl;
 
-	cout << "Cate locuri sunt pe fiecare rand? ";
+	cout << "Locuri pe rand: ";
 	in >> s.nrLocuriPeRand;
-	cout << endl;
 
 	if (s.nrRanduri > 0 && s.nrLocuriPeRand > 0)
 	{
@@ -551,57 +599,60 @@ istream& operator>> (istream& in, Sala& s)
 	in >> s.pretLocSala;
 
 	cout << "Tip sala: ";
-	in >> s.tipSala;
+	in >> ws;
+	getline(in, s.tipSala);
+
 	cout << endl;
 
 	return in;
 }
 
-ofstream& operator<<(ofstream& of, Sala s)
-{
-	int locuriLibere = 0;
+//ofstream& operator<<(ofstream& of, Sala s)
+//{
+//	int locuriLibere = 0;
+//
+//	if (of.is_open())
+//	{
+//		of << "Nume sala: " << s.numeSala << endl;
+//		of << "Tip sala: " << s.tipSala << endl;
+//		of << "Nr locuri in sala: " << s.nrRanduri * s.nrLocuriPeRand << endl << endl;
+//		of << "Locuri disponibile: " << endl;
+//		//of << "-------------------------" << endl;
+//		for (int i = 0; i < s.nrRanduri; i++)
+//		{
+//			of << "Rand " << i + 1 << ": ";
+//			for (int j = 0; j < s.nrLocuriPeRand; j++)
+//			{
+//				of << " " << s.locuriSala[i][j];
+//				if (s.locuriSala[i][j] == 0)
+//					locuriLibere++;
+//			}
+//			of << endl;
+//		}
+//		of << "Locuri libere in sala: " << locuriLibere << endl;
+//	}
+//	return of;
+//}
 
-	if (of.is_open())
-	{
-		of << "Nume sala: " << s.numeSala << endl;
-		of << "Tip sala: " << s.tipSala << endl;
-		of << "Nr locuri in sala: " << s.nrRanduri * s.nrLocuriPeRand << endl << endl;
-		of << "Locuri disponibile: " << endl;
-		//of << "-------------------------" << endl;
-		for (int i = 0; i < s.nrRanduri; i++)
-		{
-			of << "Rand " << i + 1 << ": ";
-			for (int j = 0; j < s.nrLocuriPeRand; j++)
-			{
-				of << " " << s.locuriSala[i][j];
-				if (s.locuriSala[i][j] == 0)
-					locuriLibere++;
-			}
-			of << endl;
-		}
-		of << "Locuri libere in sala: " << locuriLibere << endl;
-	}
-	return of;
-}
+//ifstream& operator>>(ifstream& iff, Sala& s)
+//{
+//	if (iff.is_open()) {
+//		string buffer;
+//		string buffer2;
+//		iff.ignore(100, '\n');
+//		iff.ignore(100, ' ');
+//		iff >> ws;
+//		getline(iff, buffer);
+//		s.numeSala = new char[buffer.length() + 1];
+//		strcpy_s(s.numeSala, buffer.length() + 1, buffer.c_str());
+//		iff.ignore(100, ':');
+//		iff.ignore(1, ' ');
+//		iff >> s.nrLocuriPeRand;
+//	}
+//	return iff;
+//	//out << "Au fost adaugate " << adaugareLocuripeRand << "locuri pe randul:" << rand <<endl;
+//}
 
-ifstream& operator>>(ifstream& iff, Sala& s)
-{
-	if (iff.is_open()) {
-		string buffer;
-		string buffer2;
-		iff.ignore(100, '\n');
-		iff.ignore(100, ' ');
-		iff >> ws;
-		getline(iff, buffer);
-		s.numeSala = new char[buffer.length() + 1];
-		strcpy_s(s.numeSala, buffer.length() + 1, buffer.c_str());
-		iff.ignore(100, ':');
-		iff.ignore(1, ' ');
-		iff >> s.nrLocuriPeRand;
-	}
-	return iff;
-	//out << "Au fost adaugate " << adaugareLocuripeRand << "locuri pe randul:" << rand <<endl;
-}
 
 class Film
 {
@@ -2299,6 +2350,247 @@ public:
 		f.close();
 	}
 };*/
+
+Sala** administrareSala(Sala** vectorSala)
+{
+	int optiune = 0;
+	int nrSali = 0;
+	int nrSaliNoi = 0;
+	bool existaIdSala = false;
+	ofstream f1;
+	ifstream f2;
+
+	system("cls");
+
+	do
+	{
+
+		cout << endl <<
+			"==== Administrare sali: ====" << endl << endl <<
+			"1. Adaugare sala" << endl <<
+			"2. Modificare sala" << endl <<
+			"3. Stergere sala" << endl <<
+			"4. Afisare info sala" << endl <<
+			"0. Exit" << endl;
+
+		cout << endl << "Selecteaza optiunea: ";
+
+		cin >> optiune;
+		f2.open("sala.bin", ios::_Nocreate | ios::binary);
+		f2.read((char*)&nrSali, sizeof(nrSali));
+
+		if (nrSali != 0)
+		{
+			if (optiune == 1)
+			{
+
+				cout << "Introduceti nr. de sali pe care doriti sa le adaugati:";
+				cin >> nrSaliNoi;
+
+				vectorSala = new Sala * [nrSali + nrSaliNoi];
+			}
+			else
+			{
+
+				vectorSala = new Sala * [nrSali];
+
+			}
+			for (int indx = 0; indx < nrSali; indx++)
+			{
+				vectorSala[indx] = new Sala();
+				vectorSala[indx]->deserializareSala(f2, *vectorSala[indx]);
+			}
+
+		}
+		else
+		{
+
+			if (optiune == 1)
+			{
+
+				cout << "Introduceti nr. de sali pe care doriti sa le adaugati:";
+				cin >> nrSaliNoi;
+
+				vectorSala = new Sala * [nrSaliNoi];
+
+			}
+			else
+			{
+				cout << "Nu exista sali salvate in fisierul binar!" << endl;
+			}
+
+		}
+
+		f2.close();
+
+		switch (optiune)
+		{
+		case 1:
+			if (nrSali != 0)
+			{
+
+				int index_film = 1;
+				for (int indx = 0; indx < nrSali; indx++)
+				{
+
+					if (vectorSala[indx]->getIdSala() > index_film)
+						index_film = vectorSala[indx]->getIdSala();
+
+				}
+
+				Sala::setNrSala(index_film);
+
+			}
+
+			for (int indx = nrSali; indx < nrSali + nrSaliNoi; indx++)
+			{
+				vectorSala[indx] = new Sala();
+				cin >> (*vectorSala[indx]);
+			}
+
+			nrSali += nrSaliNoi;
+
+			break;
+
+		case 2:
+			int idSala;
+
+			if (nrSali != 0)
+			{
+				cout << "Introduceti ID sala pe care doriti sa-l modificati ";
+				do
+				{
+					cin >> idSala;
+					existaIdSala = false;
+
+					for (int indx = 0; indx < nrSali; indx++)
+					{
+
+						if (vectorSala[indx]->getIdSala() == idSala)
+						{
+
+							existaIdSala = true;
+							cin >> (*vectorSala[indx]);
+						}
+					}
+
+					if (!existaIdSala)
+						cout << "Introduceti un ID valid!: ";
+
+				} while ((!existaIdSala) || (idSala < 1));
+
+			}
+			break;
+
+		case 3:
+			if (nrSali != 0)
+			{
+				cout << "Introduceti ID Sala pe care doriti sa-l stergeti ";
+
+				do
+				{
+
+					cin >> idSala;
+					existaIdSala = false;
+
+					for (int indx = 0; indx < nrSali; indx++)
+					{
+
+						if (vectorSala[indx]->getIdSala() == idSala)
+							existaIdSala = true;
+					}
+
+					if (!existaIdSala)
+						cout << "Introduceti un ID valid!: ";
+
+				} while ((!existaIdSala) || (idSala < 1));
+
+				for (int indx = 0; indx < nrSali; indx++)
+				{
+
+					if (vectorSala[indx]->getIdSala() == idSala)
+					{
+
+						existaIdSala = true;
+						delete vectorSala[indx];
+						vectorSala[indx] = nullptr;
+						nrSaliNoi = nrSali - 1;
+
+					}
+
+				}
+			}
+			break;
+		case 4:
+			if (nrSali != 0)
+			{
+				cout << "Lista Sali inregistrate" << endl;
+				cout << "===========================" << endl;
+
+				for (int indx = 0; indx < nrSali; indx++)
+				{
+
+					if (vectorSala[indx] != nullptr)
+						cout << (*vectorSala[indx]);
+
+				}
+			}
+			break;
+		}
+
+		if (nrSali != 0 && optiune < 4)
+		{
+
+			f1.open("sala.bin", ios::binary);
+
+			if (optiune == 3)
+			{
+
+				f1.write((char*)&nrSaliNoi, sizeof(nrSali));
+
+			}
+			else
+			{
+
+				f1.write((char*)&nrSali, sizeof(nrSali));
+
+			}
+
+			for (int indx = 0; indx < nrSali; indx++)
+			{
+
+				if (vectorSala[indx] != nullptr)
+					vectorSala[indx]->serializareSala(f1, *vectorSala[indx]);
+
+			}
+
+			f1.close();
+
+			if (optiune == 3)
+				nrSali = nrSaliNoi;
+
+			switch (optiune)
+			{
+
+			case 1:
+				cout << endl << "Datele despre sali au fost inregistrate cu succes in fisierul binar!" << endl;
+				break;
+
+			case 2:
+				cout << endl << "Infrmatiile au fost actualizate cu succes in fisierul binar!" << endl;
+				break;
+
+			case 3:
+				cout << endl << "Infrmatiile au fost sterse din fisierul binar!" << endl;
+				break;
+			}
+
+		}
+
+	} while (optiune != 0);
+
+	return vectorSala;
+}
 
 Film** administrare_filme(Film** lista_filme)
 {
