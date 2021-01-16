@@ -1538,6 +1538,25 @@ public:
 
 		return *this;
 	}
+
+	int getIdClient()
+	{
+		return idClient;
+	}
+
+	static int getNrClienti()
+	{
+
+		return nrClienti;
+
+	}
+
+	static void setNrClienti(int nrClienti)
+	{
+
+		Client::nrClienti = nrClienti;
+
+	}
 	char* getNume()
 	{
 		if (numeClient == nullptr)
@@ -1652,9 +1671,9 @@ public:
 	}
 
 
-	void serializeClient()
+	void serializeClient(ofstream& f, Client client_crt)
 	{
-		ofstream f("Client.bin", ios::binary);
+
 		f.write(numeClient, (long long)strlen(numeClient) + 1);
 		f.write((char*)&nrCarduri, sizeof(nrCarduri));
 		for (int i = 0; i < nrCarduri; i++)
@@ -1662,15 +1681,15 @@ public:
 			f.write((char*)&nrAsociatCard[i], sizeof(nrAsociatCard[i]));
 		}
 		f.write(numeUtilizatorClient.c_str(), numeUtilizatorClient.length());
-		f.close();
+
 	}
 
-	void deserializeClient()
+	void deserializeClient(ifstream& f2, Client client_crt)
 	{
-		ifstream f("Client.bin", ios::binary);
+
 		string buffer = "";
 		char c = 0;
-		while ((c = f.get()) != 0)
+		while ((c = f2.get()) != 0)
 		{
 			buffer += c;
 		}
@@ -1678,20 +1697,20 @@ public:
 		numeClient = new char[buffer.length() + 1];
 		strcpy_s(numeClient, buffer.length() + 1, buffer.c_str());
 
-		f.read((char*)&nrCarduri, sizeof(nrCarduri));
+		f2.read((char*)&nrCarduri, sizeof(nrCarduri));
 		delete[] nrAsociatCard;
 		nrAsociatCard = new int[nrCarduri];
 		for (int i = 0; i < nrCarduri; i++)
 		{
-			f.read((char*)&nrAsociatCard[i], sizeof(nrAsociatCard[i]));
+			f2.read((char*)&nrAsociatCard[i], sizeof(nrAsociatCard[i]));
 		}
 
 		int length = 0;
-		f.read((char*)&length, sizeof(length));
+		f2.read((char*)&length, sizeof(length));
 		char* aux = new char[length];
-		f.read(aux, length);
+		f2.read(aux, length);
 		numeUtilizatorClient = aux;
-		f.close();
+
 	}
 
 	friend ostream& operator<<(ostream&, Client);
@@ -1923,6 +1942,25 @@ public:
 		return *this;
 	}
 
+	int getIdRezervare()
+	{
+		return idRezervare;
+	}
+
+	static int getNrRezervari()
+	{
+
+		return nrRezervari;
+
+	}
+
+	static void setNrRezervari(int nrRezervari)
+	{
+
+		Rezervare::nrRezervari = nrRezervari;
+
+	}
+
 	char* getDataRezervare()
 	{
 		if (dataRezervare == nullptr)
@@ -2025,9 +2063,9 @@ public:
 		return false;
 	}
 
-	void serializeRezervare()
+	void serializeRezervare(ofstream& f, Rezervare rezervare_crt)
 	{
-		ofstream f("Rezervare.bin", ios::binary);
+
 		f.write(dataRezervare, (long long)strlen(dataRezervare) + 1);
 		f.write((char*)&nrBilete, sizeof(nrBilete));
 		for (int i = 0; i < nrBilete; i++)
@@ -2035,15 +2073,15 @@ public:
 			f.write((char*)&nrBileteRezervate[i], sizeof(nrBileteRezervate[i]));
 		}
 		f.write(numeUtilizatorClient.c_str(), numeUtilizatorClient.length() + 1);
-		f.close();
+
 	}
 
-	void deserializeRezervare()
+	void deserializeRezervare(ifstream& f2, Rezervare rezervare_crt)
 	{
-		ifstream f("Rezervare.bin", ios::binary);
+
 		string buffer = "";
 		char c = 0;
-		while ((c = f.get()) != 0)
+		while ((c = f2.get()) != 0)
 		{
 			buffer += c;
 		}
@@ -2051,17 +2089,16 @@ public:
 		dataRezervare = new char[buffer.length() + 1];
 		strcpy_s(dataRezervare, buffer.length() + 1, buffer.c_str());
 
-		f.read((char*)&nrBilete, sizeof(nrBilete));
+		f2.read((char*)&nrBilete, sizeof(nrBilete));
 		delete[] nrBileteRezervate;
 		nrBileteRezervate = new int[nrBilete];
 		for (int i = 0; i < nrBilete; i++)
 		{
-			f.read((char*)&nrBileteRezervate[i], sizeof(nrBileteRezervate[i]));
+			f2.read((char*)&nrBileteRezervate[i], sizeof(nrBileteRezervate[i]));
 		}
 
-		f.read((char*)&numeUtilizatorClient, sizeof(numeUtilizatorClient));
+		f2.read((char*)&numeUtilizatorClient, sizeof(numeUtilizatorClient));
 
-		f.close();
 	}
 
 	friend ostream& operator<<(ostream&, Rezervare);
@@ -2413,7 +2450,7 @@ Film** administrare_filme(Film** lista_filme)
 			if (nr_filme != 0)
 			{
 				cout << "Introduceti ID Film pe care doriti sa-l stergeti ";
-				
+
 				do
 				{
 					//Se verifica daca ID-ul filmului este valid (este ID-ul unui film existent)
@@ -2483,7 +2520,7 @@ Film** administrare_filme(Film** lista_filme)
 		}
 
 		// La finalul oricarei operatiuni se inregistreaza filme in fisierul binar daca exista filem de inregistrat
-		if (nr_filme != 0 && optiune  < 4 )
+		if (nr_filme != 0 && optiune < 4)
 		{
 
 			f1.open("film.bin", ios::binary);
@@ -2518,24 +2555,532 @@ Film** administrare_filme(Film** lista_filme)
 			switch (optiune)
 			{
 
-				case 1:
-					cout << endl << "Datele despre filme au fost inregistrate cu succes in fisierul binar!" << endl;
-					break;
+			case 1:
+				cout << endl << "Datele despre filme au fost inregistrate cu succes in fisierul binar!" << endl;
+				break;
 
-				case 2:
-					cout << endl <<"Infrmatiile au fost actualizate cu succes in fisierul binar!" << endl;
-					break;
+			case 2:
+				cout << endl << "Informatiile au fost actualizate cu succes in fisierul binar!" << endl;
+				break;
 
-				case 3:
-					cout << endl << "Infrmatiile au fost sterse din fisierul binar!" << endl;
-					break;
+			case 3:
+				cout << endl << "Informatiile au fost sterse din fisierul binar!" << endl;
+				break;
 			}
-			
+
 		}
 
 	} while (optiune != 0);
 
 	return lista_filme;
+}
+
+Rezervare** administrare_rezervari(Rezervare** lista_rezervari)
+{
+	int optiune;
+	int nr_rezervari = 0;
+	int nr_rezervari_noi = 0;
+	bool exista_idrezervare = false;
+	ofstream f1;
+	ifstream f2;
+
+	system("cls");
+
+	do
+	{
+		cout << endl <<
+			"==== Administrare rezervari: ====" << endl << endl <<
+			"1. Adaugare rezervari" << endl <<
+			"2. Modificare rezervari" << endl <<
+			"3. Stergere rezervari" << endl <<
+			"4. Afisare info rezervari" << endl <<
+			"0. Exit" << endl;
+
+		cout << endl << "Selecteaza optiunea: ";
+
+		cin >> optiune;
+		f2.open("rezervare.bin", ios::_Nocreate | ios::binary);
+		f2.read((char*)&nr_rezervari, sizeof(nr_rezervari)); //nr rezervari inregistrate in fisier
+
+		if (nr_rezervari != 0)
+		{
+			if (optiune == 1)
+			{
+
+				cout << "Introduceti nr. de rezervari pe care doriti sa le adaugati:";
+				cin >> nr_rezervari_noi;
+
+				lista_rezervari = new Rezervare * [nr_rezervari + nr_rezervari_noi];
+			}
+			else
+			{
+
+				lista_rezervari = new Rezervare * [nr_rezervari];
+
+			}
+			//Se citesc rezervarile din fisierul binar
+			for (int i = 0; i < nr_rezervari; i++)
+			{
+				lista_rezervari[i] = new Rezervare();
+				lista_rezervari[i]->deserializeRezervare(f2, *lista_rezervari[i]);
+			}
+		}
+		else
+		{
+			if (optiune == 1)
+			{
+
+				cout << "Introduceti nr. de rezervari pe care doriti sa le adaugati:";
+				cin >> nr_rezervari_noi;
+
+				lista_rezervari = new Rezervare * [nr_rezervari_noi];
+
+			}
+			else
+			{
+
+				cout << "Nu exista rezervari salvate in fisierul binar!" << endl;
+
+			}
+		}
+
+		f2.close();
+
+		switch (optiune)
+		{
+		case 1:
+			//Inregistrare rezervari noi
+
+			//Se verifica ultimul ID de rezervare inregistrat pt a se porni contorul pt rezervarile noi din acel loc
+			if (nr_rezervari != 0)
+			{
+
+				int index_rezervare = 1;
+				for (int i = 0; i < nr_rezervari; i++)
+				{
+
+					if (lista_rezervari[i]->getIdRezervare() > index_rezervare)
+						index_rezervare = lista_rezervari[i]->getIdRezervare();
+
+				}
+
+				Rezervare::setNrRezervari(index_rezervare);
+
+			}
+
+			for (int i = nr_rezervari; i < nr_rezervari + nr_rezervari_noi; i++)
+			{
+				lista_rezervari[i] = new Rezervare();
+				cin >> (*lista_rezervari[i]);
+			}
+
+			// Se seteaza nr de rezervari la nr de rezervari din fisierul binar + nr rezervari noi inregistrate 
+			nr_rezervari += nr_rezervari_noi;
+
+			break;
+
+		case 2:
+			// Modificare informatii rezervare
+			int IDRezervare;
+
+			if (nr_rezervari != 0)
+			{
+				cout << "Introduceti ID-ul rezervarii pe care doriti sa o modificati ";
+				do
+				{
+					//Se verifica daca ID-ul rezervarii este valid (este ID-ul unei rezervari existente)
+
+					cin >> IDRezervare;
+					exista_idrezervare = false;
+
+					for (int i = 0; i < nr_rezervari; i++)
+					{
+
+						if (lista_rezervari[i]->getIdRezervare() == IDRezervare)
+						{
+
+							exista_idrezervare = true;
+							cin >> (*lista_rezervari[i]);
+						}
+					}
+
+					if (!exista_idrezervare)
+						cout << "Introduceti un ID valid!: ";
+
+				} while ((!exista_idrezervare) || (IDRezervare < 1));
+
+			}
+			break;
+
+		case 3:
+			//Stergere rezervari
+			if (nr_rezervari != 0)
+			{
+				cout << "Introduceti ID-ul rezervarii pe care doriti sa o stergeti ";
+
+				do
+				{
+					//Se verifica daca ID-ul rezervarii este valid 
+
+					cin >> IDRezervare;
+					exista_idrezervare = false;
+
+					for (int i = 0; i < nr_rezervari; i++)
+					{
+
+						if (lista_rezervari[i]->getIdRezervare() == IDRezervare)
+							exista_idrezervare = true;
+					}
+
+					if (!exista_idrezervare)
+						cout << "Introduceti un ID valid!: ";
+
+				} while ((!exista_idrezervare) || (IDRezervare < 1));
+
+				for (int i = 0; i < nr_rezervari; i++)
+				{
+
+					if (lista_rezervari[i]->getIdRezervare() == IDRezervare)
+					{
+
+						exista_idrezervare = true;
+						delete lista_rezervari[i];
+						lista_rezervari[i] = nullptr;
+
+						//Setam nr rezervari cu unu mai putin
+						nr_rezervari_noi = nr_rezervari - 1;
+
+					}
+
+				}
+			}
+			break;
+
+		case 4:
+			//Afisare lista rezervari			
+			if (nr_rezervari != 0)
+			{
+				cout << "Lista rezervari inregistrate" << endl;
+				cout << "===========================" << endl;
+
+				for (int i = 0; i < nr_rezervari; i++)
+				{
+
+					if (lista_rezervari[i] != nullptr)
+						cout << (*lista_rezervari[i]);
+
+				}
+			}
+			break;
+		}
+		// La finalul oricarei operatiuni se inregistreaza rezervari in fisierul binar daca exista rezervari de inregistrat
+		if (nr_rezervari != 0 && optiune < 4)
+		{
+
+			f1.open("rezervare.bin", ios::binary);
+
+			//Se scrie nr. de rezervari in fisier
+			if (optiune == 3)
+			{
+
+				f1.write((char*)&nr_rezervari_noi, sizeof(nr_rezervari_noi));
+
+			}
+			else
+			{
+
+				f1.write((char*)&nr_rezervari, sizeof(nr_rezervari));
+
+			}
+
+			for (int i = 0; i < nr_rezervari; i++)
+			{
+
+				if (lista_rezervari[i] != nullptr)
+					lista_rezervari[i]->serializeRezervare(f1, *lista_rezervari[i]);
+
+			}
+
+			f1.close();
+
+			if (optiune == 3)
+				nr_rezervari = nr_rezervari_noi;
+
+			switch (optiune)
+			{
+
+			case 1:
+				cout << endl << "Datele despre rezervari au fost inregistrate cu succes in fisierul binar!" << endl;
+				break;
+
+			case 2:
+				cout << endl << "Informatiile au fost actualizate cu succes in fisierul binar!" << endl;
+				break;
+
+			case 3:
+				cout << endl << "Informatiile au fost sterse din fisierul binar!" << endl;
+				break;
+			}
+
+		}
+
+	} while (optiune != 0);
+
+	return lista_rezervari;
+}
+
+Client** administrare_clienti(Client** lista_clienti)
+{
+	int optiune;
+	int nr_clienti = 0;
+	int nr_clienti_noi = 0;
+	bool exista_idclient = false;
+	ofstream f1;
+	ifstream f2;
+
+	system("cls");
+
+	do
+	{
+		cout << endl <<
+			"==== Administrare clienti: ====" << endl << endl <<
+			"1. Adaugare clienti" << endl <<
+			"2. Modificare clienti" << endl <<
+			"3. Stergere clienti" << endl <<
+			"4. Afisare info clienti" << endl <<
+			"0. Exit" << endl;
+
+		cout << endl << "Selecteaza optiunea: ";
+
+		cin >> optiune;
+		f2.open("clienti.bin", ios::_Nocreate | ios::binary);
+		f2.read((char*)&nr_clienti, sizeof(nr_clienti)); //nr clienti inregistrate in fisier
+
+		if (nr_clienti != 0)
+		{
+			if (optiune == 1)
+			{
+
+				cout << "Introduceti nr. de clienti pe care doriti sa ii adaugati:";
+				cin >> nr_clienti_noi;
+
+				lista_clienti = new Client * [nr_clienti + nr_clienti_noi];
+			}
+			else
+			{
+
+				lista_clienti = new Client * [nr_clienti];
+
+			}
+			//Se citesc clientii din fisierul binar
+			for (int i = 0; i < nr_clienti; i++)
+			{
+				lista_clienti[i] = new Client();
+				lista_clienti[i]->deserializeClient(f2, *lista_clienti[i]);
+			}
+		}
+		else
+		{
+			if (optiune == 1)
+			{
+
+				cout << "Introduceti nr. de clienti pe care doriti sa ii adaugati:";
+				cin >> nr_clienti_noi;
+
+				lista_clienti = new Client * [nr_clienti_noi];
+
+			}
+			else
+			{
+
+				cout << "Nu exista clienti salvati in fisierul binar!" << endl;
+
+			}
+		}
+
+		f2.close();
+
+		switch (optiune)
+		{
+		case 1:
+			//Inregistrare clienti noi
+
+			//Se verifica ultimul ID de clienti inregistrat pt a se porni contorul pt clientii noi din acel loc
+			if (nr_clienti != 0)
+			{
+
+				int index_client = 1;
+				for (int i = 0; i < nr_clienti; i++)
+				{
+
+					if (lista_clienti[i]->getIdClient() > index_client)
+						index_client = lista_clienti[i]->getIdClient();
+
+				}
+
+				Client::setNrClienti(index_client);
+
+			}
+
+			for (int i = nr_clienti; i < nr_clienti + nr_clienti_noi; i++)
+			{
+				lista_clienti[i] = new Client();
+				cin >> (*lista_clienti[i]);
+			}
+
+			// Se seteaza nr de clienti la nr de clienti din fisierul binar + nr clienti noi inregistrati
+			nr_clienti += nr_clienti_noi;
+
+			break;
+
+		case 2:
+			// Modificare informatii client
+			int IDClient;
+
+			if (nr_clienti != 0)
+			{
+				cout << "Introduceti ID-ul clientului pe ale carui informatii doriti sa le modificati ";
+				do
+				{
+					//Se verifica daca ID-ul clientului este valid (este ID-ul unei rezervari existente)
+
+					cin >> IDClient;
+					exista_idclient = false;
+
+					for (int i = 0; i < nr_clienti; i++)
+					{
+
+						if (lista_clienti[i]->getIdClient() == IDClient)
+						{
+
+							exista_idclient = true;
+							cin >> (*lista_clienti[i]);
+						}
+					}
+
+					if (!exista_idclient)
+						cout << "Introduceti un ID valid!: ";
+
+				} while ((!exista_idclient) || (IDClient < 1));
+
+			}
+			break;
+
+		case 3:
+			//Stergere clienti
+			if (nr_clienti != 0)
+			{
+				cout << "Introduceti ID-ul clientului pe care doriti sa il stergeti ";
+
+				do
+				{
+					//Se verifica daca ID-ul clientului este valid 
+
+					cin >> IDClient;
+					exista_idclient = false;
+
+					for (int i = 0; i < nr_clienti; i++)
+					{
+
+						if (lista_clienti[i]->getIdClient() == IDClient)
+							exista_idclient = true;
+					}
+
+					if (!exista_idclient)
+						cout << "Introduceti un ID valid!: ";
+
+				} while ((!exista_idclient) || (IDClient < 1));
+
+				for (int i = 0; i < nr_clienti; i++)
+				{
+
+					if (lista_clienti[i]->getIdClient() == IDClient)
+					{
+
+						exista_idclient = true;
+						delete lista_clienti[i];
+						lista_clienti[i] = nullptr;
+
+						//Setam nr clienti cu unu mai putin
+						nr_clienti_noi = nr_clienti - 1;
+
+					}
+
+				}
+			}
+			break;
+
+		case 4:
+			//Afisare lista clienti			
+			if (nr_clienti != 0)
+			{
+				cout << "Lista clienti inregistrati" << endl;
+				cout << "===========================" << endl;
+
+				for (int i = 0; i < nr_clienti; i++)
+				{
+
+					if (lista_clienti[i] != nullptr)
+						cout << (*lista_clienti[i]);
+
+				}
+			}
+			break;
+		}
+		// La finalul oricarei operatiuni se inregistreaza clienti in fisierul binar daca exista clienti de inregistrat
+		if (nr_clienti != 0 && optiune < 4)
+		{
+
+			f1.open("clienti.bin", ios::binary);
+
+			//Se scrie nr. de clienti in fisier
+			if (optiune == 3)
+			{
+
+				f1.write((char*)&nr_clienti_noi, sizeof(nr_clienti_noi));
+
+			}
+			else
+			{
+
+				f1.write((char*)&nr_clienti, sizeof(nr_clienti));
+
+			}
+
+			for (int i = 0; i < nr_clienti; i++)
+			{
+
+				if (lista_clienti[i] != nullptr)
+					lista_clienti[i]->serializeClient(f1, *lista_clienti[i]);
+
+			}
+
+			f1.close();
+
+			if (optiune == 3)
+				nr_clienti = nr_clienti_noi;
+
+			switch (optiune)
+			{
+
+			case 1:
+				cout << endl << "Datele despre clienti au fost inregistrate cu succes in fisierul binar!" << endl;
+				break;
+
+			case 2:
+				cout << endl << "Informatiile au fost actualizate cu succes in fisierul binar!" << endl;
+				break;
+
+			case 3:
+				cout << endl << "Informatiile au fost sterse din fisierul binar!" << endl;
+				break;
+			}
+
+		}
+
+	} while (optiune != 0);
+
+	return lista_clienti;
 }
 
 int main()
@@ -2587,8 +3132,10 @@ int main()
 		case 3:
 			break;
 		case 4:
+			administrare_rezervari(lista_rezervari);
 			break;
 		case 5:
+			administrare_clienti(lista_clienti);
 			break;
 		case 6:
 			break;
