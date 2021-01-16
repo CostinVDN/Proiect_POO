@@ -214,22 +214,35 @@ public:
 		locuriSala[rand - 1][loc - 1] = 1;
 	}
 
-	void setOrarSala(int zi, int ora)
+	bool setOrarSala(int zi, int ora, int durata, int idFilm)
 	{
-		while (true)
+		if (zi > 0 && zi < 8 && ora > 9 && ora < 20)
 		{
-			if (zi > 0 && zi < 8 && ora > 9 && ora < 20)
+			float x = durata;
+			zi -= 1;
+			ora -= 10;
+			x = ceil(x / 60);
+			if (ora + x > 9)
 			{
-				zi -= 1;
-				ora -= 10;
-				orarSala[zi][ora] = 1;
-				break;
+				x = x - (ora + x - 10);
 			}
-			else
+			for (int i = 0; i < x; i++)
 			{
-				cout << "Ziua si ora sunt invalide! Incearca din nou! [zi intre 1-7, ora intre 10-19]" << endl;
+				if (orarSala[zi][ora + i] != 0)
+				{
+					cout << "Spatiul nu este suficient pentru ora aleasa! ";
+					return true;
+				}
+				else
+				{
+					orarSala[zi][ora + i] = idFilm;
+				}
+
 			}
+			return false;
 		}
+		cout << "Ziua si ora sunt invalide! Incearca din nou! [zi intre 1-7, ora intre 10-19]" << endl;
+		return true;
 	}
 
 	void setPretLocSala(int pret)
@@ -533,6 +546,9 @@ istream& operator>> (istream& in, Sala& s)
 			}
 		}
 	}
+
+	cout << "Pret loc sala: ";
+	in >> s.pretLocSala;
 
 	cout << "Tip sala: ";
 	in >> s.tipSala;
