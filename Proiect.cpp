@@ -40,7 +40,7 @@ public:
 		}
 
 		for (int i = 0; i < 7; i++) {
-			for (int j = 0; j < 10; j++)
+			for (int j = 0; j < 3; j++)
 			{
 				orarSala[i][j] = 0;
 			}
@@ -82,7 +82,7 @@ public:
 		}
 
 		for (int i = 0; i < 7; i++) {
-			for (int j = 0; j < 10; j++)
+			for (int j = 0; j < 3; j++)
 			{
 				orarSala[i][j] = 0;
 			}
@@ -129,7 +129,7 @@ public:
 		}
 
 		for (int i = 0; i < 7; i++) {
-			for (int j = 0; j < 10; j++)
+			for (int j = 0; j < 3; j++)
 			{
 				this->orarSala[i][j] = s.orarSala[i][j];
 			}
@@ -181,7 +181,7 @@ public:
 			}
 
 			for (int i = 0; i < 7; i++) {
-				for (int j = 0; j < 10; j++)
+				for (int j = 0; j < 3; j++)
 				{
 					this->orarSala[i][j] = s.orarSala[i][j];
 				}
@@ -232,35 +232,37 @@ public:
 		locuriSala[rand - 1][loc - 1] = 1;
 	}
 
-	bool setOrarSala(int zi, int ora, int durata, int idFilm)
+	void setOrarSala(int nrZile, int* zile, int nrOre, int* ore, int idFilm)
 	{
-		if (zi > 0 && zi < 8 && ora > 9 && ora < 20)
+		for (int i = 0; i < nrZile; i++)
 		{
-			float x = durata;
-			zi -= 1;
-			ora -= 10;
-			x = ceil(x / 60);
-			if (ora + x > 9)
+			zile[i] -= 1;
+		}
+		for (int i = 0; i < nrOre; i++)
+		{
+			if (ore[i] == 10)
 			{
-				x = x - (ora + x - 10);
+				ore[i] = 0;
 			}
-			for (int i = 0; i < x; i++)
+			else if (ore[i] == 14)
 			{
-				if (orarSala[zi][ora + i] != 0)
-				{
-					cout << "Spatiul nu este suficient pentru ora aleasa! ";
-					return true;
-				}
-				else
-				{
-					orarSala[zi][ora + i] = idFilm;
-				}
+				ore[i] = 1;
+			}
+			else
+			{
+				ore[i] = 2;
+			}
+		}
+
+
+		for (int i = 0; i < nrZile; i++)
+		{
+			for (int j = 0; j < nrOre; j++)
+			{
+				orarSala[zile[i]][ore[j]] = idFilm;
 
 			}
-			return false;
 		}
-		cout << "Ora este invalida! Incearca din nou! [ore intre 10-19]" << endl;
-		return true;
 	}
 
 	void setPretLocSala(int pret)
@@ -315,11 +317,11 @@ public:
 	void getOrarSala()
 	{
 		cout << numeSala << ", id " << nrSala << endl;
-		cout << "==================================" << endl;
+		cout << "===================" << endl;
 		string zile[7] = { "L ", "Ma", "Mi", "J ", "V ", "S ", "D " };
-		int ore[10] = { 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
+		int ore[3] = { 10, 14, 18 };
 		cout << "Ora: ";
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < 3; i++)
 		{
 			cout << ore[i] << " ";
 		}
@@ -328,7 +330,7 @@ public:
 		for (int i = 0; i < 7; i++)
 		{
 			cout << zile[i] << " : ";
-			for (int j = 0; j < 10; j++)
+			for (int j = 0; j < 3; j++)
 			{
 				cout << orarSala[i][j] << "  ";
 			}
@@ -449,7 +451,7 @@ public:
 
 		for (int i = 0; i < 7; i++)
 		{
-			for (int j = 0; j < 10; j++)
+			for (int j = 0; j < 3; j++)
 			{
 				f.write((char*)&orarSala[i][j], sizeof(orarSala[i][j]));
 			}
@@ -497,7 +499,7 @@ public:
 
 		for (int i = 0; i < 7; i++)
 		{
-			for (int j = 0; j < 10; j++)
+			for (int j = 0; j < 3; j++)
 			{
 				f.read((char*)&orarSala[i][j], sizeof(orarSala[i][j]));
 			}
@@ -556,7 +558,7 @@ ostream& operator<< (ostream& out, Sala s)
 	//out << "Locuri disponibile: " << locuriLibere << endl << endl;
 
 	//s.getLocuriSala();
-	//s.getOrarSala();
+	s.getOrarSala();
 
 	return out;
 }
@@ -1210,30 +1212,47 @@ istream& operator>> (istream& in, Film& f)
 					break;
 				}
 			}
+		}
+
+		while (true)
+		{
+			cout << "Introdu numarul proiectiilor pe zi ";
+			in >> f.nrProiectiiZi;
+
+			if (f.nrProiectiiZi > 0 && f.nrProiectiiZi < 4)
+			{
+				break;
+			}
+			else
+			{
+				cout << "Numarul maxim de proiectii intr-o zi este 3! Incearca din nou!" << endl;
+			}
+		}
+
+		f.oreProiectii = new int[f.nrProiectiiZi];
+		for (int i = 0; i < f.nrProiectiiZi; i++)
+		{
 			while (true)
 			{
-				cout << "Introdu numarul proiectiilor pentru ziua " << f.zileProiectii[i] << ": ";
-				in >> f.nrProiectiiZi;
-
-				if (f.nrProiectiiZi > 0 && f.nrProiectiiZi < 5)
+				cout << "Ora [" << i + 1 << "]: ";
+				in >> f.oreProiectii[i];
+				if (i == 2 && f.oreProiectii[i] == f.oreProiectii[i - 1] || f.oreProiectii[i] == f.oreProiectii[i - 2])
 				{
+					cout << "Ora este invalida, incearca din nou!" << endl;
+				}
+				else if (i == 1 && f.oreProiectii[i] == f.oreProiectii[i - 1])
+				{
+					cout << "Ora este invalida, incearca din nou!" << endl;
+				}
+				else if (f.oreProiectii[i] == 10 || f.oreProiectii[i] == 14 || f.oreProiectii[i] == 18)
+				{
+					vectorSali[f.idSala]->setOrarSala(f.nrZile, f.zileProiectii, f.nrProiectiiZi, f.oreProiectii, f.idFilm);
 					break;
 				}
 				else
 				{
-					cout << "Numarul maxim de proiectii intr-o zi este 4! Incearca din nou!" << endl;
+					cout << "Ora este invalida, incearca din nou!" << endl;
 				}
-			}
-
-			f.oreProiectii = new int[f.nrProiectiiZi];
-			for (int j = 0; j < f.nrProiectiiZi; j++)
-			{
-				cout << "Ora [" << j + 1 << "]: ";
-
-				do
-				{
-					in >> f.oreProiectii[j];
-				} while (vectorSali[f.idSala]->setOrarSala(f.zileProiectii[i], f.oreProiectii[j], f.durata, 4));
 			}
 		}
 	}
