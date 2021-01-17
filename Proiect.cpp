@@ -236,7 +236,7 @@ public:
 	{
 		if (zi > 0 && zi < 8 && ora > 9 && ora < 20)
 		{
-			float x = durata;
+			float x = (float)durata;
 			zi -= 1;
 			ora -= 10;
 			x = ceil(x / 60);
@@ -1878,19 +1878,25 @@ public:
 
 	void serializeClient(ofstream& f, Client client_crt)
 	{
+		f.write((char*)&idClient, sizeof(idClient));
 
 		f.write(numeClient, (long long)strlen(numeClient) + 1);
+
 		f.write((char*)&nrCarduri, sizeof(nrCarduri));
 		for (int i = 0; i < nrCarduri; i++)
 		{
 			f.write((char*)&nrAsociatCard[i], sizeof(nrAsociatCard[i]));
 		}
-		f.write(numeUtilizatorClient.c_str(), numeUtilizatorClient.length());
+
+		int length = numeUtilizatorClient.length() + 1;
+		f.write((char*)&length, sizeof(length));
+		f.write(numeUtilizatorClient.c_str(), length);
 
 	}
 
 	void deserializeClient(ifstream& f2, Client client_crt)
 	{
+		f2.read((char*)&idClient, sizeof(idClient));
 
 		string buffer = "";
 		char c = 0;
@@ -1927,6 +1933,7 @@ int Client::nrClienti = 0;
 
 ostream& operator<<(ostream& out, Client c)
 {
+	out << "ID client: " << c.idClient << endl;
 	if (c.numeClient != nullptr)
 	{
 		out << endl << "Nume: " << c.numeClient << endl;
@@ -2222,7 +2229,7 @@ public:
 
 	int operator[](int index)
 	{
-		if (index >= 0 && index < nrBilete / sizeof(int) && nrBileteRezervate != nullptr)
+		if (index >= 0 && index < (int)(nrBilete / sizeof(int)) && nrBileteRezervate != nullptr)
 		{
 			return nrBileteRezervate[index];
 		}
@@ -2270,19 +2277,25 @@ public:
 
 	void serializeRezervare(ofstream& f, Rezervare rezervare_crt)
 	{
+		f.write((char*)&idRezervare, sizeof(idRezervare));
 
 		f.write(dataRezervare, (long long)strlen(dataRezervare) + 1);
+
 		f.write((char*)&nrBilete, sizeof(nrBilete));
 		for (int i = 0; i < nrBilete; i++)
 		{
 			f.write((char*)&nrBileteRezervate[i], sizeof(nrBileteRezervate[i]));
 		}
-		f.write(numeUtilizatorClient.c_str(), numeUtilizatorClient.length() + 1);
+
+		int length = numeUtilizatorClient.length() + 1;
+		f.write((char*)&length, sizeof(length));
+		f.write(numeUtilizatorClient.c_str(), length);
 
 	}
 
 	void deserializeRezervare(ifstream& f2, Rezervare rezervare_crt)
 	{
+		f2.read((char*)&idRezervare, sizeof(idRezervare));
 
 		string buffer = "";
 		char c = 0;
@@ -2302,7 +2315,11 @@ public:
 			f2.read((char*)&nrBileteRezervate[i], sizeof(nrBileteRezervate[i]));
 		}
 
-		f2.read((char*)&numeUtilizatorClient, sizeof(numeUtilizatorClient));
+		int length = 0;
+		f2.read((char*)&length, sizeof(length));
+		char* aux = new char[length];
+		f2.read(aux, length);
+		numeUtilizatorClient = aux;
 
 	}
 
@@ -2315,6 +2332,7 @@ int Rezervare::nrRezervari = 0;
 ostream& operator<<(ostream& out, Rezervare r)
 {
 	out << "Detalii legate de rezervare: " << endl;
+	out << "ID rezervare: " << r.idRezervare << endl;
 	if (r.dataRezervare != nullptr)
 	{
 		out << "Data rezervarii: " << r.dataRezervare << endl;
@@ -3841,7 +3859,7 @@ int main()
 	int loc = 0;
 	int optiune;
 
-	
+
 
 	do
 	{
