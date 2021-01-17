@@ -261,7 +261,7 @@ public:
 	bool ExistaProiectie(int zi, int ora)
 	{
 
-				zi -= 1;
+		zi -= 1;
 		if (ora == 10)
 		{
 			ora = 0;
@@ -279,6 +279,23 @@ public:
 			return true;
 		else
 			return false;
+	}
+	
+	//NEW
+	void stergeFilm(int idfilm)
+	{
+
+		for (int zi = 0; zi < 7; zi++)
+		{
+			for (int indx = 0; indx < 3; indx++)
+			{
+			
+				if (this->orarSala[zi][indx] == idfilm)
+					this->orarSala[zi][indx] = 0;
+
+			}
+		}
+
 	}
 
 	void setPretLocSala(int pret)
@@ -681,10 +698,10 @@ private:
 	const int idFilm;
 	static int nrFilme;
 	char* nume;
-	int nrZile;
-	int* zileProiectii;
-	int nrProiectiiZi;
-	int* oreProiectii;
+	int nrZile; //In cate zile rileaza filmul intr-o saptamana
+	int* zileProiectii; // Zilee de proiectie (L, Ma, Mi. etc)
+	int nrProiectiiZi; //De catre ori ruleaza un film intr-o zi
+	int* oreProiectii;////la ce ore ruleaza un film intr-o zi
 	string gen;
 	int durata;
 	int idSala;
@@ -891,6 +908,13 @@ public:
 	int getIdFilm()
 	{
 		return idFilm;
+	}
+
+	int getIdSala()
+	{
+
+		return this->idSala;
+
 	}
 
 	char* getNume()
@@ -2793,8 +2817,7 @@ Sala** administrareSala(Sala** vectorSala)
 			}
 
 			nrSali += nrSaliNoi;
-
-			break;
+break;
 
 		case 2:
 			int idSala;
@@ -3134,6 +3157,42 @@ Film** administrare_filme(Film** lista_filme)
 					if (lista_filme[indx]->getIdFilm() == IDFilm)
 					{
 
+
+						//Se incarca datele pentru sali - odata cu filmul se va setrge si id-ul filmului din program
+						ifstream fluxDeserializare;
+						ofstream fluxSerializare;
+						Sala** vectorSali = nullptr;
+						int dimensiuneVector = 0;
+
+						fluxDeserializare.open("sala.bin", ios::_Nocreate | ios::binary);
+						fluxDeserializare.read((char*)&dimensiuneVector, sizeof(dimensiuneVector));
+						vectorSali = new Sala * [dimensiuneVector];
+
+						for (int i = 0; i < dimensiuneVector; i++)
+						{
+							vectorSali[i] = new Sala();
+							vectorSali[i]->deserializareSala(fluxDeserializare, *vectorSali[i]);
+						}
+						fluxDeserializare.close();
+
+						//Se sterge filmul din programul salii
+						vectorSali[lista_filme[indx]->getIdSala() - 1]->stergeFilm(IDFilm);
+
+						// Se actualizaeaza datele in fisier
+						fluxSerializare.open("sala.bin", ios::binary);
+						fluxSerializare.write((char*)&dimensiuneVector, sizeof(dimensiuneVector));
+
+						for (int i = 0; i < dimensiuneVector; i++)
+						{
+							if (vectorSali[i] != nullptr)
+							{
+								vectorSali[i]->serializareSala(fluxSerializare, *vectorSali[i]);
+							}
+						}
+
+						fluxSerializare.close();
+
+						//Se sterge filmul din fisier
 						exista_idfilm = true;
 						delete lista_filme[indx];
 						lista_filme[indx] = nullptr;
