@@ -3822,7 +3822,7 @@ public:
 	Client** lista_clienti = nullptr;
 	Bilet** lista_bilete = nullptr;
 	Rezervare** lista_rezervari = nullptr;
-	int nr_sali, nr_bilete, nr_clienti, nr_rezervari;
+	//int nr_sali, nr_bilete, nr_clienti, nr_rezervari;
 };
 
 int main()
