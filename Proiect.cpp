@@ -236,7 +236,7 @@ public:
 	{
 		if (zi > 0 && zi < 8 && ora > 9 && ora < 20)
 		{
-			float x = (float)durata;
+			float x = durata;
 			zi -= 1;
 			ora -= 10;
 			x = ceil(x / 60);
@@ -259,7 +259,7 @@ public:
 			}
 			return false;
 		}
-		cout << "Ziua si ora sunt invalide! Incearca din nou! [zi intre 1-7, ora intre 10-19]" << endl;
+		cout << "Ora este invalida! Incearca din nou! [ore intre 10-19]" << endl;
 		return true;
 	}
 
@@ -1121,6 +1121,23 @@ ostream& operator<< (ostream& out, Film f)
 //Operator citire info Filme
 istream& operator>> (istream& in, Film& f)
 {
+	//Repo repo;
+	ifstream fluxDeserializare;
+	ofstream fluxSerializare;
+	Sala** vectorSali = nullptr;
+	int dimensiuneVector = 0;
+
+	fluxDeserializare.open("sala.bin", ios::_Nocreate | ios::binary);
+	fluxDeserializare.read((char*)&dimensiuneVector, sizeof(dimensiuneVector));
+	vectorSali = new Sala * [dimensiuneVector];
+
+	for (int i = 0; i < dimensiuneVector; i++)
+	{
+		vectorSali[i] = new Sala();
+		vectorSali[i]->deserializareSala(fluxDeserializare, *vectorSali[i]);
+	}
+	fluxDeserializare.close();
+
 
 	cout << endl << "Nume film: ";
 	delete[] f.nume;
@@ -1136,11 +1153,42 @@ istream& operator>> (istream& in, Film& f)
 
 	cout << "Durata: ";
 	in >> f.durata;
+	cout << endl;
 
-	cout << "Id sala: ";
-	in >> f.idSala;
+	if (dimensiuneVector == 0)
+	{
+		cout << "Nu exista sali! " << endl;
+	}
+	else
+	{
+		cout << "Id-uri sali existente: ";
+		for (int i = 0; i < dimensiuneVector; i++)
+		{
+			cout << vectorSali[i]->getIdSala() << " ";
+		}
+	}
 
-	cout << "Introdu numarul zilelor din saptamana in care va rula filmul: ";
+
+	int da = 0;
+	while (da == 0)
+	{
+
+		cout << endl << "Selecteaza id-ul salii: ";
+		in >> f.idSala;
+		cout << endl;
+
+		for (int i = 0; i < dimensiuneVector; i++)
+		{
+			if (f.idSala == vectorSali[i]->getIdSala())
+			{
+				vectorSali[i]->getOrarSala();
+				da = 1;
+			}
+		}
+	}
+
+
+	cout << "In cate zile pe saptamana va rula filmul: ";
 	in >> f.nrZile;
 
 	if (f.nrZile > 0)
@@ -1149,22 +1197,60 @@ istream& operator>> (istream& in, Film& f)
 		f.zileProiectii = new int[f.nrZile];
 		for (int i = 0; i < f.nrZile; i++)
 		{
-			cout << "Zi " << i + 1 << ": ";
-			in >> f.zileProiectii[i];
+			while (true)
+			{
+				cout << "Zi " << i + 1 << ": ";
+				in >> f.zileProiectii[i];
+				if (f.zileProiectii[i] < 1 && f.zileProiectii[i] > 7)
+				{
+					cout << "Optiunea este invalida! [Introdu numere de la 1 la 7]" << endl;
+				}
+				else
+				{
+					break;
+				}
+			}
+			while (true)
+			{
+				cout << "Introdu numarul proiectiilor pentru ziua " << f.zileProiectii[i] << ": ";
+				in >> f.nrProiectiiZi;
+
+				if (f.nrProiectiiZi > 0 && f.nrProiectiiZi < 5)
+				{
+					break;
+				}
+				else
+				{
+					cout << "Numarul maxim de proiectii intr-o zi este 4! Incearca din nou!" << endl;
+				}
+			}
+
+			f.oreProiectii = new int[f.nrProiectiiZi];
+			for (int j = 0; j < f.nrProiectiiZi; j++)
+			{
+				cout << "Ora [" << j + 1 << "]: ";
+
+				do
+				{
+					in >> f.oreProiectii[j];
+				} while (vectorSali[f.idSala]->setOrarSala(f.zileProiectii[i], f.oreProiectii[j], f.durata, 4));
+			}
 		}
 	}
 
-	cout << "Introdu numarul proiectiilor pe zi: ";
-	in >> f.nrProiectiiZi;
-	if (f.nrProiectiiZi > 0)
+
+	fluxSerializare.open("sala.bin", ios::binary);
+	fluxSerializare.write((char*)&dimensiuneVector, sizeof(dimensiuneVector));
+
+	for (int i = 0; i < dimensiuneVector; i++)
 	{
-		f.oreProiectii = new int[f.nrProiectiiZi];
-		for (int i = 0; i < f.nrProiectiiZi; i++)
+		if (vectorSali[i] != nullptr)
 		{
-			cout << "Ora [" << i + 1 << "]: ";
-			in >> f.oreProiectii[i];
+			vectorSali[i]->serializareSala(fluxSerializare, *vectorSali[i]);
 		}
 	}
+
+	fluxSerializare.close();
 
 	return in;
 }
@@ -3831,17 +3917,6 @@ Client** administrare_clienti(Client** lista_clienti)
 	return lista_clienti;
 }
 
-class Repo
-{
-public:
-
-	Sala** lista_sali = nullptr;
-	Film** lista_filme = nullptr;
-	Client** lista_clienti = nullptr;
-	Bilet** lista_bilete = nullptr;
-	Rezervare** lista_rezervari = nullptr;
-	//int nr_sali, nr_bilete, nr_clienti, nr_rezervari;
-};
 
 int main()
 {
@@ -3850,7 +3925,13 @@ int main()
 	//s.setOrarSala(3, 12);
 	//s.getOrarSala();
 
-	Repo repo;
+	Sala** lista_sali = nullptr;
+	Film** lista_filme = nullptr;
+	Client** lista_clienti = nullptr;
+	Bilet** lista_bilete = nullptr;
+	Rezervare** lista_rezervari = nullptr;
+	//int nr_sali, nr_bilete, nr_clienti, nr_rezervari;
+
 	string username = "administrator";
 	string password = "parola";
 	string revenireMeniu = "1";
@@ -3880,19 +3961,19 @@ int main()
 		switch (optiune)
 		{
 		case 1:
-			administrareSala(repo.lista_sali);
+			administrareSala(lista_sali);
 			break;
 		case 2:
-			administrare_filme(repo.lista_filme);
+			administrare_filme(lista_filme);
 			break;
 		case 3:
-			administrare_bilete(repo.lista_bilete);
+			administrare_bilete(lista_bilete);
 			break;
 		case 4:
-			administrare_rezervari(repo.lista_rezervari);
+			administrare_rezervari(lista_rezervari);
 			break;
 		case 5:
-			administrare_clienti(repo.lista_clienti);
+			administrare_clienti(lista_clienti);
 			break;
 		case 6:
 			break;
