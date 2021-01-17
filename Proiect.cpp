@@ -209,6 +209,11 @@ public:
 		Sala::nrTotalSali = nr;
 	}
 
+	static int getNrSali()
+	{
+		return Sala::nrTotalSali ;
+	}
+
 	void setDenumireSala(char* denumireSala)
 	{
 		//if (denumireSala != nullptr)
@@ -250,6 +255,30 @@ public:
 		}
 
 		orarSala[zi][ora] = idFilm;
+	}
+
+	//NEW - Verifica daca intr-o anumita zi si la o anumita ora ruleaza in sala un film
+	bool ExistaProiectie(int zi, int ora)
+	{
+
+				zi -= 1;
+		if (ora == 10)
+		{
+			ora = 0;
+		}
+		if (ora == 14)
+		{
+			ora = 1;
+		}
+		if (ora == 18)
+		{
+			ora = 2;
+		}
+
+		if (orarSala[zi][ora] != 0)
+			return true;
+		else
+			return false;
 	}
 
 	void setPretLocSala(int pret)
@@ -1067,6 +1096,22 @@ int Film::nrFilme = 0;
 //Operator afisare info Filme
 ostream& operator<< (ostream& out, Film f)
 {
+	ifstream fluxDeserializare;
+	ofstream fluxSerializare;
+	Sala** vectorSali = nullptr;
+	int dimensiuneVector = 0;
+
+	fluxDeserializare.open("sala.bin", ios::_Nocreate | ios::binary);
+	fluxDeserializare.read((char*)&dimensiuneVector, sizeof(dimensiuneVector));
+	vectorSali = new Sala * [dimensiuneVector];
+
+	for (int i = 0; i < dimensiuneVector; i++)
+	{
+		vectorSali[i] = new Sala();
+		vectorSali[i]->deserializareSala(fluxDeserializare, *vectorSali[i]);
+	}
+	fluxDeserializare.close();
+
 	out << endl;
 	if (f.idFilm != 0)
 		out << "ID Film: " << f.idFilm << endl;
@@ -1102,7 +1147,12 @@ ostream& operator<< (ostream& out, Film f)
 
 	cout << "Genul filmului: " << f.gen << endl;
 	cout << "Durata filmului: " << f.durata << endl;
-	cout << "Id sala: " << f.idSala << endl;
+	for (int indx = 0; indx < dimensiuneVector; indx++)
+	{
+		if (vectorSali[indx]->getIdSala() == f.idSala)
+			cout << "Sala: " << vectorSali[indx]->getDenumireSala() << endl;
+
+	}
 
 	return out;
 }
@@ -1110,7 +1160,7 @@ ostream& operator<< (ostream& out, Film f)
 //Operator citire info Filme
 istream& operator>> (istream& in, Film& f)
 {
-	//Repo repo;
+
 	ifstream fluxDeserializare;
 	ofstream fluxSerializare;
 	Sala** vectorSali = nullptr;
@@ -1144,110 +1194,134 @@ istream& operator>> (istream& in, Film& f)
 	in >> f.durata;
 	cout << endl;
 
-	if (dimensiuneVector == 0)
+	bool exista_film;
+	do
 	{
-		cout << "Nu exista sali! " << endl;
-	}
-	else
-	{
-		cout << "Id-uri sali existente: ";
-		for (int i = 0; i < dimensiuneVector; i++)
+		exista_film = false;
+		if (dimensiuneVector == 0)
 		{
-			cout << vectorSali[i]->getIdSala() << " ";
+			cout << "Nu exista sali! " << endl;
 		}
-	}
+		else
+		{
+			cout << "Sali existente: ";
+			for (int i = 0; i < dimensiuneVector; i++)
+			{
+				cout << "ID " << vectorSali[i]->getIdSala() << " - " << vectorSali[i]->getDenumireSala();
+			}
+		}
 
-
-	int da = 0;
-	while (da == 0)
-	{
-
+		int exista_sala = 0;
 		cout << endl << "Selecteaza id-ul salii: ";
-		in >> f.idSala;
-		cout << endl;
 
-		for (int i = 0; i < dimensiuneVector; i++)
+		do
 		{
-			if (f.idSala == vectorSali[i]->getIdSala())
+			in >> f.idSala;
+			for (int i = 0; i < dimensiuneVector; i++)
 			{
-				vectorSali[i]->getOrarSala();
-				da = 1;
-			}
-		}
-	}
-
-
-	cout << "In cate zile pe saptamana va rula filmul: ";
-	in >> f.nrZile;
-
-	if (f.nrZile > 0)
-	{
-		cout << "Pentru ziua 'luni' introdu 1:" << endl;
-		f.zileProiectii = new int[f.nrZile];
-		for (int i = 0; i < f.nrZile; i++)
-		{
-			while (true)
-			{
-				cout << "Zi " << i + 1 << ": ";
-				in >> f.zileProiectii[i];
-				if (f.zileProiectii[i] < 1 && f.zileProiectii[i] > 7)
+				if (f.idSala == vectorSali[i]->getIdSala())
 				{
-					cout << "Optiunea este invalida! [Introdu numere de la 1 la 7]" << endl;
-				}
-				else
-				{
-					break;
+					vectorSali[i]->getOrarSala();
+					exista_sala = 1;
 				}
 			}
-		}
 
-		while (true)
+			if (!exista_sala)
+				cout << "Introduceti un ID valid: ";
+
+		} while (!exista_sala);
+
+		cout << "In cate zile pe saptamana va rula filmul: ";
+		in >> f.nrZile;
+
+		if (f.nrZile > 0)
 		{
-			cout << "Introdu numarul proiectiilor pe zi ";
-			in >> f.nrProiectiiZi;
-
-			if (f.nrProiectiiZi > 0 && f.nrProiectiiZi < 4)
+			cout << "Pentru ziua 'luni' introdu 1:" << endl;
+			f.zileProiectii = new int[f.nrZile];
+			for (int i = 0; i < f.nrZile; i++)
 			{
-				break;
-			}
-			else
-			{
-				cout << "Numarul maxim de proiectii intr-o zi este 3! Incearca din nou!" << endl;
-			}
-		}
-
-		f.oreProiectii = new int[f.nrProiectiiZi];
-		for (int i = 0; i < f.nrProiectiiZi; i++)
-		{
-			while (true)
-			{
-				cout << "Ora [" << i + 1 << "]: ";
-				in >> f.oreProiectii[i];
-				if (i == 2 && f.oreProiectii[i] == f.oreProiectii[i - 1] || f.oreProiectii[i] == f.oreProiectii[i - 2])
+				while (true)
 				{
-					cout << "Ora este invalida, incearca din nou!" << endl;
-				}
-				else if (i == 1 && f.oreProiectii[i] == f.oreProiectii[i - 1])
-				{
-					cout << "Ora este invalida, incearca din nou!" << endl;
-				}
-				else if (f.oreProiectii[i] == 10 || f.oreProiectii[i] == 14 || f.oreProiectii[i] == 18)
-				{
-					for (int j = 0; j < f.nrZile; j++)
+					cout << "Zi " << i + 1 << ": ";
+					in >> f.zileProiectii[i];
+					if (f.zileProiectii[i] < 1 && f.zileProiectii[i] > 7)
 					{
-						vectorSali[f.idSala - 1]->setOrarSala(f.zileProiectii[j], f.oreProiectii[i], f.idFilm);
+						cout << "Optiunea este invalida! [Introdu numere de la 1 la 7]" << endl;
 					}
-					
+					else
+					{
+						break;
+					}
+				}
+			}
+
+			while (true)
+			{
+				cout << "Introdu numarul proiectiilor pe zi ";
+				in >> f.nrProiectiiZi;
+
+				if (f.nrProiectiiZi > 0 && f.nrProiectiiZi < 4)
+				{
 					break;
 				}
 				else
 				{
-					cout << "Ora este invalida, incearca din nou!" << endl;
+					cout << "Numarul maxim de proiectii intr-o zi este 3! Incearca din nou!" << endl;
+				}
+			}
+
+			f.oreProiectii = new int[f.nrProiectiiZi];
+			for (int i = 0; i < f.nrProiectiiZi; i++)
+			{
+				while (true)
+				{
+					cout << "Ora [" << i + 1 << "]: ";
+					in >> f.oreProiectii[i];
+					if (i == 2 && f.oreProiectii[i] == f.oreProiectii[i - 1] || f.oreProiectii[i] == f.oreProiectii[i - 2])
+					{
+						cout << "Ora este invalida, incearca din nou!" << endl;
+					}
+					else if (i == 1 && f.oreProiectii[i] == f.oreProiectii[i - 1])
+					{
+						cout << "Ora este invalida, incearca din nou!" << endl;
+					}
+					else if (f.oreProiectii[i] == 10 || f.oreProiectii[i] == 14 || f.oreProiectii[i] == 18)
+					{
+
+						for (int j = 0; j < f.nrZile; j++)
+						{
+							//Se verifica daca ruleaza vreun film la data si orele introduse
+							if (vectorSali[f.idSala- 1]->ExistaProiectie(f.zileProiectii[j], f.oreProiectii[i]))
+								exista_film = true;
+						}
+
+						break;
+					}
+					else
+					{
+						cout << "Ora este invalida, incearca din nou!" << endl;
+					}
 				}
 			}
 		}
-	}
 
+		if (!exista_film)
+		{
+			for (int i = 0; i < f.nrProiectiiZi; i++)
+			{
+				for (int j = 0; j < f.nrZile; j++)
+				{
+					vectorSali[f.idSala - 1]->setOrarSala(f.zileProiectii[j], f.oreProiectii[i], f.idFilm);
+				}
+			}
+		}
+		else
+		{
+
+			cout << "La data si orele selectate ruleaza alt film! Introduceti alte date! " << endl << endl;
+
+		}
+	} while (exista_film);
 
 	fluxSerializare.open("sala.bin", ios::binary);
 	fluxSerializare.write((char*)&dimensiuneVector, sizeof(dimensiuneVector));
@@ -2625,6 +2699,7 @@ Sala** administrareSala(Sala** vectorSala)
 	int nrSali = 0;
 	int nrSaliNoi = 0;
 	bool existaIdSala = false;
+	bool sterge_sala = true;
 	ofstream f1;
 	ifstream f2;
 
@@ -2694,6 +2769,7 @@ Sala** administrareSala(Sala** vectorSala)
 		switch (optiune)
 		{
 		case 1:
+
 			if (nrSali != 0)
 			{
 
@@ -2751,8 +2827,10 @@ Sala** administrareSala(Sala** vectorSala)
 			break;
 
 		case 3:
+			sterge_sala = true;
 			if (nrSali != 0)
 			{
+				
 				cout << "Introduceti ID Sala pe care doriti sa-l stergeti ";
 
 				do
@@ -2779,11 +2857,31 @@ Sala** administrareSala(Sala** vectorSala)
 					if (vectorSala[indx]->getIdSala() == idSala)
 					{
 
-						existaIdSala = true;
-						delete vectorSala[indx];
-						vectorSala[indx] = nullptr;
-						nrSaliNoi = nrSali - 1;
+						for (int zi = 1; zi < 8; zi++)
+						{
 
+							//Se pot sterge doar salile care nu au filme care ruleaza
+							if (vectorSala[vectorSala[indx]->getIdSala() -1]->ExistaProiectie(zi, 10) || vectorSala[vectorSala[indx]->getIdSala()-1]->ExistaProiectie(zi, 14
+								|| vectorSala[vectorSala[indx]->getIdSala()-1]->ExistaProiectie(zi, 18)))
+							{
+
+								sterge_sala=false;
+
+							}
+						}
+						if (sterge_sala)
+						{
+							existaIdSala = true;
+							delete vectorSala[indx];
+							vectorSala[indx] = nullptr;
+							nrSaliNoi = nrSali - 1;
+						}
+						else
+						{
+
+							cout << "Sala nu poate fi stearsa intrucat ruleaza filme!" << endl;
+
+						}
 					}
 
 				}
@@ -2811,7 +2909,7 @@ Sala** administrareSala(Sala** vectorSala)
 
 			f1.open("sala.bin", ios::binary);
 
-			if (optiune == 3)
+			if (optiune == 3 && sterge_sala)
 			{
 
 				f1.write((char*)&nrSaliNoi, sizeof(nrSali));
@@ -2834,7 +2932,7 @@ Sala** administrareSala(Sala** vectorSala)
 
 			f1.close();
 
-			if (optiune == 3)
+			if (optiune == 3 && sterge_sala)
 				nrSali = nrSaliNoi;
 
 			switch (optiune)
