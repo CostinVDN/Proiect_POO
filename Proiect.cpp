@@ -3557,6 +3557,8 @@ Rezervare** administrare_rezervari(Rezervare** lista_rezervari)
 	return lista_rezervari;
 }
 
+
+
 Client** administrare_clienti(Client** lista_clienti)
 {
 	int optiune;
@@ -3811,6 +3813,18 @@ Client** administrare_clienti(Client** lista_clienti)
 	return lista_clienti;
 }
 
+class Repo
+{
+public:
+
+	Sala** lista_sali = nullptr;
+	Film** lista_filme = nullptr;
+	Client** lista_clienti = nullptr;
+	Bilet** lista_bilete = nullptr;
+	Rezervare** lista_rezervari = nullptr;
+	int nr_sali, nr_bilete, nr_clienti, nr_rezervari;
+};
+
 int main()
 {
 	//Sala s;
@@ -3818,21 +3832,16 @@ int main()
 	//s.setOrarSala(3, 12);
 	//s.getOrarSala();
 
-	//Repo repo;
+	Repo repo;
 	string username = "administrator";
 	string password = "parola";
 	string revenireMeniu = "1";
-	int nr_sali, nr_bilete, nr_clienti, nr_rezervari;
 	int optiuneFilm = 0;
 	int rand = 0;
 	int loc = 0;
 	int optiune;
 
-	Sala** lista_sali = nullptr;
-	Film** lista_filme = nullptr;
-	Client** lista_clienti = nullptr;
-	Bilet** lista_bilete = nullptr;
-	Rezervare** lista_rezervari = nullptr;
+	
 
 	do
 	{
@@ -3853,19 +3862,19 @@ int main()
 		switch (optiune)
 		{
 		case 1:
-			administrareSala(lista_sali);
+			administrareSala(repo.lista_sali);
 			break;
 		case 2:
-			administrare_filme(lista_filme);
+			administrare_filme(repo.lista_filme);
 			break;
 		case 3:
-			administrare_bilete(lista_bilete);
+			administrare_bilete(repo.lista_bilete);
 			break;
 		case 4:
-			administrare_rezervari(lista_rezervari);
+			administrare_rezervari(repo.lista_rezervari);
 			break;
 		case 5:
-			administrare_clienti(lista_clienti);
+			administrare_clienti(repo.lista_clienti);
 			break;
 		case 6:
 			break;
