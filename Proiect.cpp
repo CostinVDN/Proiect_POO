@@ -232,37 +232,24 @@ public:
 		locuriSala[rand - 1][loc - 1] = 1;
 	}
 
-	void setOrarSala(int nrZile, int* zile, int nrOre, int* ore, int idFilm)
+	void setOrarSala(int zi, int ora, int idFilm)
 	{
-		for (int i = 0; i < nrZile; i++)
+
+		zi -= 1;
+		if (ora == 10)
 		{
-			zile[i] -= 1;
+			ora = 0;
 		}
-		for (int i = 0; i < nrOre; i++)
+		if (ora == 14)
 		{
-			if (ore[i] == 10)
-			{
-				ore[i] = 0;
-			}
-			else if (ore[i] == 14)
-			{
-				ore[i] = 1;
-			}
-			else
-			{
-				ore[i] = 2;
-			}
+			ora = 1;
+		}
+		if (ora == 18)
+		{
+			ora = 2;
 		}
 
-
-		for (int i = 0; i < nrZile; i++)
-		{
-			for (int j = 0; j < nrOre; j++)
-			{
-				orarSala[zile[i]][ore[j]] = idFilm;
-
-			}
-		}
+		orarSala[zi][ora] = idFilm;
 	}
 
 	void setPretLocSala(int pret)
@@ -1246,7 +1233,11 @@ istream& operator>> (istream& in, Film& f)
 				}
 				else if (f.oreProiectii[i] == 10 || f.oreProiectii[i] == 14 || f.oreProiectii[i] == 18)
 				{
-					vectorSali[f.idSala]->setOrarSala(f.nrZile, f.zileProiectii, f.nrProiectiiZi, f.oreProiectii, f.idFilm);
+					for (int j = 0; j < f.nrZile; j++)
+					{
+						vectorSali[f.idSala - 1]->setOrarSala(f.zileProiectii[j], f.oreProiectii[i], f.idFilm);
+					}
+					
 					break;
 				}
 				else
