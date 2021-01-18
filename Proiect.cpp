@@ -211,7 +211,7 @@ public:
 
 	static int getNrSali()
 	{
-		return Sala::nrTotalSali ;
+		return Sala::nrTotalSali;
 	}
 
 	void setDenumireSala(char* denumireSala)
@@ -280,7 +280,7 @@ public:
 		else
 			return false;
 	}
-	
+
 	//NEW
 	void stergeFilm(int idfilm)
 	{
@@ -289,7 +289,7 @@ public:
 		{
 			for (int indx = 0; indx < 3; indx++)
 			{
-			
+
 				if (this->orarSala[zi][indx] == idfilm)
 					this->orarSala[zi][indx] = 0;
 
@@ -1268,7 +1268,7 @@ istream& operator>> (istream& in, Film& f)
 				{
 					cout << "Zi " << i + 1 << ": ";
 					in >> f.zileProiectii[i];
-					if (f.zileProiectii[i] < 1 && f.zileProiectii[i] > 7)
+					if ((f.zileProiectii[i] < 1) || (f.zileProiectii[i] > 7) || (f.zileProiectii[i] == f.zileProiectii[i - 1]))
 					{
 						cout << "Optiunea este invalida! [Introdu numere de la 1 la 7]" << endl;
 					}
@@ -1315,7 +1315,7 @@ istream& operator>> (istream& in, Film& f)
 						for (int j = 0; j < f.nrZile; j++)
 						{
 							//Se verifica daca ruleaza vreun film la data si orele introduse
-							if (vectorSali[f.idSala- 1]->ExistaProiectie(f.zileProiectii[j], f.oreProiectii[i]))
+							if (vectorSali[f.idSala - 1]->ExistaProiectie(f.zileProiectii[j], f.oreProiectii[i]))
 								exista_film = true;
 						}
 
@@ -1629,16 +1629,16 @@ public:
 	}
 
 	//NEW
-	void setlocuri(int* locuri, int nrlocuri)
+	void setlocuri(int* locuri, int nrLocuri)
 	{
 
-		if (nrlocuri > 0 && locuri != nullptr)
+		if (nrLocuri > 0 && locuri != nullptr)
 		{
 
 			this->nrLocuri = nrLocuri;
 			this->locuri = new int[nrLocuri];
 
-			for (int indx = 0; indx < nrlocuri; indx++)
+			for (int indx = 0; indx < nrLocuri; indx++)
 				this->locuri[indx] = locuri[indx];
 		}
 		else
@@ -1720,6 +1720,21 @@ int Bilet::nrBileteEmise = 0;
 //Operator afisare info Bilete
 ostream& operator<< (ostream& out, Bilet b)
 {
+	ifstream fluxDeserializare;
+	ofstream fluxSerializare;
+	Film** vectorFilme = nullptr;
+	int dimensiuneVector = 0;
+
+	fluxDeserializare.open("film.bin", ios::_Nocreate | ios::binary);
+	fluxDeserializare.read((char*)&dimensiuneVector, sizeof(dimensiuneVector));
+	vectorFilme = new Film * [dimensiuneVector];
+
+	for (int i = 0; i < dimensiuneVector; i++)
+	{
+		vectorFilme[i] = new Film();
+		vectorFilme[i]->deserializareFilm(fluxDeserializare, *vectorFilme[i]);
+	}
+	fluxDeserializare.close();
 
 	out << "ID Bilet : " << b.codBilet << endl;
 	out << "ID Film : " << b.idFilm << endl;
@@ -1736,6 +1751,21 @@ ostream& operator<< (ostream& out, Bilet b)
 //Operator citire info Bilete
 istream& operator>> (istream& in, Bilet& b)
 {
+	ifstream fluxDeserializare;
+	ofstream fluxSerializare;
+	Film** vectorFilme = nullptr;
+	int dimensiuneVector = 0;
+
+	fluxDeserializare.open("film.bin", ios::_Nocreate | ios::binary);
+	fluxDeserializare.read((char*)&dimensiuneVector, sizeof(dimensiuneVector));
+	vectorFilme = new Film * [dimensiuneVector];
+
+	for (int i = 0; i < dimensiuneVector; i++)
+	{
+		vectorFilme[i] = new Film();
+		vectorFilme[i]->deserializareFilm(fluxDeserializare, *vectorFilme[i]);
+	}
+	fluxDeserializare.close();
 
 	string buffer;
 
@@ -1746,24 +1776,48 @@ istream& operator>> (istream& in, Bilet& b)
 	b.dataFilm = new char[buffer.length() + 1];
 	strcpy_s(b.dataFilm, buffer.length() + 1, buffer.c_str());
 
-	cout << "Nuarul randului: ";
+	cout << "Numarul randului: ";
 	in >> b.rand;
 
-	cout << "Nuarul de locuti dorite: ";
+	cout << "Numarul de locuri dorite: ";
 	in >> b.nrLocuri;
 
 	delete[] b.locuri;
 	b.locuri = new int[b.nrLocuri];
 	for (int indx = 0; indx < b.nrLocuri; indx++)
 	{
-
-		cout << "Locul [" << indx + 1 << "]: ";
-		in >> b.locuri[indx];
+		while (true)
+		{
+			cout << "Locul [" << indx + 1 << "]: ";
+			in >> b.locuri[indx];
+			if (b.locuri[indx] == b.locuri[indx - 1])
+			{
+				cout << "Locul nu este disponibil! Incercati din nou" << endl;
+			}
+			else
+			{
+				break;
+			}
+		}
 
 	}
 
+	int exista_film = 0;
 	cout << "ID Film: ";
-	in >> b.idFilm;
+	do
+	{
+		in >> b.idFilm;
+		for (int i = 0; i < dimensiuneVector; i++)
+		{
+			if (b.idFilm == vectorFilme[i]->getIdFilm())
+			{
+				exista_film = 1;
+			}
+		}
+		if (exista_film == 0)
+			cout << "Introduceti un ID valid: ";
+
+	} while (exista_film == 0);
 
 	return in;
 }
@@ -2150,6 +2204,10 @@ ostream& operator<<(ostream& out, Client c)
 			out << "Card " << i + 1 << ": " << c.nrAsociatCard[i] << endl;
 		}
 	}
+
+	out << "Nume utilizator client" << endl;
+	out << c.numeUtilizatorClient;
+
 	cout << endl;
 	return out;
 }
@@ -2200,6 +2258,8 @@ istream& operator>>(istream& in, Client& c)
 		cout << endl;
 	}
 
+	cout << "Nume utilizatorclient ";
+	in >> c.numeUtilizatorClient;
 
 	return in;
 }
@@ -2227,6 +2287,7 @@ private:
 	int nrBilete;
 	bool achitat;
 	string numeUtilizatorClient;
+	int idBilet;
 
 public:
 	Rezervare() :idRezervare(++nrRezervari)
@@ -2236,6 +2297,7 @@ public:
 		nrBilete = 0;
 		achitat = false;
 		numeUtilizatorClient = "";
+		idBilet = 0;
 	}
 
 	Rezervare(int nrBilete) :idRezervare(++nrRezervari)
@@ -2245,9 +2307,10 @@ public:
 		nrBileteRezervate = new int[nrBilete];
 		achitat = false;
 		numeUtilizatorClient = "";
+		idBilet = 0;
 	}
 
-	Rezervare(char* dataRezervare, int* nrBileteRezervate, int nrBilete, bool achitat, string numeUtilizatorClient) :idRezervare(++nrRezervari)
+	Rezervare(char* dataRezervare, int* nrBileteRezervate, int nrBilete, bool achitat, string numeUtilizatorClient, int idBilet) :idRezervare(++nrRezervari)
 	{
 		if (dataRezervare != nullptr)
 		{
@@ -2275,6 +2338,7 @@ public:
 		}
 		this->achitat = achitat;
 		this->numeUtilizatorClient = numeUtilizatorClient;
+		this->idBilet = idBilet;
 
 	}
 
@@ -2306,6 +2370,7 @@ public:
 		}
 		achitat = r.achitat;
 		numeUtilizatorClient = r.numeUtilizatorClient;
+		idBilet = r.idBilet;
 	}
 
 	~Rezervare()
@@ -2344,6 +2409,7 @@ public:
 		}
 		achitat = r.achitat;
 		numeUtilizatorClient = r.numeUtilizatorClient;
+		idBilet = r.idBilet;
 
 		return *this;
 	}
@@ -2519,12 +2585,30 @@ public:
 
 	friend ostream& operator<<(ostream&, Rezervare);
 	friend istream& operator>>(istream&, Rezervare&);
+	friend class Bilet;
 };
 
 int Rezervare::nrRezervari = 0;
 
 ostream& operator<<(ostream& out, Rezervare r)
 {
+
+	ifstream fluxDeserializare;
+	ofstream fluxSerializare;
+	Bilet** vectorBilete = nullptr;
+	int dimensiuneVector = 0;
+
+	fluxDeserializare.open("bilet.bin", ios::_Nocreate | ios::binary);
+	fluxDeserializare.read((char*)&dimensiuneVector, sizeof(dimensiuneVector));
+	vectorBilete = new Bilet * [dimensiuneVector];
+
+	for (int i = 0; i < dimensiuneVector; i++)
+	{
+		vectorBilete[i] = new Bilet();
+		vectorBilete[i]->deserializareBilet(fluxDeserializare, *vectorBilete[i]);
+	}
+	fluxDeserializare.close();
+
 	out << "Detalii legate de rezervare: " << endl;
 	out << "ID rezervare: " << r.idRezervare << endl;
 	if (r.dataRezervare != nullptr)
@@ -2536,15 +2620,10 @@ ostream& operator<<(ostream& out, Rezervare r)
 	{
 		for (int i = 0; i < r.nrBilete; i++)
 		{
-			out << "Id-ul biletului " << i << ":" << r.nrBileteRezervate[i] << endl;
+			out << "Id-ul biletului " << i + 1 << ": " << r.nrBileteRezervate[i] << endl;
+
 		}
 	}
-
-	if (r.achitat != 1)
-		out << "Neachitat";
-	else
-		out << "Achitat";
-	out << endl;
 
 	out << "Numele utilizatorului: " << r.numeUtilizatorClient;
 	out << endl;
@@ -2554,28 +2633,149 @@ ostream& operator<<(ostream& out, Rezervare r)
 
 istream& operator>>(istream& in, Rezervare& r)
 {
+	ifstream fluxDeserializare;
+	ofstream fluxSerializare;
+	Bilet** vectorBilete = nullptr;
+	int dimensiuneVector = 0;
+
+	fluxDeserializare.open("bilet.bin", ios::_Nocreate | ios::binary);
+	fluxDeserializare.read((char*)&dimensiuneVector, sizeof(dimensiuneVector));
+	vectorBilete = new Bilet * [dimensiuneVector];
+
+	for (int i = 0; i < dimensiuneVector; i++)
+	{
+		vectorBilete[i] = new Bilet();
+		vectorBilete[i]->deserializareBilet(fluxDeserializare, *vectorBilete[i]);
+	}
+	fluxDeserializare.close();
+
+
 	delete[]r.dataRezervare;
 	string buffer;
-	cout << "Data rezervarii: ";
+	cout << "Data rezervarii (de forma ZZ/LL/AAAA): ";
 	in >> ws;
 	getline(in, buffer);
 	r.dataRezervare = new char[buffer.length() + 1];
 	strcpy_s(r.dataRezervare, buffer.length() + 1, buffer.c_str());
 
-	delete[]r.nrBileteRezervate;
 	cout << "Introdu numarul de bilete pe care doresti sa le rezervi: ";
 	in >> r.nrBilete;
-	r.nrBileteRezervate = new int[r.nrBilete];
-	//for (int i = 0; i < r.nrBilete; i++)
-	//{
-	//	cout << "Id-ul biletului " << i << " :";
-	//	in >> r.nrBileteRezervate[i];
-	//}
 
-	//cout << "Introduceti 0 daca nu ati achitat sau 1 daca ati achitat ";
-	//in >> r.achitat;
-	cout << "Numele utilizatorului: ";
-	in >> r.numeUtilizatorClient;
+	if (dimensiuneVector < r.nrBilete)
+	{
+		while (dimensiuneVector < r.nrBilete)
+		{
+			cout << "Nu exista " << r.nrBilete << " bilete disponibile! Introduceti o optiune valida: ";
+			in >> r.nrBilete;
+		}
+	}
+	else
+	{
+		cout << "Bilete disponibile: ";
+		for (int i = 0; i < dimensiuneVector; i++)
+		{
+			cout << "ID " << vectorBilete[i]->getcodBIlet() << " ";
+		}
+	}
+	cout << endl;
+
+	if (r.nrBilete > 0)
+	{
+		cout << "Selectati biletele " << endl;
+		r.nrBileteRezervate = new int[r.nrBilete];
+		for (int i = 0; i < r.nrBilete; i++)
+		{
+			int nr_bilete_selectate = 0;
+			while (true)
+			{
+				cout << "Biletul " << i + 1 << ": ";
+				in >> r.nrBileteRezervate[i];
+				for (int j = 0; j < dimensiuneVector; j++)
+				{
+					if (r.nrBileteRezervate[i] == vectorBilete[j]->getcodBIlet() && r.nrBileteRezervate[i] != r.nrBileteRezervate[i - 1])
+					{
+						nr_bilete_selectate = 1;
+						r.nrBileteRezervate[i] = vectorBilete[j]->getcodBIlet();
+
+					}
+				}
+
+				if (nr_bilete_selectate == 0)
+					cout << "Optiunea este invalida!" << endl;
+				else
+				{
+					break;
+				}
+			}
+		}
+	}
+
+	ifstream fluxDeserializare1;
+	ofstream fluxSerializare1;
+	Client** vectorClienti = nullptr;
+	int dimensiuneVector1 = 0;
+
+	fluxDeserializare1.open("clienti.bin", ios::_Nocreate | ios::binary);
+	fluxDeserializare1.read((char*)&dimensiuneVector1, sizeof(dimensiuneVector1));
+	vectorClienti = new Client * [dimensiuneVector1];
+
+	for (int i = 0; i < dimensiuneVector1; i++)
+	{
+		vectorClienti[i] = new Client();
+		vectorClienti[i]->deserializeClient(fluxDeserializare1, *vectorClienti[i]);
+	}
+	fluxDeserializare1.close();
+
+	int exista_utilizator = 0;
+	cout << "Introdu numele de utilizator: ";
+	do
+	{
+		in >> r.numeUtilizatorClient;
+		for (int i = 0; i < dimensiuneVector1; i++)
+		{
+			if (r.numeUtilizatorClient == vectorClienti[i]->getNumeUtilizatorClient())
+			{
+				exista_utilizator = 1;
+			}
+		}
+
+		if (exista_utilizator == 0)
+		{
+			cout << "Nu exsita niciun client cu acest nume de utilizator!" << endl;
+			cout << "Incercati din nou: ";
+		}
+
+
+	} while (exista_utilizator == 0);
+
+
+
+	fluxSerializare.open("bilet.bin", ios::binary);
+	fluxSerializare.write((char*)&dimensiuneVector, sizeof(dimensiuneVector));
+
+	for (int i = 0; i < dimensiuneVector; i++)
+	{
+		if (vectorBilete[i] != nullptr)
+		{
+			vectorBilete[i]->serializareBilet(fluxSerializare, *vectorBilete[i]);
+		}
+	}
+
+	fluxSerializare.close();
+
+	fluxSerializare1.open("clienti.bin", ios::binary);
+	fluxSerializare1.write((char*)&dimensiuneVector1, sizeof(dimensiuneVector1));
+
+	for (int i = 0; i < dimensiuneVector1; i++)
+	{
+		if (vectorClienti[i] != nullptr)
+		{
+			vectorClienti[i]->serializeClient(fluxSerializare, *vectorClienti[i]);
+		}
+	}
+
+	fluxSerializare1.close();
+
 	return in;
 }
 
@@ -2817,7 +3017,7 @@ Sala** administrareSala(Sala** vectorSala)
 			}
 
 			nrSali += nrSaliNoi;
-break;
+			break;
 
 		case 2:
 			int idSala;
@@ -2853,7 +3053,7 @@ break;
 			sterge_sala = true;
 			if (nrSali != 0)
 			{
-				
+
 				cout << "Introduceti ID Sala pe care doriti sa-l stergeti ";
 
 				do
@@ -2884,11 +3084,11 @@ break;
 						{
 
 							//Se pot sterge doar salile care nu au filme care ruleaza
-							if (vectorSala[vectorSala[indx]->getIdSala() -1]->ExistaProiectie(zi, 10) || vectorSala[vectorSala[indx]->getIdSala()-1]->ExistaProiectie(zi, 14
-								|| vectorSala[vectorSala[indx]->getIdSala()-1]->ExistaProiectie(zi, 18)))
+							if (vectorSala[vectorSala[indx]->getIdSala() - 1]->ExistaProiectie(zi, 10) || vectorSala[vectorSala[indx]->getIdSala() - 1]->ExistaProiectie(zi, 14
+								|| vectorSala[vectorSala[indx]->getIdSala() - 1]->ExistaProiectie(zi, 18)))
 							{
 
-								sterge_sala=false;
+								sterge_sala = false;
 
 							}
 						}
