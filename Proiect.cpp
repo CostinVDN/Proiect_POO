@@ -629,10 +629,42 @@ istream& operator>> (istream& in, Sala& s)
 	delete[] s.locuriSala;
 	cout << "Randuri: ";
 	in >> s.nrRanduri;
+
+	while (in.fail() || s.nrRanduri < 0)
+	{
+
+		in.clear();
+		in.ignore(numeric_limits<streamsize>::max(), '\n');
+		cout << "Imtroducei un numar > 0 : ";
+
+		in >> s.nrRanduri;
+
+	}
+
+	in.clear();
+	in.ignore(numeric_limits<streamsize>::max(), '\n');
+
+
+
 	//cout << endl;
 
 	cout << "Locuri pe rand: ";
 	in >> s.nrLocuriPeRand;
+
+	while (in.fail() || s.nrLocuriPeRand < 0)
+	{
+
+		in.clear();
+		in.ignore(numeric_limits<streamsize>::max(), '\n');
+		cout << "Imtroducei un numar > 0 : ";
+
+		in >> s.nrLocuriPeRand;
+
+	}
+
+	in.clear();
+	in.ignore(numeric_limits<streamsize>::max(), '\n');
+
 
 	if (s.nrRanduri > 0 && s.nrLocuriPeRand > 0)
 	{
@@ -652,6 +684,21 @@ istream& operator>> (istream& in, Sala& s)
 
 	cout << "Pret loc sala: ";
 	in >> s.pretLocSala;
+
+	while (in.fail() || s.pretLocSala < 0)
+	{
+
+		in.clear();
+		in.ignore(numeric_limits<streamsize>::max(), '\n');
+		cout << "Imtroducei un pret > 0 : ";
+
+		in >> s.pretLocSala;
+
+	}
+
+	in.clear();
+	in.ignore(numeric_limits<streamsize>::max(), '\n');
+
 
 	cout << "Tip sala: ";
 	in >> ws;
@@ -1234,6 +1281,21 @@ istream& operator>> (istream& in, Film& f)
 
 	cout << "Durata: ";
 	in >> f.durata;
+
+	while (in.fail() || f.durata < 0)
+	{
+
+		in.clear();
+		in.ignore(numeric_limits<streamsize>::max(), '\n');
+		cout << "Imtroducei un numar > 0 : ";
+
+		in >> f.durata;
+
+	}
+
+	in.clear();
+	in.ignore(numeric_limits<streamsize>::max(), '\n');
+
 	cout << endl;
 
 	bool exista_film;
@@ -1276,6 +1338,20 @@ istream& operator>> (istream& in, Film& f)
 		cout << "In cate zile pe saptamana va rula filmul: ";
 		in >> f.nrZile;
 
+		while (in.fail() || f.nrZile < 0)
+		{
+
+			in.clear();
+			in.ignore(numeric_limits<streamsize>::max(), '\n');
+			cout << "Imtroducei un numar > 0 : ";
+
+			in >> f.nrZile;
+
+		}
+
+		in.clear();
+		in.ignore(numeric_limits<streamsize>::max(), '\n');
+
 		if (f.nrZile > 0)
 		{
 			bool zi_incorecta;
@@ -1288,27 +1364,30 @@ istream& operator>> (istream& in, Film& f)
 				cout << "Zi " << indx + 1 << ": ";
 				in >> f.zileProiectii[indx];
 
-				if ((f.zileProiectii[indx] < 1) || (f.zileProiectii[indx] > 7))
+				while (in.fail() || (f.zileProiectii[indx] < 1) || (f.zileProiectii[indx] > 7))
 				{
 
-					cout << "Optiunea este invalida! [Introdu numere de la 1 la 7]" << endl;
-					zi_incorecta= true;
+					in.clear();
+					in.ignore(numeric_limits<streamsize>::max(), '\n');
+					cout << "Optiunea este invalida! [Introdu numere de la 1 la 7]";
+
+					in >> f.zileProiectii[indx];
 
 				}
-				else
+
+				in.clear();
+				in.ignore(numeric_limits<streamsize>::max(), '\n');
+
+				//Se verifica sa nu se dubleze ziua (ex. 1, 2,1)
+				for (int indx2 = 0; indx2 < indx; indx2++)
 				{
-					//Se verifica sa nu se dubleze ziua (ex. 1, 2,1)
-					for (int indx2 = 0; indx2 < indx; indx2++)
+					if (f.zileProiectii[indx2] == f.zileProiectii[indx])
 					{
-						if (f.zileProiectii[indx2] == f.zileProiectii[indx])
-						{
 
-							cout << "Nu puteti introduce o zi de doua ori! " << endl;
-							zi_incorecta= true;
+						cout << "Nu puteti introduce o zi de doua ori! " << endl;
+						zi_incorecta= true;
 
-						}
 					}
-
 				}
 
 				if (!zi_incorecta)
@@ -1317,20 +1396,22 @@ istream& operator>> (istream& in, Film& f)
 			}while (indx < f.nrZile || zi_incorecta);
 
 			
-			while (true)
+			cout << "Introdu numarul proiectiilor pe zi ";
+			in >> f.nrProiectiiZi;
+
+			while (in.fail() || (f.nrProiectiiZi > 0 && f.nrProiectiiZi < 4))
 			{
-				cout << "Introdu numarul proiectiilor pe zi ";
+
+				in.clear();
+				in.ignore(numeric_limits<streamsize>::max(), '\n');
+				cout << "Numarul maxim de proiectii intr-o zi este 3! Incearca din nou!" << endl;
+
 				in >> f.nrProiectiiZi;
 
-				if (f.nrProiectiiZi > 0 && f.nrProiectiiZi < 4)
-				{
-					break;
-				}
-				else
-				{
-					cout << "Numarul maxim de proiectii intr-o zi este 3! Incearca din nou!" << endl;
-				}
 			}
+
+			in.clear();
+			in.ignore(numeric_limits<streamsize>::max(), '\n');
 
 			f.oreProiectii = new int[f.nrProiectiiZi];
 			for (int i = 0; i < f.nrProiectiiZi; i++)
@@ -1339,6 +1420,22 @@ istream& operator>> (istream& in, Film& f)
 				{
 					cout << "Ora [" << i + 1 << "]: ";
 					in >> f.oreProiectii[i];
+
+					while (in.fail() || f.oreProiectii[i] < 10)
+					{
+
+						in.clear();
+						in.ignore(numeric_limits<streamsize>::max(), '\n');
+						cout << "Imtroeuceti o ora valida [10, 14 sau 18] :" << endl;
+
+						in >> f.oreProiectii[i];
+
+					}
+
+					in.clear();
+					in.ignore(numeric_limits<streamsize>::max(), '\n');
+
+
 					if (i == 2 && f.oreProiectii[i] == f.oreProiectii[i - 1] || f.oreProiectii[i] == f.oreProiectii[i - 2])
 					{
 						cout << "Ora este invalida, incearca din nou!" << endl;
@@ -1998,7 +2095,7 @@ istream& operator>> (istream& in, Bilet& b)
 		in >> b.idFilm;
 
 		//Model validare int
-		while (in.fail())
+		while (in.fail() || b.idFilm <0)
 		{
 			
 			in.clear();
@@ -2008,6 +2105,10 @@ istream& operator>> (istream& in, Bilet& b)
 			in >> b.idFilm;
 
 		} 
+
+		in.clear();
+		in.ignore(numeric_limits<streamsize>::max(), '\n');
+
 
 		for (int i = 0; i < dimensiuneVector; i++)
 		{
@@ -2075,7 +2176,7 @@ istream& operator>> (istream& in, Bilet& b)
 		{
 			in >> b.rand;
 			//Model validare int
-			while (in.fail())
+			while (in.fail() || b.rand < 0)
 			{
 
 				in.clear();
@@ -2085,6 +2186,10 @@ istream& operator>> (istream& in, Bilet& b)
 				in >> b.rand;
 
 			}
+
+			in.clear();
+			in.ignore(numeric_limits<streamsize>::max(), '\n');
+
 			if (b.rand > randuri_sala)
 				cout << "Numarul randului nu trebuie sa depaseasca numarul de rnaduri din sala: ";
 
@@ -2096,7 +2201,7 @@ istream& operator>> (istream& in, Bilet& b)
 		{
 			in >> b.nrLocuri;
 			//Model validare int
-			while (in.fail())
+			while (in.fail() || b.nrLocuri < 0)
 			{
 
 				in.clear();
@@ -2106,6 +2211,10 @@ istream& operator>> (istream& in, Bilet& b)
 				in >> b.nrLocuri;
 
 			}
+
+			in.clear();
+			in.ignore(numeric_limits<streamsize>::max(), '\n');
+
 
 			if (b.nrLocuri > nrlocuri_rand)
 				cout << "Numarul de locuri selectate nu trebuie sa depaseasca numarul de locuri de pe rand: ";
@@ -2125,7 +2234,7 @@ istream& operator>> (istream& in, Bilet& b)
 				in >> b.locuri[indx];
 				//Model validare int
 
-				while (in.fail())
+				while (in.fail() || b.locuri[indx] < 0)
 				{
 
 					in.clear();
@@ -2135,6 +2244,9 @@ istream& operator>> (istream& in, Bilet& b)
 					in >> b.locuri[indx];;
 
 				}
+				in.clear();
+				in.ignore(numeric_limits<streamsize>::max(), '\n');
+
 
 				//1. Se valideaza ca locul sa nu ie > ca nr de locui de pe rand
 				if (b.locuri[indx] > nrlocuri_rand)
@@ -2612,6 +2724,20 @@ istream& operator>>(istream& in, Client& c)
 	{
 		cout << endl << "Introdu numarul de carduri pe care doresti sa le salvezi: ";
 		in >> c.nrCarduri;
+
+		while (in.fail() || c.nrCarduri < 0)
+		{
+
+			in.clear();
+			in.ignore(numeric_limits<streamsize>::max(), '\n');
+			cout << "Introduceti un numar valid > 0 :" << endl;
+
+			in >> c.nrCarduri;
+
+		}
+		in.clear();
+		in.ignore(numeric_limits<streamsize>::max(), '\n');
+
 		if (c.nrCarduri > 0)
 		{
 
@@ -2621,6 +2747,21 @@ istream& operator>>(istream& in, Client& c)
 				cout << "Intordu numarul asociat pentru ";
 				cout << "Cardul " << i + 1 << ": ";
 				in >> c.nrAsociatCard[i];
+
+				while (in.fail() || c.nrAsociatCard[i] < 0)
+				{
+
+					in.clear();
+					in.ignore(numeric_limits<streamsize>::max(), '\n');
+					cout << "Numar inavlid!  Cardul " << i + 1 << ": " << endl;
+
+					in >> c.nrAsociatCard[i];
+
+				}
+
+				in.clear();
+				in.ignore(numeric_limits<streamsize>::max(), '\n');
+
 			}
 		}
 		else
@@ -3115,12 +3256,40 @@ istream& operator>>(istream& in, Rezervare& r)
 	cout << "Introdu numarul de bilete pe care doresti sa le rezervi: ";
 	in >> r.nrBilete;
 
+	while (in.fail() || r.nrBilete < 0)
+	{
+
+		in.clear();
+		in.ignore(numeric_limits<streamsize>::max(), '\n');
+		cout << "Imtroeuceti un numar valid >0 : ";
+
+		in >> r.nrBilete;
+
+	}
+
+	in.clear();
+	in.ignore(numeric_limits<streamsize>::max(), '\n');
+
 	if (dimensiuneVector < r.nrBilete)
 	{
 		while (dimensiuneVector < r.nrBilete)
 		{
 			cout << "Nu exista " << r.nrBilete << " bilete disponibile! Introduceti o optiune valida: ";
 			in >> r.nrBilete;
+
+			while (in.fail() || r.nrBilete < 0)
+			{
+
+				in.clear();
+				in.ignore(numeric_limits<streamsize>::max(), '\n');
+				cout << "Introduceti un nr valid > 0 :" << endl;
+
+				in >> r.nrBilete;
+
+			}
+
+			in.clear();
+			in.ignore(numeric_limits<streamsize>::max(), '\n');
 		}
 	}
 	else
@@ -3144,6 +3313,21 @@ istream& operator>>(istream& in, Rezervare& r)
 			{
 				cout << "Biletul " << i + 1 << ": ";
 				in >> r.nrBileteRezervate[i];
+
+				while (in.fail() || r.nrBileteRezervate[i] < 0)
+				{
+
+					in.clear();
+					in.ignore(numeric_limits<streamsize>::max(), '\n');
+					cout << "Introduceti un numar valid > 0: " << endl;
+
+					in >> r.nrBileteRezervate[i];
+
+				}
+
+				in.clear();
+				in.ignore(numeric_limits<streamsize>::max(), '\n');
+
 				for (int j = 0; j < dimensiuneVector; j++)
 				{
 					if (r.nrBileteRezervate[i] == vectorBilete[j]->getcodBIlet())
@@ -3396,8 +3580,22 @@ Sala** administrareSala(Sala** vectorSala)
 			"0. Exit" << endl;
 
 		cout << endl << "Selecteaza optiunea: ";
-
 		cin >> optiune;
+
+		while (cin.fail() || optiune < 0 || optiune > 4)
+		{
+
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			cout << "Selectati o optiune valida : ";
+
+			cin >> optiune;
+
+		}
+
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
 		f2.open("sala.bin", ios::_Nocreate | ios::binary);
 		f2.read((char*)&nrSali, sizeof(nrSali));
 
@@ -3407,10 +3605,21 @@ Sala** administrareSala(Sala** vectorSala)
 			{
 
 				cout << "Introduceti nr. de sali pe care doriti sa le adaugati:";
-				do
+				cin >> nrSaliNoi;
+
+				while (cin.fail() || nrSaliNoi < 0)
 				{
+
+					cin.clear();
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+					cout << "Introduceti un nr. valid : ";
+
 					cin >> nrSaliNoi;
-				} while (nrSaliNoi > 0);
+
+				}
+
+				cin.clear();
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
 				vectorSala = new Sala * [nrSali + nrSaliNoi];
 			}
@@ -3435,6 +3644,20 @@ Sala** administrareSala(Sala** vectorSala)
 
 				cout << "Introduceti nr. de sali pe care doriti sa le adaugati:";
 				cin >> nrSaliNoi;
+
+				while (cin.fail() || nrSaliNoi < 0)
+				{
+
+					cin.clear();
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+					cout << "Selectati o optiune valida : ";
+
+					cin >> nrSaliNoi;
+
+				}
+
+				cin.clear();
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
 				vectorSala = new Sala * [nrSaliNoi];
 
@@ -3486,6 +3709,21 @@ Sala** administrareSala(Sala** vectorSala)
 				do
 				{
 					cin >> idSala;
+
+					while (cin.fail())
+					{
+
+						cin.clear();
+						cin.ignore(numeric_limits<streamsize>::max(), '\n');
+						cout << "Selectati un ID valid : ";
+
+						cin >> idSala;
+
+					}
+
+					cin.clear();
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
 					existaIdSala = false;
 
 					for (int indx = 0; indx < nrSali; indx++)
@@ -3518,6 +3756,21 @@ Sala** administrareSala(Sala** vectorSala)
 				{
 
 					cin >> idSala;
+
+					while (cin.fail() || nrSaliNoi < 0)
+					{
+
+						cin.clear();
+						cin.ignore(numeric_limits<streamsize>::max(), '\n');
+						cout << "Imtroduceti un ID valid : ";
+
+						cin >> idSala;
+
+					}
+
+					cin.clear();
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
 					existaIdSala = false;
 
 					for (int indx = 0; indx < nrSali; indx++)
@@ -3624,11 +3877,11 @@ Sala** administrareSala(Sala** vectorSala)
 				break;
 
 			case 2:
-				cout << endl << "Infrmatiile au fost actualizate cu succes in fisierul binar!" << endl;
+				cout << endl << "Informatiile au fost actualizate cu succes in fisierul binar!" << endl;
 				break;
 
 			case 3:
-				cout << endl << "Infrmatiile au fost sterse din fisierul binar!" << endl;
+				cout << endl << "Informatiile au fost sterse din fisierul binar!" << endl;
 				break;
 			}
 
@@ -3665,6 +3918,21 @@ Film** administrare_filme(Film** lista_filme)
 
 		cin >> optiune;
 
+		while (cin.fail() || optiune < 0)
+		{
+
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			cout << "Selectati o optiune valida : ";
+
+			cin >> optiune;
+
+		}
+
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+
 		//Se citesc nr. de filme salvate din fisier
 		f2.open("film.bin", ios::_Nocreate | ios::binary);
 		f2.read((char*)&nr_filme, sizeof(nr_filme)); //nr filme inregistrate in fisier
@@ -3676,6 +3944,21 @@ Film** administrare_filme(Film** lista_filme)
 
 				cout << "Introduceti nr. de fime pe care doriti sa le adaugati:";
 				cin >> nr_filme_noi;
+
+				while (cin.fail() || nr_filme_noi < 0)
+				{
+
+					cin.clear();
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+					cout << "Imtroduceti un nr valid : ";
+
+					cin >> nr_filme_noi;
+
+				}
+
+				cin.clear();
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
 
 				lista_filme = new Film * [nr_filme + nr_filme_noi];
 			}
@@ -3702,6 +3985,22 @@ Film** administrare_filme(Film** lista_filme)
 
 				cout << "Introduceti nr. de fime pe care doriti sa le adaugati:";
 				cin >> nr_filme_noi;
+
+				while (cin.fail() || nr_filme_noi< 0)
+				{
+
+					cin.clear();
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+					cout << "Imtroduceti un numar > 0 : ";
+
+					cin >> nr_filme_noi;
+
+				}
+
+				cin.clear();
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+
 
 				lista_filme = new Film * [nr_filme_noi];
 
@@ -3763,6 +4062,21 @@ Film** administrare_filme(Film** lista_filme)
 					//Se verifica daca ID-ul filmului este valid (este ID-ul unui film existent)
 
 					cin >> IDFilm;
+
+					while (cin.fail() || IDFilm < 0)
+					{
+
+						cin.clear();
+						cin.ignore(numeric_limits<streamsize>::max(), '\n');
+						cout << "Introduceti un ID valid >0 : ";
+
+						cin >> IDFilm;
+
+					}
+
+					cin.clear();
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
 					exista_idfilm = false;
 
 					for (int indx = 0; indx < nr_filme; indx++)
@@ -3795,6 +4109,23 @@ Film** administrare_filme(Film** lista_filme)
 					//Se verifica daca ID-ul filmului este valid (este ID-ul unui film existent)
 
 					cin >> IDFilm;
+
+					while (cin.fail() || IDFilm < 0)
+					{
+
+						cin.clear();
+						cin.ignore(numeric_limits<streamsize>::max(), '\n');
+						cout << "Introduceti un ID valid >0 : ";
+
+						cin >> IDFilm;
+
+					}
+
+					cin.clear();
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+
+
 					exista_idfilm = false;
 
 					for (int indx = 0; indx < nr_filme; indx++)
@@ -3964,6 +4295,20 @@ Bilet** administrare_bilete(Bilet** lista_bilete)
 
 		cin >> optiune;
 
+		while (cin.fail() || optiune  < 0 || optiune > 6)
+		{
+
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			cout << "Selectati o optiune valida : ";
+
+			cin >> optiune;
+
+		}
+
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
 		//Se citesc nr. de filme salvate din fisier
 		f2.open("bilet.bin", ios::_Nocreate | ios::binary);
 		f2.read((char*)&nr_bilete, sizeof(nr_bilete)); //nr bilete inregistrate in fisier
@@ -3975,6 +4320,20 @@ Bilet** administrare_bilete(Bilet** lista_bilete)
 
 				cout << "Introduceti nr. de Bilete pe care doriti sa le adaugati:";
 				cin >> nr_bilete_noi;
+
+				while (cin.fail() || nr_bilete_noi< 0)
+				{
+
+					cin.clear();
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+					cout << "Introduceti un numar > 0 : ";
+
+					cin >> nr_bilete_noi;
+
+				}
+
+				cin.clear();
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
 				lista_bilete = new Bilet * [nr_bilete + nr_bilete_noi];
 			}
@@ -4001,6 +4360,20 @@ Bilet** administrare_bilete(Bilet** lista_bilete)
 
 				cout << "Introduceti nr. de bilete pe care doriti sa le adaugati:";
 				cin >> nr_bilete_noi;
+
+				while (cin.fail() || nr_bilete_noi< 0)
+				{
+
+					cin.clear();
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+					cout << "Introduceti un numar > 0: ";
+
+					cin >> nr_bilete_noi;
+
+				}
+
+				cin.clear();
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
 				lista_bilete = new Bilet * [nr_bilete_noi];
 
@@ -4062,6 +4435,21 @@ Bilet** administrare_bilete(Bilet** lista_bilete)
 					//Se verifica daca ID-ul Biletului este valid (este ID-ul unui bilet existent)
 
 					cin >> IDBilet;
+
+					while (cin.fail() || IDBilet < 0)
+					{
+
+						cin.clear();
+						cin.ignore(numeric_limits<streamsize>::max(), '\n');
+						cout << "IMtroduceti un ID >0: ";
+
+						cin >> IDBilet;
+
+					}
+
+					cin.clear();
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
 					exista_idbilet = false;
 
 					for (int indx = 0; indx < nr_bilete; indx++)
@@ -4094,6 +4482,21 @@ Bilet** administrare_bilete(Bilet** lista_bilete)
 					//Se verifica daca ID-ul biltului este valid (este ID-ul unui bilet existent)
 
 					cin >> IDBilet;
+					
+					while (cin.fail() || IDBilet < 0)
+					{
+
+						cin.clear();
+						cin.ignore(numeric_limits<streamsize>::max(), '\n');
+						cout << "Introduceti un ID > 0 : ";
+
+						cin >> IDBilet;
+
+					}
+
+					cin.clear();
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
 					exista_idbilet = false;
 
 					for (int indx = 0; indx < nr_bilete; indx++)
@@ -4216,11 +4619,11 @@ Bilet** administrare_bilete(Bilet** lista_bilete)
 				break;
 
 			case 2:
-				cout << endl << "Infrmatiile au fost actualizate cu succes in fisierul binar!" << endl;
+				cout << endl << "Informatiile au fost actualizate cu succes in fisierul binar!" << endl;
 				break;
 
 			case 3:
-				cout << endl << "Infrmatiile au fost sterse din fisierul binar!" << endl;
+				cout << endl << "Informatiile au fost sterse din fisierul binar!" << endl;
 				break;
 			}
 
@@ -4256,6 +4659,21 @@ Rezervare** administrare_rezervari(Rezervare** lista_rezervari)
 		cout << endl << "Selecteaza optiunea: ";
 
 		cin >> optiune;
+
+		while (cin.fail() || optiune < 0 || optiune > 4)
+		{
+
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			cout << "Selectati o optiune valida : ";
+
+			cin >> optiune;
+
+		}
+
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
 		f2.open("rezervare.bin", ios::_Nocreate | ios::binary);
 		f2.read((char*)&nr_rezervari, sizeof(nr_rezervari)); //nr rezervari inregistrate in fisier
 
@@ -4266,6 +4684,20 @@ Rezervare** administrare_rezervari(Rezervare** lista_rezervari)
 
 				cout << "Introduceti nr. de rezervari pe care doriti sa le adaugati:";
 				cin >> nr_rezervari_noi;
+
+				while (cin.fail() || nr_rezervari_noi < 0)
+				{
+
+					cin.clear();
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+					cout << "Introduceti un numar > 0 : ";
+
+					cin >> nr_rezervari_noi;
+
+				}
+
+				cin.clear();
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
 				lista_rezervari = new Rezervare * [nr_rezervari + nr_rezervari_noi];
 			}
@@ -4289,6 +4721,20 @@ Rezervare** administrare_rezervari(Rezervare** lista_rezervari)
 
 				cout << "Introduceti nr. de rezervari pe care doriti sa le adaugati:";
 				cin >> nr_rezervari_noi;
+
+				while (cin.fail() || nr_rezervari_noi< 0)
+				{
+
+					cin.clear();
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+					cout << "Indtroduceti un numar > 0 : ";
+
+					cin >> nr_rezervari_noi;
+
+				}
+
+				cin.clear();
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
 				lista_rezervari = new Rezervare * [nr_rezervari_noi];
 
@@ -4348,6 +4794,21 @@ Rezervare** administrare_rezervari(Rezervare** lista_rezervari)
 					//Se verifica daca ID-ul rezervarii este valid (este ID-ul unei rezervari existente)
 
 					cin >> IDRezervare;
+
+					while (cin.fail() || IDRezervare < 0)
+					{
+
+						cin.clear();
+						cin.ignore(numeric_limits<streamsize>::max(), '\n');
+						cout << "Introduceti un numar > 0 : ";
+
+						cin >> IDRezervare;
+
+					}
+
+					cin.clear();
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
 					exista_idrezervare = false;
 
 					for (int i = 0; i < nr_rezervari; i++)
@@ -4380,6 +4841,21 @@ Rezervare** administrare_rezervari(Rezervare** lista_rezervari)
 					//Se verifica daca ID-ul rezervarii este valid 
 
 					cin >> IDRezervare;
+
+					while (cin.fail() || IDRezervare < 0)
+					{
+
+						cin.clear();
+						cin.ignore(numeric_limits<streamsize>::max(), '\n');
+						cout << "Introduceti un numar > 0 : ";
+
+						cin >> IDRezervare;
+
+					}
+
+					cin.clear();
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
 					exista_idrezervare = false;
 
 					for (int i = 0; i < nr_rezervari; i++)
@@ -4774,14 +5250,25 @@ int main()
 			"1. Administrare sali" << endl <<
 			"2. Administrare filme" << endl <<
 			"3. Administrare bilete" << endl <<
-			"4. Administrare rezervare" << endl <<
-			"5. Administrare clienti" << endl <<
+			"4. Administrare clienti" << endl <<
+			"5. Administrare rezervare" << endl <<
 			"6. Cont client" << endl <<
 			"0. Exit" << endl;
 
 		cout << endl << "Selecteaza optiunea: ";
-
 		cin >> optiune;
+
+		while (cin.fail() || optiune <0 || optiune >6)
+		{
+
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			cout << "Selectati o optiune valida : ";
+
+			cin >> optiune;
+
+		}
+		
 
 		switch (optiune)
 		{
@@ -4795,10 +5282,10 @@ int main()
 			administrare_bilete(lista_bilete);
 			break;
 		case 4:
-			administrare_rezervari(lista_rezervari);
+			administrare_clienti(lista_clienti);
 			break;
 		case 5:
-			administrare_clienti(lista_clienti);
+			administrare_rezervari(lista_rezervari);
 			break;
 		case 6:
 			break;
