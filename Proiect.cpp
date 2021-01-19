@@ -5778,5 +5778,5 @@ int main()
 		//int nrBilete[] = { 1,2,3,4,5,6,7,8 };
 		//Rezervare r((char*)"12/10/2020", nrBilete, 8, true);
 		//cout << r.getNrBileteRezervate();
-
+		//test
 }
