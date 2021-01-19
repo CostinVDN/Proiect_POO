@@ -1304,7 +1304,7 @@ istream& operator>> (istream& in, Film& f)
 		exista_film = false;
 		if (dimensiuneVector == 0)
 		{
-			cout << "Nu exista sali! " << endl;
+			cout << "Nu exista sali! Adaugati mai intai o sala! " << endl;
 		}
 		else
 		{
@@ -1369,7 +1369,7 @@ istream& operator>> (istream& in, Film& f)
 		if (f.nrZile > 0)
 		{
 			bool zi_incorecta;
-			cout << "Pentru ziua 'luni' introdu 1:" << endl;
+			cout << "Ex: pentru ziua 'Luni' introduceti cifra 1:" << endl;
 			f.zileProiectii = new int[f.nrZile];
 			int indx = 0;
 			
@@ -1383,7 +1383,7 @@ istream& operator>> (istream& in, Film& f)
 
 					in.clear();
 					in.ignore(numeric_limits<streamsize>::max(), '\n');
-					cout << "Optiunea este invalida! [Introdu numere de la 1 la 7]";
+					cout << "Optiunea este invalida! [Introduceti doar numere de la 1 la 7]";
 
 					in >> f.zileProiectii[indx];
 
@@ -1410,7 +1410,7 @@ istream& operator>> (istream& in, Film& f)
 			}while (indx < f.nrZile || zi_incorecta);
 
 			
-			cout << "Introdu numarul proiectiilor pe zi ";
+			cout << "Introduceti numarul proiectiilor pe zi ";
 			in >> f.nrProiectiiZi;
 
 			while (in.fail() || f.nrProiectiiZi <= 0 || f.nrProiectiiZi > 3)
@@ -1440,7 +1440,7 @@ istream& operator>> (istream& in, Film& f)
 
 						in.clear();
 						in.ignore(numeric_limits<streamsize>::max(), '\n');
-						cout << "Introeuceti o ora valida [10, 14 sau 18] :" << endl;
+						cout << "Introduceti o ora valida [10, 14 sau 18]: " << endl;
 
 						in >> f.oreProiectii[i];
 
@@ -1491,7 +1491,7 @@ istream& operator>> (istream& in, Film& f)
 		else
 		{
 
-			cout << "La data si orele selectate ruleaza alt film! Introduceti alte date! " << endl << endl;
+			cout << "La data si orele selectate ruleaza deja un alt film! Introduceti alte date! " << endl << endl;
 
 		}
 	} while (exista_film);
@@ -2114,7 +2114,7 @@ istream& operator>> (istream& in, Bilet& b)
 			
 			in.clear();
 			in.ignore(numeric_limits<streamsize>::max(), '\n');
-			cout << "Introduceti un ID valid : ";
+			cout << "Introduceti un ID valid: ";
 
 			in >> b.idFilm;
 
@@ -2195,7 +2195,7 @@ istream& operator>> (istream& in, Bilet& b)
 
 				in.clear();
 				in.ignore(numeric_limits<streamsize>::max(), '\n');
-				cout << "Introduceti un numar valid : ";
+				cout << "Introduceti un numar valid: ";
 
 				in >> b.rand;
 
@@ -2731,12 +2731,12 @@ istream& operator>>(istream& in, Client& c)
 		delete[] c.nrAsociatCard;
 	}
 
-	cout << "Doresti sa salvezi datele cardurilor pentru plati ulterioare? [apasa 1 pentru da, 0 pentru nu] ";
+	cout << "Doriti sa salvati datele cardului pentru plati ulterioare? Apasati 1 pentru DA, 0 pentru NU: ";
 	int optiune = 0;
 	in >> optiune;
 	if (optiune == 1)
 	{
-		cout << endl << "Introdu numarul de carduri pe care doresti sa le salvezi: ";
+		cout << endl << "Introduceti numarul de carduri pe care doriti sa le salvati: ";
 		in >> c.nrCarduri;
 
 		while (in.fail() || c.nrCarduri <= 0)
@@ -3267,7 +3267,7 @@ istream& operator>>(istream& in, Rezervare& r)
 	r.dataRezervare = new char[buffer.length() + 1];
 	strcpy_s(r.dataRezervare, buffer.length() + 1, buffer.c_str());
 
-	cout << "Introdu numarul de bilete pe care doresti sa le rezervi: ";
+	cout << "Introduceti numarul de bilete pe care doriti sa le rezervati: ";
 	in >> r.nrBilete;
 
 	while (in.fail() || r.nrBilete <= 0)
@@ -3288,7 +3288,7 @@ istream& operator>>(istream& in, Rezervare& r)
 	{
 		while (dimensiuneVector < r.nrBilete)
 		{
-			cout << "Nu exista " << r.nrBilete << " bilete disponibile! Introduceti o optiune valida: ";
+			cout << "Nu exista " << r.nrBilete << " bilet(e) disponibil(e)! Introduceti o optiune valida: ";
 			in >> r.nrBilete;
 
 			while (in.fail() || r.nrBilete <= 0)
@@ -3296,7 +3296,7 @@ istream& operator>>(istream& in, Rezervare& r)
 
 				in.clear();
 				in.ignore(numeric_limits<streamsize>::max(), '\n');
-				cout << "Introduceti un nr valid > 0 :" << endl;
+				cout << "Introduceti un nr valid > 0: " << endl;
 
 				in >> r.nrBilete;
 
@@ -3380,7 +3380,7 @@ istream& operator>>(istream& in, Rezervare& r)
 	fluxDeserializare1.close();
 
 	int exista_utilizator = 0;
-	cout << "Introdu numele de utilizator: ";
+	cout << "Introduceti numele de utilizator: ";
 	do
 	{
 		in >> r.numeUtilizatorClient;
@@ -3394,7 +3394,7 @@ istream& operator>>(istream& in, Rezervare& r)
 
 		if (exista_utilizator == 0)
 		{
-			cout << "Nu exsita niciun client cu acest nume de utilizator!" << endl;
+			cout << "Ne pare rau! Nu exista niciun client cu acest nume de utilizator!" << endl;
 			cout << "Incercati din nou: ";
 		}
 
@@ -3591,7 +3591,7 @@ Sala** administrareSala(Sala** vectorSala)
 			"2. Modificare sala" << endl <<
 			"3. Stergere sala" << endl <<
 			"4. Afisare info sala" << endl <<
-			"0. Exit" << endl;
+			"0. Inchidere" << endl;
 
 		cout << endl << "Selecteaza optiunea: ";
 		cin >> optiune;
@@ -3618,7 +3618,7 @@ Sala** administrareSala(Sala** vectorSala)
 			if (optiune == 1)
 			{
 
-				cout << "Introduceti nr. de sali pe care doriti sa le adaugati:";
+				cout << "Introduceti numarul de sali pe care doriti sa le adaugati: ";
 				cin >> nrSaliNoi;
 
 				while (cin.fail() || nrSaliNoi <= 0)
@@ -3626,7 +3626,7 @@ Sala** administrareSala(Sala** vectorSala)
 
 					cin.clear();
 					cin.ignore(numeric_limits<streamsize>::max(), '\n');
-					cout << "Introduceti un nr. valid : ";
+					cout << "Introduceti un numar valid : ";
 
 					cin >> nrSaliNoi;
 
@@ -3656,7 +3656,7 @@ Sala** administrareSala(Sala** vectorSala)
 			if (optiune == 1)
 			{
 
-				cout << "Introduceti nr. de sali pe care doriti sa le adaugati:";
+				cout << "Introduceti numarul de sali pe care doriti sa le adaugati: ";
 				cin >> nrSaliNoi;
 
 				while (cin.fail() || nrSaliNoi <= 0)
@@ -3719,7 +3719,7 @@ Sala** administrareSala(Sala** vectorSala)
 
 			if (nrSali != 0)
 			{
-				cout << "Introduceti ID sala pe care doriti sa-l modificati ";
+				cout << "Introduceti ID-ul salii pe care doriti sa o modificati: ";
 				do
 				{
 					cin >> idSala;
@@ -3752,7 +3752,7 @@ Sala** administrareSala(Sala** vectorSala)
 					}
 
 					if (!existaIdSala)
-						cout << "Introduceti un ID valid!: ";
+						cout << "Introduceti un ID valid: ";
 
 				} while ((!existaIdSala) || (idSala < 1));
 
@@ -3764,7 +3764,7 @@ Sala** administrareSala(Sala** vectorSala)
 			if (nrSali != 0)
 			{
 
-				cout << "Introduceti ID Sala pe care doriti sa-l stergeti ";
+				cout << "Introduceti ID-ul salii pe care doriti sa o stergeti: ";
 
 				do
 				{
@@ -3776,7 +3776,7 @@ Sala** administrareSala(Sala** vectorSala)
 
 						cin.clear();
 						cin.ignore(numeric_limits<streamsize>::max(), '\n');
-						cout << "Imtroduceti un ID valid : ";
+						cout << "Introduceti un ID valid: ";
 
 						cin >> idSala;
 
@@ -3795,7 +3795,7 @@ Sala** administrareSala(Sala** vectorSala)
 					}
 
 					if (!existaIdSala)
-						cout << "Introduceti un ID valid!: ";
+						cout << "Introduceti un ID valid: ";
 
 				} while ((!existaIdSala) || (idSala < 1));
 
@@ -3926,7 +3926,7 @@ Film** administrare_filme(Film** lista_filme)
 			"2. Modificare film" << endl <<
 			"3. Stergere film" << endl <<
 			"4. Afisare info filme" << endl <<
-			"0. Exit" << endl;
+			"0. Inchidere" << endl;
 
 		cout << endl << "Selecteaza optiunea: ";
 
@@ -3956,7 +3956,7 @@ Film** administrare_filme(Film** lista_filme)
 			if (optiune == 1)
 			{
 
-				cout << "Introduceti nr. de fime pe care doriti sa le adaugati:";
+				cout << "Introduceti numarul de filme pe care doriti sa le adaugati: ";
 				cin >> nr_filme_noi;
 
 				while (cin.fail() || nr_filme_noi <= 0)
@@ -3964,7 +3964,7 @@ Film** administrare_filme(Film** lista_filme)
 
 					cin.clear();
 					cin.ignore(numeric_limits<streamsize>::max(), '\n');
-					cout << "Introduceti un nr valid : ";
+					cout << "Introduceti un numar valid: ";
 
 					cin >> nr_filme_noi;
 
@@ -3997,7 +3997,7 @@ Film** administrare_filme(Film** lista_filme)
 			if (optiune == 1)
 			{
 
-				cout << "Introduceti nr. de fime pe care doriti sa le adaugati:";
+				cout << "Introduceti numarul de fime pe care doriti sa le adaugati: ";
 				cin >> nr_filme_noi;
 
 				while (cin.fail() || nr_filme_noi <= 0)
@@ -4005,7 +4005,7 @@ Film** administrare_filme(Film** lista_filme)
 
 					cin.clear();
 					cin.ignore(numeric_limits<streamsize>::max(), '\n');
-					cout << "Introduceti un numar > 0 : ";
+					cout << "Introduceti un numar > 0: ";
 
 					cin >> nr_filme_noi;
 
@@ -4070,7 +4070,7 @@ Film** administrare_filme(Film** lista_filme)
 
 			if (nr_filme != 0)
 			{
-				cout << "Introduceti ID Film pe care doriti sa-l modificati ";
+				cout << "Introduceti ID-ul filmului pe care doriti sa-l modificati: ";
 				do
 				{
 					//Se verifica daca ID-ul filmului este valid (este ID-ul unui film existent)
@@ -4082,7 +4082,7 @@ Film** administrare_filme(Film** lista_filme)
 
 						cin.clear();
 						cin.ignore(numeric_limits<streamsize>::max(), '\n');
-						cout << "Introduceti un ID valid >0 : ";
+						cout << "Introduceti un ID valid >0: ";
 
 						cin >> IDFilm;
 
@@ -4149,7 +4149,7 @@ Film** administrare_filme(Film** lista_filme)
 					}
 
 					if (!exista_idfilm)
-						cout << "Introduceti un ID valid!: ";
+						cout << "Introduceti un ID valid: ";
 
 				} while ((!exista_idfilm) || (IDFilm < 1));
 
@@ -4160,7 +4160,7 @@ Film** administrare_filme(Film** lista_filme)
 			//Stergere filme
 			if (nr_filme != 0)
 			{
-				cout << "Introduceti ID Film pe care doriti sa-l stergeti ";
+				cout << "Introduceti ID-ul filmului pe care doriti sa-l stergeti: ";
 
 				do
 				{
@@ -4173,7 +4173,7 @@ Film** administrare_filme(Film** lista_filme)
 
 						cin.clear();
 						cin.ignore(numeric_limits<streamsize>::max(), '\n');
-						cout << "Introduceti un ID valid >0 : ";
+						cout << "Introduceti un ID valid >0: ";
 
 						cin >> IDFilm;
 
@@ -4194,7 +4194,7 @@ Film** administrare_filme(Film** lista_filme)
 					}
 
 					if (!exista_idfilm)
-						cout << "Introduceti un ID valid!: ";
+						cout << "Introduceti un ID valid: ";
 
 				} while ((!exista_idfilm) || (IDFilm < 1));
 
@@ -4347,7 +4347,7 @@ Bilet** administrare_bilete(Bilet** lista_bilete)
 			"3. Stergere bilet" << endl <<
 			"4. Afisare info bilete" << endl <<
 			"5. Printare bilete" << endl <<
-			"0. Exit" << endl;
+			"0. Inchidere" << endl;
 
 		cout << endl << "Selecteaza optiunea: ";
 
@@ -4376,7 +4376,7 @@ Bilet** administrare_bilete(Bilet** lista_bilete)
 			if (optiune == 1)
 			{
 
-				cout << "Introduceti nr. de Bilete pe care doriti sa le adaugati:";
+				cout << "Introduceti numarul de bilete pe care doriti sa le adaugati: ";
 				cin >> nr_bilete_noi;
 
 				while (cin.fail() || nr_bilete_noi <= 0)
@@ -4384,7 +4384,7 @@ Bilet** administrare_bilete(Bilet** lista_bilete)
 
 					cin.clear();
 					cin.ignore(numeric_limits<streamsize>::max(), '\n');
-					cout << "Introduceti un numar > 0 : ";
+					cout << "Introduceti un numar > 0: ";
 
 					cin >> nr_bilete_noi;
 
@@ -4416,7 +4416,7 @@ Bilet** administrare_bilete(Bilet** lista_bilete)
 			if (optiune == 1)
 			{
 
-				cout << "Introduceti nr. de bilete pe care doriti sa le adaugati:";
+				cout << "Introduceti numarul de bilete pe care doriti sa le adaugati: ";
 				cin >> nr_bilete_noi;
 
 				while (cin.fail() || nr_bilete_noi <= 0)
@@ -4487,7 +4487,7 @@ Bilet** administrare_bilete(Bilet** lista_bilete)
 
 			if (nr_bilete != 0)
 			{
-				cout << "Introduceti ID Film pe care doriti sa-l modificati ";
+				cout << "Introduceti ID-ul filmului pe care doriti sa-l modificati: ";
 				do
 				{
 					//Se verifica daca ID-ul Biletului este valid (este ID-ul unui bilet existent)
@@ -4522,7 +4522,7 @@ Bilet** administrare_bilete(Bilet** lista_bilete)
 					}
 
 					if (!exista_idbilet)
-						cout << "Introduceti un ID valid!: ";
+						cout << "Introduceti un ID valid: ";
 
 				} while ((!exista_idbilet) || (IDBilet < 1));
 
@@ -4533,7 +4533,7 @@ Bilet** administrare_bilete(Bilet** lista_bilete)
 			//Stergere filme
 			if (nr_bilete != 0)
 			{
-				cout << "Introduceti ID Bilet pe care doriti sa-l stergeti ";
+				cout << "Introduceti ID-ul biletului pe care doriti sa-l stergeti: ";
 
 				do
 				{
@@ -4546,7 +4546,7 @@ Bilet** administrare_bilete(Bilet** lista_bilete)
 
 						cin.clear();
 						cin.ignore(numeric_limits<streamsize>::max(), '\n');
-						cout << "Introduceti un ID > 0 : ";
+						cout << "Introduceti un ID > 0: ";
 
 						cin >> IDBilet;
 
@@ -4565,7 +4565,7 @@ Bilet** administrare_bilete(Bilet** lista_bilete)
 					}
 
 					if (!exista_idbilet)
-						cout << "Introduceti un ID valid!: ";
+						cout << "Introduceti un ID valid: ";
 
 				} while ((!exista_idbilet) || (IDBilet < 1));
 
@@ -4712,7 +4712,7 @@ Rezervare** administrare_rezervari(Rezervare** lista_rezervari)
 			"2. Modificare rezervari" << endl <<
 			"3. Stergere rezervari" << endl <<
 			"4. Afisare info rezervari" << endl <<
-			"0. Exit" << endl;
+			"0. Inchidere" << endl;
 
 		cout << endl << "Selecteaza optiunea: ";
 
@@ -4740,7 +4740,7 @@ Rezervare** administrare_rezervari(Rezervare** lista_rezervari)
 			if (optiune == 1)
 			{
 
-				cout << "Introduceti nr. de rezervari pe care doriti sa le adaugati:";
+				cout << "Introduceti numarul de rezervari pe care doriti sa le adaugati: ";
 				cin >> nr_rezervari_noi;
 
 				while (cin.fail() || nr_rezervari_noi <= 0)
@@ -4748,7 +4748,7 @@ Rezervare** administrare_rezervari(Rezervare** lista_rezervari)
 
 					cin.clear();
 					cin.ignore(numeric_limits<streamsize>::max(), '\n');
-					cout << "Introduceti un numar > 0 : ";
+					cout << "Introduceti un numar > 0: ";
 
 					cin >> nr_rezervari_noi;
 
@@ -4777,7 +4777,7 @@ Rezervare** administrare_rezervari(Rezervare** lista_rezervari)
 			if (optiune == 1)
 			{
 
-				cout << "Introduceti nr. de rezervari pe care doriti sa le adaugati:";
+				cout << "Introduceti numarul de rezervari pe care doriti sa le adaugati: ";
 				cin >> nr_rezervari_noi;
 
 				while (cin.fail() || nr_rezervari_noi<= 0)
@@ -4785,7 +4785,7 @@ Rezervare** administrare_rezervari(Rezervare** lista_rezervari)
 
 					cin.clear();
 					cin.ignore(numeric_limits<streamsize>::max(), '\n');
-					cout << "Introduceti un numar > 0 : ";
+					cout << "Introduceti un numar > 0: ";
 
 					cin >> nr_rezervari_noi;
 
@@ -4846,7 +4846,7 @@ Rezervare** administrare_rezervari(Rezervare** lista_rezervari)
 
 			if (nr_rezervari != 0)
 			{
-				cout << "Introduceti ID-ul rezervarii pe care doriti sa o modificati ";
+				cout << "Introduceti ID-ul rezervarii pe care doriti sa o modificati: ";
 				do
 				{
 					//Se verifica daca ID-ul rezervarii este valid (este ID-ul unei rezervari existente)
@@ -4858,7 +4858,7 @@ Rezervare** administrare_rezervari(Rezervare** lista_rezervari)
 
 						cin.clear();
 						cin.ignore(numeric_limits<streamsize>::max(), '\n');
-						cout << "Introduceti un numar > 0 : ";
+						cout << "Introduceti un numar > 0: ";
 
 						cin >> IDRezervare;
 
@@ -4881,7 +4881,7 @@ Rezervare** administrare_rezervari(Rezervare** lista_rezervari)
 					}
 
 					if (!exista_idrezervare)
-						cout << "Introduceti un ID valid!: ";
+						cout << "Introduceti un ID valid: ";
 
 				} while ((!exista_idrezervare) || (IDRezervare < 1));
 
@@ -4892,7 +4892,7 @@ Rezervare** administrare_rezervari(Rezervare** lista_rezervari)
 			//Stergere rezervari
 			if (nr_rezervari != 0)
 			{
-				cout << "Introduceti ID-ul rezervarii pe care doriti sa o stergeti ";
+				cout << "Introduceti ID-ul rezervarii pe care doriti sa o stergeti: ";
 
 				do
 				{
@@ -4905,7 +4905,7 @@ Rezervare** administrare_rezervari(Rezervare** lista_rezervari)
 
 						cin.clear();
 						cin.ignore(numeric_limits<streamsize>::max(), '\n');
-						cout << "Introduceti un numar > 0 : ";
+						cout << "Introduceti un numar > 0: ";
 
 						cin >> IDRezervare;
 
@@ -4924,7 +4924,7 @@ Rezervare** administrare_rezervari(Rezervare** lista_rezervari)
 					}
 
 					if (!exista_idrezervare)
-						cout << "Introduceti un ID valid!: ";
+						cout << "Introduceti un ID valid: ";
 
 				} while ((!exista_idrezervare) || (IDRezervare < 1));
 
@@ -5041,7 +5041,7 @@ Client** administrare_clienti(Client** lista_clienti)
 			"2. Modificare clienti" << endl <<
 			"3. Stergere clienti" << endl <<
 			"4. Afisare info clienti" << endl <<
-			"0. Exit" << endl;
+			"0. Inchidere" << endl;
 
 		cout << endl << "Selecteaza optiunea: ";
 
@@ -5052,7 +5052,7 @@ Client** administrare_clienti(Client** lista_clienti)
 
 			cin.clear();
 			cin.ignore(numeric_limits<streamsize>::max(), '\n');
-			cout << "Introduceti o optiune valida : ";
+			cout << "Introduceti o optiune valida: ";
 
 			cin >> optiune;
 
@@ -5069,7 +5069,7 @@ Client** administrare_clienti(Client** lista_clienti)
 			if (optiune == 1)
 			{
 
-				cout << "Introduceti nr. de clienti pe care doriti sa ii adaugati:";
+				cout << "Introduceti numarul de clienti pe care doriti sa ii adaugati: ";
 				cin >> nr_clienti_noi;
 
 				lista_clienti = new Client * [nr_clienti + nr_clienti_noi];
@@ -5092,7 +5092,7 @@ Client** administrare_clienti(Client** lista_clienti)
 			if (optiune == 1)
 			{
 
-				cout << "Introduceti nr. de clienti pe care doriti sa ii adaugati:";
+				cout << "Introduceti numarul de clienti pe care doriti sa ii adaugati: ";
 				cin >> nr_clienti_noi;
 
 				while (cin.fail() || nr_clienti_noi <= 0)
@@ -5100,7 +5100,7 @@ Client** administrare_clienti(Client** lista_clienti)
 
 					cin.clear();
 					cin.ignore(numeric_limits<streamsize>::max(), '\n');
-					cout << "Introduceti un numar > 0 : ";
+					cout << "Introduceti un numar > 0: ";
 
 					cin >> nr_clienti_noi;
 
@@ -5161,7 +5161,7 @@ Client** administrare_clienti(Client** lista_clienti)
 
 			if (nr_clienti != 0)
 			{
-				cout << "Introduceti ID-ul clientului pe ale carui informatii doriti sa le modificati ";
+				cout << "Introduceti ID-ul clientului pe ale carui informatii doriti sa le modificati: ";
 				do
 				{
 					//Se verifica daca ID-ul clientului este valid (este ID-ul unei rezervari existente)
@@ -5173,7 +5173,7 @@ Client** administrare_clienti(Client** lista_clienti)
 
 						cin.clear();
 						cin.ignore(numeric_limits<streamsize>::max(), '\n');
-						cout << "Introduceti un numar > 0 : ";
+						cout << "Introduceti un numar > 0: ";
 
 						cin >> IDClient;
 
@@ -5196,7 +5196,7 @@ Client** administrare_clienti(Client** lista_clienti)
 					}
 
 					if (!exista_idclient)
-						cout << "Introduceti un ID valid!: ";
+						cout << "Introduceti un ID valid: ";
 
 				} while ((!exista_idclient) || (IDClient < 1));
 
@@ -5207,7 +5207,7 @@ Client** administrare_clienti(Client** lista_clienti)
 			//Stergere clienti
 			if (nr_clienti != 0)
 			{
-				cout << "Introduceti ID-ul clientului pe care doriti sa il stergeti ";
+				cout << "Introduceti ID-ul clientului pe care doriti sa il stergeti: ";
 
 				do
 				{
@@ -5220,7 +5220,7 @@ Client** administrare_clienti(Client** lista_clienti)
 
 						cin.clear();
 						cin.ignore(numeric_limits<streamsize>::max(), '\n');
-						cout << "Introduceti un numar > 0 : ";
+						cout << "Introduceti un numar > 0: ";
 
 						cin >> IDClient;
 
@@ -5239,7 +5239,7 @@ Client** administrare_clienti(Client** lista_clienti)
 					}
 
 					if (!exista_idclient)
-						cout << "Introduceti un ID valid!: ";
+						cout << "Introduceti un ID valid: ";
 
 				} while ((!exista_idclient) || (IDClient < 1));
 
@@ -5387,7 +5387,7 @@ int main()
 			"4. Administrare clienti" << endl <<
 			"5. Administrare rezervare" << endl <<
 			"6. Cont client" << endl <<
-			"0. Exit" << endl;
+			"0. Inchidere" << endl;
 
 		cout << endl << "Selecteaza optiunea: ";
 		cin >> optiune;
@@ -5465,7 +5465,7 @@ int main()
 	//		"3. Modificare rezervare" << endl <<
 	//		"4. Administrare cinema" << endl <<
 	//		"5. Cont client" << endl <<
-	//		"0. Exit" << endl;
+	//		"0. Inchidere" << endl;
 
 	//	cout << endl << "Selecteaza optiunea: ";
 
@@ -5780,5 +5780,3 @@ int main()
 		//cout << r.getNrBileteRezervate();
 
 }
-
-
