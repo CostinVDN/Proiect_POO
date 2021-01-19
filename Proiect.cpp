@@ -3771,7 +3771,7 @@ Sala** administrareSala(Sala** vectorSala)
 
 					cin >> idSala;
 
-					while (cin.fail() || nrSaliNoi <= 0)
+					while (cin.fail() || idSala <= 0)
 					{
 
 						cin.clear();
