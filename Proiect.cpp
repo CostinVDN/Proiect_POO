@@ -1311,7 +1311,7 @@ istream& operator>> (istream& in, Film& f)
 			cout << "Sali existente: ";
 			for (int i = 0; i < dimensiuneVector; i++)
 			{
-				cout << "ID " << vectorSali[i]->getIdSala() << " - " << vectorSali[i]->getDenumireSala();
+				cout << "ID " << vectorSali[i]->getIdSala() << " - " << vectorSali[i]->getDenumireSala() << " ";
 			}
 		}
 
@@ -1321,6 +1321,20 @@ istream& operator>> (istream& in, Film& f)
 		do
 		{
 			in >> f.idSala;
+			while (in.fail() || f.idSala <= 0)
+			{
+
+				in.clear();
+				in.ignore(numeric_limits<streamsize>::max(), '\n');
+				cout << "Selectati un ID valid : ";
+
+				in >> f.idSala;
+
+			}
+
+			in.clear();
+			in.ignore(numeric_limits<streamsize>::max(), '\n');
+
 			for (int i = 0; i < dimensiuneVector; i++)
 			{
 				if (f.idSala == vectorSali[i]->getIdSala())
@@ -1399,7 +1413,7 @@ istream& operator>> (istream& in, Film& f)
 			cout << "Introdu numarul proiectiilor pe zi ";
 			in >> f.nrProiectiiZi;
 
-			while (in.fail() || f.nrProiectiiZi <= 0 || f.nrProiectiiZi > 4)
+			while (in.fail() || f.nrProiectiiZi <= 0 || f.nrProiectiiZi > 3)
 			{
 
 				in.clear();
@@ -3402,18 +3416,18 @@ istream& operator>>(istream& in, Rezervare& r)
 
 	fluxSerializare.close();
 
-	fluxSerializare1.open("clienti.bin", ios::binary);
-	fluxSerializare1.write((char*)&dimensiuneVector1, sizeof(dimensiuneVector1));
+	//fluxSerializare1.open("clienti.bin", ios::binary);
+	//fluxSerializare1.write((char*)&dimensiuneVector1, sizeof(dimensiuneVector1));
 
-	for (int i = 0; i < dimensiuneVector1; i++)
-	{
-		if (vectorClienti[i] != nullptr)
-		{
-			vectorClienti[i]->serializeClient(fluxSerializare, *vectorClienti[i]);
-		}
-	}
+	//for (int i = 0; i < dimensiuneVector1; i++)
+	//{
+	//	if (vectorClienti[i] != nullptr)
+	//	{
+	//		vectorClienti[i]->serializeClient(fluxSerializare, *vectorClienti[i]);
+	//	}
+	//}
 
-	fluxSerializare1.close();
+	//fluxSerializare1.close();
 
 	return in;
 }
@@ -3710,7 +3724,7 @@ Sala** administrareSala(Sala** vectorSala)
 				{
 					cin >> idSala;
 
-					while (cin.fail())
+					while (cin.fail() || idSala <= 0)
 					{
 
 						cin.clear();
@@ -4078,6 +4092,50 @@ Film** administrare_filme(Film** lista_filme)
 					cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
 					exista_idfilm = false;
+
+					// Se sterg datele despre filmul existent pentru a se inregistra noile proiectii
+					for (int indx = 0; indx < nr_filme; indx++)
+					{
+
+						if (lista_filme[indx]->getIdFilm() == IDFilm)
+						{
+
+
+							//Se incarca datele pentru sali - odata cu filmul se va setrge si id-ul filmului din program
+							ifstream fluxDeserializare;
+							ofstream fluxSerializare;
+							Sala** vectorSali = nullptr;
+							int dimensiuneVector = 0;
+
+							fluxDeserializare.open("sala.bin", ios::_Nocreate | ios::binary);
+							fluxDeserializare.read((char*)&dimensiuneVector, sizeof(dimensiuneVector));
+							vectorSali = new Sala * [dimensiuneVector];
+
+							for (int i = 0; i < dimensiuneVector; i++)
+							{
+								vectorSali[i] = new Sala();
+								vectorSali[i]->deserializareSala(fluxDeserializare, *vectorSali[i]);
+							}
+							fluxDeserializare.close();
+
+							//Se sterge filmul din programul salii
+							vectorSali[lista_filme[indx]->getIdSala() - 1]->stergeFilm(IDFilm);
+
+							// Se actualizaeaza datele in fisier
+							fluxSerializare.open("sala.bin", ios::binary);
+							fluxSerializare.write((char*)&dimensiuneVector, sizeof(dimensiuneVector));
+
+							for (int i = 0; i < dimensiuneVector; i++)
+							{
+								if (vectorSali[i] != nullptr)
+								{
+									vectorSali[i]->serializareSala(fluxSerializare, *vectorSali[i]);
+								}
+							}
+
+							fluxSerializare.close();
+						}
+					}
 
 					for (int indx = 0; indx < nr_filme; indx++)
 					{
@@ -5280,17 +5338,13 @@ Client** administrare_clienti(Client** lista_clienti)
 
 int main()
 {
-	//Sala s;
-	//s.getOrarSala();
-	//s.setOrarSala(3, 12);
-	//s.getOrarSala();
 
 	Sala** lista_sali = nullptr;
 	Film** lista_filme = nullptr;
 	Client** lista_clienti = nullptr;
 	Bilet** lista_bilete = nullptr;
 	Rezervare** lista_rezervari = nullptr;
-	//int nr_sali, nr_bilete, nr_clienti, nr_rezervari;
+	int nr_sali{ 0 }, nr_filme{ 0 }, nr_bilete{ 0 }, nr_clienti{ 0 }, nr_rezervari{ 0 };
 
 	string username = "administrator";
 	string password = "parola";
@@ -5300,10 +5354,31 @@ int main()
 	int loc = 0;
 	int optiune;
 
-
-
 	do
 	{
+
+
+		//Se citesc nr. de sali - daca nu sunt sali nu se pot inregistra filme
+		ifstream fluxDeserializare;
+		fluxDeserializare.open("sala.bin", ios::_Nocreate | ios::binary);
+		fluxDeserializare.read((char*)&nr_sali, sizeof(nr_sali));
+		fluxDeserializare.close();
+
+		//Se citesc nr. de filme - daca nu sunt fil;me nu se pot inregistra bilete
+		fluxDeserializare.open("film.bin", ios::_Nocreate | ios::binary);
+		fluxDeserializare.read((char*)&nr_filme, sizeof(nr_filme));
+		fluxDeserializare.close();
+
+		//Se citesc nr. de bilete - daca nu sunt bilete nu se pot inregistra rezervarile si clientii
+		fluxDeserializare.open("bilet.bin", ios::_Nocreate | ios::binary);
+		fluxDeserializare.read((char*)&nr_bilete, sizeof(nr_bilete));
+		fluxDeserializare.close();
+
+		//Se citesc nr. de clienti - daca nu sunt clienti nu se pot inregistra rezervari
+		fluxDeserializare.open("clienti.bin", ios::_Nocreate | ios::binary);
+		fluxDeserializare.read((char*)&nr_clienti, sizeof(nr_clienti));
+		fluxDeserializare.close();
+
 		cout << endl <<
 			"==== Meniu: ====" << endl << endl <<
 			"1. Administrare sali" << endl <<
@@ -5335,16 +5410,44 @@ int main()
 			administrareSala(lista_sali);
 			break;
 		case 2:
-			administrare_filme(lista_filme);
+			if (nr_sali < 1)
+			{
+				cout << "Trebuie adaugata cel putin o sala pentru a putea inregistra un film";
+			}
+			else
+			{
+				administrare_filme(lista_filme);
+			}
 			break;
 		case 3:
-			administrare_bilete(lista_bilete);
+			if (nr_filme < 1)
+			{
+				cout << "Trebuie adaugat cel putin un film pentru a putea inregistra bilete";
+			}
+			else
+			{
+				administrare_bilete(lista_bilete);
+			}
 			break;
 		case 4:
-			administrare_clienti(lista_clienti);
+			if (nr_bilete < 1)
+			{
+				cout << "Trebuie adaugat cel putin un bilet pentru a putea inregistra un client";
+			}
+			else
+			{
+				administrare_clienti(lista_clienti);
+			}
 			break;
 		case 5:
-			administrare_rezervari(lista_rezervari);
+			if (nr_clienti <1)
+			{
+				cout << "Trebuie adaugat cel putin un client pentru a putea inregistra o rezervare";
+			}
+			else
+			{
+				administrare_rezervari(lista_rezervari);
+			}
 			break;
 		case 6:
 			break;
